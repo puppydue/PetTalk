@@ -1,3 +1,35 @@
+Tôi đang làm việc trong dự án Django có tên **PetTalk**, cấu trúc project như sau:
+
+PetTalk/
+├── manage.py
+├── PetTalk/ (project chính: settings, urls, views)
+├── forum/ (app chính để test layout base)
+├── templates/ (chứa base.html, home.html)
+└── static/css/base.css
+
+Hiện dự án đã có:
+- `base.html`: giao diện tổng thể của website (header, sidebar, layout 3 cột, kế thừa được cho các app khác)
+- `base.css`: stylesheet toàn cục, đã chỉnh:
+  - màu nền trang thành `#FFF2CC`
+  - giãn cách giữa các ô sidebar bằng `margin-bottom`
+  - giữ layout responsive (ẩn sidebar ở màn hình nhỏ)
+- `forum` app có:
+  - `views.py` với view `post_list` dùng để test base layout
+  - `urls.py` với path `''` trỏ đến `post_list`
+  - `templates/forum/post_list.html` kế thừa từ base.html (chỉ có nội dung trống để kiểm tra layout)
+- `settings.py` đã được cấu hình:
+  - `TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']`
+  - `STATICFILES_DIRS = [BASE_DIR / 'static']`
+  - Đã thêm `'forum'` vào `INSTALLED_APPS`
+- `urls.py` trong project chính đã `include('forum.urls')`
+- Đã test thành công tại `http://127.0.0.1:8000/forum/`
+  → Hiển thị giao diện PetTalk với header, sidebar, màu nền vàng nhạt chuẩn
+
+Mục tiêu tiếp theo: mở rộng layout này cho các app khác (events, badges, moderation, accounts),  
+mỗi app sẽ có file `urls.py`, `views.py`, `templates/<app>/...` kế thừa `base.html`.
+
+👉 ChatGPT, hãy tiếp tục hỗ trợ tôi dựa trên setup Django này (không cần tạo lại base hoặc cấu trúc).
+
 # 👥 TEAM_GUIDE.md — Hướng dẫn làm việc nhóm với Git/GitHub cho PetTalk
 
 > Dành cho **người mới hoàn toàn**. Làm theo tuần tự là chạy được ngay.  
