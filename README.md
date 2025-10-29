@@ -1,11 +1,19 @@
 Tôi đang làm việc trong dự án Django có tên **PetTalk**, cấu trúc project như sau:
 
+```
 PetTalk/
 ├── manage.py
-├── PetTalk/ (project chính: settings, urls, views)
-├── forum/ (app chính để test layout base)
-├── templates/ (chứa base.html, home.html)
-└── static/css/base.css
+│
+├── PetTalk/              # Project chính (chứa settings, urls, views)
+│
+├── forum/                # App chính để test layout base
+│
+├── templates/            # Chứa file HTML (base.html, ...)
+│
+└── static/
+    └── css/
+        └── base.css
+```
 
 Hiện dự án đã có:
 - `base.html`: giao diện tổng thể của website (header, sidebar, layout 3 cột, kế thừa được cho các app khác)
