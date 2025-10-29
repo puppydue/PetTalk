@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}PetTalk{% endblock %}</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Base CSS -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="logo" onclick="window.location.href='/'">
+      <i class="fa-solid fa-paw"></i> PetTalk
+    </div>
+    <div class="user-bar">
+      <span>Minh Nguyen</span>
+      <i class="fa-solid fa-user" onclick="window.location.href='/profile/'"></i>
+    </div>
+  </header>
+
+  <!-- LAYOUT -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="nav-item active" onclick="window.location.href='/forum/'">
+        <i class="fa-solid fa-comments"></i> Forum
+      </div>
+      <div class="nav-item" onclick="window.location.href='/events/'">
+        <i class="fa-solid fa-calendar-days"></i> Sự kiện
+      </div>
+      <div class="nav-item" onclick="window.location.href='/badges/'">
+        <i class="fa-solid fa-trophy"></i> Điểm thưởng
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Right panel -->
+    <aside class="right-panel">
+      {% block right %}{% endblock %}
+    </aside>
+  </div>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
