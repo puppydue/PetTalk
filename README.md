@@ -93,20 +93,20 @@ python manage.py runserver
 - Mỗi tính năng / task = **1 nhánh riêng**.
 - Mẫu tên nhánh: `<tên-người>/<module>-<mô-tả-ngắn>`  
   Ví dụ:
-  - `nam/badges-profile`
-  - `minh/forum-post-crud`
-  - `khanh/auth-react`
-  - `hoan/moderation-report`
-  - `hung/event-registration`
+  - `nam`
+  - `minh`
+  - `khanh`
+  - `hoan`
+  - `hung`
 
 Tạo nhánh mới từ `main`:
 ```bash
-git checkout main
-git pull
-git checkout -b minh/forum-post-crud
+git checkout main :Di chuyển đến nhánh Main
+git pull: Lấy đồng bộ file từ hệ thống xuống local
+git checkout -b minh: tạo nhánh mới tên là "minh"
 ```
 
-Kiểm tra nhánh hiện tại:
+Kiểm tra nhánh hiện tại đang ở nhánh nào:
 ```bash
 git branch
 ```
