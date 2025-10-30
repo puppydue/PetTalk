@@ -1,0 +1,424 @@
+/* ====== TỔNG THỂ LẠI MÀU ====== */
+body {
+  background: #fff8ed; /* nền sáng vàng nhẹ */
+}
+
+/* ====== COMPOSER ====== */
+.composer {
+  background: #ffffff;
+  border: 1.5px solid #f7dba7;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+.composer:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+/* ====== NÚT ====== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn.solid {
+  background: #003459;
+  color: #fff;
+  border: 1px solid #003459;
+}
+.btn.solid:hover {
+  background: #034d80;
+  box-shadow: 0 2px 8px rgba(0,52,89,0.3);
+}
+.btn:not(.solid):not(.danger) {
+  background: #fff;
+  border: 1px solid #003459;
+  color: #003459;
+}
+.btn:not(.solid):hover {
+  background: #003459;
+  color: #fff;
+}
+.btn.danger {
+  background: #fff;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+}
+.btn.danger:hover {
+  background: #fee2e2;
+}
+
+/* ====== FILTER DROPDOWN ====== */
+.topic-filter-container {
+  position: relative;
+  display: inline-block;
+  margin: 14px 0 24px;
+}
+.topic-dropdown-btn {
+  background: #ffffff;
+  border: 1px solid #f2e3b3;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  color: #003459;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.topic-dropdown-btn:hover {
+  background: #f7dba7;
+  transform: translateY(-1px);
+}
+.topic-filter {
+  display: none;
+  position: absolute;
+  top: 120%;
+  left: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #f2e3b3;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  padding: 14px;
+  z-index: 10;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: max-content;
+}
+.topic-filter.show {
+  display: flex;
+}
+
+/* ====== CHIP STYLE ====== */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #f2e3b3;
+  color: #003459;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.chip:hover {
+  background: #f7dba7;
+  transform: scale(1.05);
+}
+.chip.active {
+  background: #003459;
+  color: #fff;
+  border-color: #003459;
+  box-shadow: 0 2px 8px rgba(0,52,89,0.3);
+}
+
+/* ====== CARD BÀI VIẾT ====== */
+.post {
+  background: #ffffff;
+  border: 1px solid #f2e3b3;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+  transition: all 0.2s ease;
+}
+.post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(0,0,0,0.08);
+}
+
+/* ====== RIGHT PANEL ====== */
+.panel {
+  background: #ffffff;
+  border: 1px solid #f2e3b3;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+/* === COMPOSER AREA FIX === */
+.composer textarea {
+  width: 100%;
+  height: 80px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  resize: none;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  color: #0f172a;
+  transition: all 0.2s ease;
+}
+.composer textarea:focus {
+  border-color: #003459;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.15);
+  outline: none;
+}
+.composer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* === BADGE FIX === */
+.badge {
+  background: linear-gradient(90deg, #f7dba7, #fff2cc);
+  color: #7c3b00;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 1px 6px rgba(247,219,167,0.4);
+  transition: all 0.2s ease;
+}
+.badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(247,219,167,0.6);
+}
+
+/* === VOTE BUTTONS FIX === */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.vote-btn {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #003459;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.vote-btn:hover {
+  background: #f7dba7;
+  border-color: #f7dba7;
+  transform: translateY(-1px);
+}
+.vote-btn.active.up {
+  background: #fde68a;
+  border-color: #facc15;
+  color: #b45309;
+  box-shadow: 0 2px 6px rgba(250,204,21,0.4);
+}
+.vote-btn.active.down {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #475569;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+.vote-count {
+  font-weight: 600;
+  color: #003459;
+  font-size: 15px;
+  min-width: 28px;
+  text-align: center;
+}
+
+/* Hiệu ứng flash nhỏ khi vote */
+.vote-count.flash {
+  animation: flashEffect 0.3s ease;
+}
+@keyframes flashEffect {
+  0% { color: #003459; }
+  50% { color: #f59e0b; transform: scale(1.3); }
+  100% { color: #003459; transform: scale(1); }
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 600px;
+  margin: 10px 0 20px;
+}
+.search-bar input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  font-size: 15px;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+.search-bar input:focus {
+  outline: none;
+  border-color: #003459;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.15);
+}
+
+/* --- Event Panel Highlight --- */
+.panel.events {
+  background: linear-gradient(180deg, #fffdf7, #fef9e6);
+  border: 2px solid #f7dba7;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 52, 89, 0.1);
+  transition: all 0.3s ease;
+}
+
+.panel.events:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0, 52, 89, 0.15);
+}
+
+.panel.events h4 {
+  font-weight: 700;
+  font-size: 18px;
+  color: #003459;
+  margin-bottom: 10px;
+}
+
+.event {
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s ease;
+}
+.event:last-child {
+  border-bottom: none;
+}
+.event:hover {
+  background: rgba(247, 219, 167, 0.2);
+  border-radius: 8px;
+  padding-left: 8px;
+  cursor: pointer;
+}
+
+.event small {
+  display: block;
+  color: #475569;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* --- USER INFO (giống post_detail) --- */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.user-info .avatar {
+  background: #003459;
+  color: #fff;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 52, 89, 0.2);
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.user-meta .username {
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  color: #003459;
+  gap: 6px;
+}
+
+.user-meta .meta {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* --- BADGE giống post_detail --- */
+.badge {
+  background: #f7dba7;
+  color: #003459;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.user-meta .username {
+  font-weight: 700;
+  color: #003459;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-meta .meta {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* --- FIX: Chủ đề nổi bật căn đều --- */
+.topic-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  justify-content: flex-start;
+  margin-top: 12px;
+}
+
+.topic-chips .chip.small {
+  flex: 1 1 calc(50% - 12px); /* mỗi hàng 2 ô đều nhau */
+  text-align: center;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+/* --- FIX: Composer canh vừa trong layout --- */
+.composer {
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 18px;
+  background: #ffffff;
+  border: 1.5px solid #f7dba7;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.composer textarea {
+  width: 100%;
+  resize: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #0f172a;
+  background: #fff;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.composer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
