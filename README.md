@@ -68,7 +68,7 @@ git config --global credential.helper store
 cd D:\5. Junior\Lập trình web\Dự án\PetTalk\GitHub
 
 # Clone project
-git clone https://github.com/<org-or-user>/PetTalk.git
+git clone https://github.com/puppydue/PetTalk.git
 
 # Vào folder dự án
 cd PetTalk
