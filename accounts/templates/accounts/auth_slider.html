@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetTalk - Đăng nhập / Đăng ký</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="container" id="container">
+      <!-- Đăng nhập -->
+      <div class="form-container sign-in">
+        <form method="post" action="">
+          {% csrf_token %}
+          <h2>Đăng nhập</h2>
+          {{ login_form.username }}
+          {{ login_form.password }}
+          <a href="{% url 'forgot_password' %}">Quên mật khẩu?</a>
+          <button class="btn" type="submit" name="login">Đăng nhập</button>
+        </form>
+      </div>
+
+      <!-- Đăng ký -->
+      <div class="form-container sign-up">
+        <form method="post" action="">
+          {% csrf_token %}
+          <h2>Tạo tài khoản mới</h2>
+          {{ register_form.username }}
+          {{ register_form.email }}
+          {{ register_form.password1 }}
+          {{ register_form.password2 }}
+          <button class="btn" type="submit" name="register">Đăng ký</button>
+        </form>
+      </div>
+
+      <!-- Overlay -->
+      <div class="overlay-container">
+        <div class="overlay">
+          <div class="overlay-panel overlay-left">
+            <h2>🐾 Bạn đã có tài khoản?</h2>
+            <p>Đăng nhập để kết nối cùng cộng đồng yêu thú cưng của PetTalk!</p>
+            <button class="btn" id="login">Đăng nhập</button>
+          </div>
+          <div class="overlay-panel overlay-right">
+            <h2>🐾 Chưa có tài khoản?</h2>
+            <p>Tham gia PetTalk ngay để chia sẻ & kết nối với mọi người!</p>
+            <button class="btn" id="register">Đăng ký</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const registerButton = document.getElementById('register');
+    const loginButton = document.getElementById('login');
+    const container = document.getElementById('container');
+    registerButton.addEventListener('click', () => container.classList.add('right-panel-active'));
+    loginButton.addEventListener('click', () => container.classList.remove('right-panel-active'));
+  </script>
+</body>
+</html>
