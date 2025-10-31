@@ -5,73 +5,20 @@
 
 {% block extra_css %}
 <style>
-    /* ====== LAYOUT CHÍNH ====== */
-.forum-layout {
-max-width: 1400px;
-margin: 0 auto;
+/* ĐÃ XÓA BỎ: .forum-layout, .left-panel, và .right-panel (phần CSS cho container)
+  vì base.html đã xử lý layout chính.
+  Chúng ta CHỈ GIỮ LẠI CSS cho nội dung bên trong.
+*/
 
-  display: grid;
-  grid-template-columns: 240px 1fr 300px; /* trái - giữa - phải */
-  gap: 32px;
-  padding: 20px 40px;
-  background: #fff8ed;
-}
-
-/* ====== CỘT TRÁI ====== */
-.left-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.menu-box {
-  background: #fff;
-  border: 1px solid #f2e3b3;
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #003459;
-  font-weight: 500;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.menu-item:hover {
-  background: #f7dba7;
-}
-.menu-item.active {
-  background: #f7dba7;
-  font-weight: 600;
-}
-
-/* ====== CỘT PHẢI ====== */
-.right-panel {
-  position: sticky;
-  top: 90px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* ====== LAYOUT 3 CỘT ====== */
-.forum-layout {
-  display: grid;
-  grid-template-columns: 1fr 300px; /* Giữa + phải */
-  gap: 30px;
-  background: #fff8ed;
-  padding: 20px 40px;
-}
-
-/* ====== DANH SÁCH BÀI VIẾT ====== */
+/* ====== DANH SÁCH BÀI VIẾT (CỘT GIỮA) ====== */
 .post-list {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  /* Thêm một chút padding để không bị dính sát lề */
+  padding: 20px 0;
+  max-width: 800px; /* Giới hạn độ rộng cột giữa cho dễ đọc */
+  margin: 0 auto; /* Căn giữa post-list nếu nó hẹp hơn main-content */
 }
 
 /* ====== KHUNG BÀI VIẾT ====== */
@@ -233,14 +180,12 @@ margin: 0 auto;
   color: #003459;
 }
 
-/* ====== CỘT PHẢI ====== */
-.right-panel {
-  position: sticky;
-  top: 90px;
-  height: fit-content;
+/* ====== CSS CHO NỘI DUNG CỘT PHẢI ====== */
+.right-panel-content {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding: 20px 0; /* Thêm padding cho đồng bộ */
 }
 .panel {
   background: #fff;
@@ -285,109 +230,241 @@ margin: 0 auto;
   font-size: 13px;
 }
 
+/* ====== CSS MỚI CHO NÚT BÌNH LUẬN ====== */
+.vote-btn.with-count {
+  width: auto; /* Cho phép nút tự co giãn theo nội dung */
+  padding: 0 12px; /* Thêm padding ngang cho đẹp */
+  gap: 8px; /* Khoảng cách giữa icon và số lượng */
+}
+
+.comment-count-inside {
+  font-weight: 600;
+  font-size: 15px;
+  color: #003459; /* Đồng bộ màu với vote-count */
+}
+
+/* CSS cho trạng thái đã vote (thêm bởi Javascript) */
+.vote-btn.voted {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #f7dba7; /* Giữ màu vàng khi đã vote */
+  border-color: #f7dba7;
+}
+    /* ... (Toàn bộ CSS cũ của bạn giữ nguyên) ... */
+
+/* ====== CSS CHO THANH TÌM KIẾM ====== */
+.search-form {
+  display: flex;
+  width: 100%;
+}
+.search-input {
+  flex-grow: 1; /* Input chiếm phần lớn không gian */
+  border: 2px solid #e0e0e0;
+  padding: 12px 16px;
+  font-size: 15px;
+  border-radius: 10px 0 0 10px; /* Bo góc trái */
+  border-right: none; /* Bỏ border phải */
+  outline: none;
+  transition: border-color 0.2s;
+  background: #fff;
+}
+.search-input:focus {
+  border-color: #003459; /* Highlight khi focus */
+}
+.search-button {
+  border: 2px solid #003459;
+  background: #003459;
+  color: #fff;
+  padding: 0 18px;
+  border-radius: 0 10px 10px 0; /* Bo góc phải */
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.search-button:hover {
+  background: #005086; /* Màu đậm hơn khi hover */
+}
+
+/* ====== DANH SÁCH BÀI VIẾT (CỘT GIỮA) ====== */
+/* ... (Phần CSS còn lại của bạn) ... */
 </style>
+
 {% endblock %}
 
+
 {% block content %}
-<div class="forum-layout">
-
-  <!-- ======= CỘT GIỮA: DANH SÁCH BÀI VIẾT ======= -->
-  <div class="post-list">
-    <h2 style="margin-bottom: 10px; color:#003459;">🐾 Bài viết nổi bật trên PetTalk</h2>
-
-    {% for post in posts %}
-    <div class="post-card">
-      <!-- USER INFO -->
-      <div class="user-info">
-        <div class="avatar">{{ post.username.username|slice:":1"|upper }}</div>
-        <div class="user-meta">
-          <div class="username">
-            {{ post.username.username }}
-            <span class="badge">Cộng tác viên Spa</span>
-          </div>
-          <div class="meta">{{ post.created_at|date:"d/m/Y H:i" }}</div>
-        </div>
-      </div>
-
-      <!-- NỘI DUNG BÀI -->
-      <div class="post-title">{{ post.title }}</div>
-      <div class="post-content">{{ post.content }}</div>
-
-      {% if post.images.all %}
-      <div class="post-images">
-        {% for img in post.images.all %}
-          <img src="{{ img.image.url }}" alt="Ảnh bài viết">
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <!-- NÚT HÀNH ĐỘNG -->
-      <div class="actions">
-        <button class="vote-btn up"><i class="fa-solid fa-thumbs-up"></i></button>
-        <span class="vote-count">{{ post.upvotes }}</span>
-        <button class="vote-btn down"><i class="fa-solid fa-thumbs-down"></i></button>
-        <span class="vote-count">{{ post.downvotes }}</span>
-        <button class="vote-btn comment-btn"><i class="fa-regular fa-comment"></i></button>
-        <button class="btn-report"><i class="fa-solid fa-flag"></i> Báo cáo</button>
-      </div>
-
-      <!-- FORM BÌNH LUẬN -->
-      <div class="comment-form">
-        <textarea placeholder="Viết bình luận..."></textarea>
-        <button>Đăng</button>
-      </div>
-
-      <!-- DANH SÁCH BÌNH LUẬN -->
-      {% if post.comments.all %}
-      <div style="margin-top:10px;">
-        {% for cmt in post.comments.all %}
-        <div class="comment-box">
-          <strong>{{ cmt.username.username }}</strong>: {{ cmt.content }}
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
-    {% empty %}
-    <p>Chưa có bài viết nào được đăng.</p>
-    {% endfor %}
+<div class="post-list">
+    <div class="search-bar-container">
+    <form action="" method="GET" class="search-form">
+      <input type="text" name="q" placeholder="Tìm kiếm bài viết theo tiêu đề..." class="search-input" value="{{ request.GET.q | default:'' }}">
+      <button type="submit" class="search-button">
+        <i class="fa-solid fa-search"></i>
+      </button>
+    </form>
   </div>
+  <h2 style="margin-bottom: 10px; color:#003459;">🐾 Bài viết nổi bật trên PetTalk</h2>
 
-  <!-- ======= CỘT PHẢI: PANEL ======= -->
-  <aside class="right-panel">
-    <div class="panel">
-      <h4>🔥 Chủ đề nổi bật</h4>
-      <div class="chip">Huấn luyện</div>
-      <div class="chip">Chăm sóc</div>
-      <div class="chip">Dinh dưỡng</div>
-      <div class="chip">Cấp cứu</div>
-    </div>
+  {% for post in posts %}
+  <div class="post-card">
 
-    <div class="panel">
-      <h4>📅 Sự kiện sắp diễn ra</h4>
-      <div class="event">
-        <strong>Workshop Grooming</strong>
-        <small>11/11/2025</small>
-      </div>
-      <div class="event">
-        <strong>Pet Adoption Day</strong>
-        <small>25/11/2025</small>
+    <div class="user-info">
+      <div class="avatar">{{ post.username.username|slice:":1"|upper }}</div>
+      <div class="user-meta">
+        <div class="username">
+          {{ post.username.username }}
+          <span class="badge">Cộng tác viên Spa</span>
+        </div>
+        <div class="meta">{{ post.created_at|date:"d/m/Y H:i" }}</div>
       </div>
     </div>
-  </aside>
 
+    <div class="post-title">{{ post.title }}</div>
+    <div class="post-content">{{ post.content }}</div>
+
+    {% if post.images.all %}
+    <div class="post-images">
+      {% for img in post.images.all %}
+        <img src="{{ img.image.url }}" alt="Ảnh bài viết">
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="actions">
+      <button class="vote-btn up"><i class="fa-solid fa-thumbs-up"></i></button>
+      <span class="vote-count">{{ post.upvotes }}</span>
+
+      <button class="vote-btn down"><i class="fa-solid fa-thumbs-down"></i></button>
+      <span class="vote-count">{{ post.downvotes }}</span>
+
+      <button class="vote-btn comment-btn with-count">
+        <i class="fa-regular fa-comment"></i>
+        <span class="comment-count-inside">{{ post.comments.all|length }}</span>
+      </button>
+
+      <button class="btn-report"><i class="fa-solid fa-flag"></i> Báo cáo</button>
+    </div>
+
+    <div class="comment-form">
+      <textarea placeholder="Viết bình luận..."></textarea>
+      <button>Đăng</button>
+    </div>
+
+    {% if post.comments.all %}
+    <div style="margin-top:10px;">
+      {% for cmt in post.comments.all %}
+      <div class="comment-box">
+        <strong>{{ cmt.username.username }}</strong>: {{ cmt.content }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+  {% empty %}
+  <p>Chưa có bài viết nào được đăng.</p>
+  {% endfor %}
 </div>
 {% endblock %}
 
+
+{% block right %}
+<div class="right-panel-content">
+  <div class="panel">
+    <h4>🔥 Chủ đề nổi bật</h4>
+    <div class="chip">Huấn luyện</div>
+    <div class="chip">Chăm sóc</div>
+    <div class="chip">Dinh dưỡng</div>
+    <div class="chip">Cấp cứu</div>
+  </div>
+
+  <div class="panel">
+    <h4>📅 Sự kiện sắp diễn ra</h4>
+    <div class="event">
+      <strong>Workshop Grooming</strong>
+      <small>11/11/2025</small>
+    </div>
+    <div class="event">
+      <strong>Pet Adoption Day</strong>
+      <small>25/11/2025</small>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
 {% block extra_js %}
 <script>
-// Toggle hiện/ẩn form bình luận
 document.addEventListener("click", e => {
-  if (e.target.closest(".comment-btn")) {
-    const postCard = e.target.closest(".post-card");
-    const form = postCard.querySelector(".comment-form");
-    form.style.display = form.style.display === "block" ? "none" : "block";
+
+  // --- 1. XỬ LÝ TOGGLE FORM BÌNH LUẬN ---
+  const commentBtn = e.target.closest(".comment-btn");
+  if (commentBtn) {
+    // Tìm thẻ .post-card cha gần nhất
+    const postCard = commentBtn.closest(".post-card");
+    if (postCard) {
+      const form = postCard.querySelector(".comment-form");
+      if (form) {
+        // Toggle (hiện/ẩn) form
+        form.style.display = form.style.display === "block" ? "none" : "block";
+      }
+    }
   }
+
+  // --- 2. XỬ LÝ UPVOTE ---
+  const upvoteBtn = e.target.closest(".vote-btn.up");
+  if (upvoteBtn) {
+    // Kiểm tra xem đã vote chưa (bằng class 'voted')
+    if (upvoteBtn.classList.contains('voted')) {
+      return; // Nếu đã vote thì không làm gì cả
+    }
+
+    // Tìm span đếm số ngay bên cạnh nút upvote
+    const countSpan = upvoteBtn.nextElementSibling;
+
+    if (countSpan && countSpan.classList.contains("vote-count")) {
+      // Lấy số hiện tại, chuyển sang số nguyên, và + 1
+      let currentVotes = parseInt(countSpan.textContent, 10);
+      countSpan.textContent = currentVotes + 1;
+
+      // Thêm class 'voted' để đánh dấu và vô hiệu hóa
+      upvoteBtn.classList.add('voted');
+
+      // Vô hiệu hóa luôn nút downvote
+      const actions = upvoteBtn.closest('.actions');
+      const downvoteBtn = actions.querySelector('.vote-btn.down');
+      if (downvoteBtn) {
+        downvoteBtn.classList.add('voted');
+      }
+    }
+  }
+
+  // --- 3. XỬ LÝ DOWNVOTE ---
+  const downvoteBtn = e.target.closest(".vote-btn.down");
+  if (downvoteBtn) {
+    // Kiểm tra xem đã vote chưa
+    if (downvoteBtn.classList.contains('voted')) {
+      return;
+    }
+
+    // Tìm span đếm số ngay bên cạnh nút downvote
+    const countSpan = downvoteBtn.nextElementSibling;
+
+    if (countSpan && countSpan.classList.contains("vote-count")) {
+      let currentVotes = parseInt(countSpan.textContent, 10);
+      countSpan.textContent = currentVotes + 1;
+
+      // Đánh dấu và vô hiệu hóa
+      downvoteBtn.classList.add('voted');
+
+      // Vô hiệu hóa luôn nút upvote
+      const actions = downvoteBtn.closest('.actions');
+      const upvoteBtn = actions.querySelector('.vote-btn.up');
+      if (upvoteBtn) {
+        upvoteBtn.classList.add('voted');
+      }
+    }
+  }
+
 });
 </script>
 {% endblock %}
