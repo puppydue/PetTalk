@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% block title %}Danh sách sự kiện{% endblock %}
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="center-toast {{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+
+  <script>
+    // Tự động ẩn sau 3 giây
+    setTimeout(() => {
+      document.querySelectorAll('.center-toast').forEach(msg => {
+        msg.style.opacity = '0';
+        msg.style.transform = 'translate(-50%, -40%) scale(0.9)';
+      });
+    }, 3000);
+  </script>
+
+  <style>
+    .center-toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      background: #4caf50; /* màu xanh thành công */
+      color: white;
+      font-weight: 600;
+      padding: 14px 26px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+      z-index: 9999;
+      min-width: 360px;
+      transition: all 0.8s ease;
+      animation: fadeInPop 0.4s ease-out;
+    }
+
+    .center-toast.error { background: #f44336; }
+    .center-toast.warning { background: #ff9800; }
+
+    @keyframes fadeInPop {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+  </style>
+{% endif %}
+
+
+<div class="event-list">
+  <h2>🎉 Danh sách sự kiện</h2>
+
+ <!-- 🧍‍♂️ SỰ KIỆN CỦA TÔI -->
+<section class="my-events">
+  <h3>🧍‍♂️ Sự kiện của tôi</h3>
+  {% if su_kien_cua_toi %}
+    <div class="event-grid">
+      {% for e in su_kien_cua_toi %}
+        <div class="event-card my-event">
+          {% if e.image %}
+            <img src="{{ e.image.url }}" alt="{{ e.title }}">
+          {% endif %}
+          <h4>{{ e.title }}</h4>
+          <p>{{ e.description|truncatechars:80 }}</p>
+          <p><strong>Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
+          <p><strong>Trạng thái:</strong>
+            {% if e.status == 'pending' %}
+              <span class="status pending">⏳ Chờ phê duyệt</span>
+            {% elif e.status == 'approved' %}
+              <span class="status approved">✅ Đã phê duyệt</span>
+            {% else %}
+              <span class="status rejected">❌ Từ chối</span>
+            {% endif %}
+          </p>
+
+          {% if e.status == 'pending' %}
+            <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">✏️ Chỉnh sửa sự kiện</a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>💤 Bạn chưa tạo sự kiện nào.</p>
+  {% endif %}
+</section>
+
+
+  <!-- 🌍 DANH SÁCH SỰ KIỆN -->
+<section class="community-events">
+  <h3>🌍 Danh sách sự kiện</h3>
+
+  <!-- Hiển thị thông báo nếu có ?success hoặc ?cancel -->
+  {% if request.GET.success %}
+    <div id="flash-message" class="flash-message success">
+      ✅ Bạn đã đăng ký tham gia sự kiện thành công!
+    </div>
+  {% elif request.GET.cancel %}
+    <div id="flash-message" class="flash-message warning">
+      ❌ Bạn đã hủy đăng ký sự kiện thành công!
+    </div>
+  {% endif %}
+
+  {% if danh_sach_su_kien %}
+    <div class="event-grid">
+      {% for e in danh_sach_su_kien %}
+        <div class="event-card">
+          {% if e.image %}
+            <img src="{{ e.image.url }}" alt="{{ e.title }}">
+          {% endif %}
+          <h4>{{ e.title }}</h4>
+          <p>{{ e.description|truncatechars:80 }}</p>
+          <p><strong>Địa điểm:</strong> {{ e.location }}</p>
+          <p><strong>Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
+
+          <!-- ✅ Kiểm tra quyền / trạng thái -->
+          {% if e.creator == user %}
+            <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem danh sách người đăng ký</a>
+          {% elif user in e.participants.all %}
+            <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn">❌ Hủy đăng ký</a>
+
+          {% else %}
+            <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn">🐾 Đăng ký tham gia</a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Chưa có sự kiện nào được phê duyệt.</p>
+  {% endif %}
+</section>
+
+<!-- Popup message hiệu ứng -->
+<script>
+  setTimeout(() => {
+    const msg = document.getElementById("flash-message");
+    if (msg) msg.style.display = "none";
+  }, 3500);
+</script>
+
+<style>
+  .flash-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #4caf50;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 1000;
+    animation: fadeInOut 3.5s ease forwards;
+    text-align: center;
+    min-width: 360px;
+  }
+
+  .flash-message.warning {
+    background: #ff9800;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(-50%, -60%); }
+    10%, 90% { opacity: 1; transform: translate(-50%, -50%); }
+    100% { opacity: 0; transform: translate(-50%, -40%); }
+  }
+</style>
+
+
+</div>
+
+<style>
+.event-list {
+  padding: 20px;
+  background-color: #fff8e1;
+  border-radius: 16px;
+}
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+.event-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+.event-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+.status.pending { color: #ff9800; font-weight: 600; }
+.status.approved { color: #4caf50; font-weight: 600; }
+.status.rejected { color: #f44336; font-weight: 600; }
+.join-btn {
+  display: inline-block;
+  background: #003459;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+}
+.join-btn:hover {
+  background: #0056a3;
+}
+
+.edit-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #ffb84d, #ff9800);
+  color: white;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: 0.3s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+.edit-btn:hover {
+  background: linear-gradient(135deg, #ffa726, #fb8c00);
+  transform: translateY(-2px);
+}
+
+</style>
+
+<style>
+.cancel-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff6b6b, #ff4757);
+  color: #fff;
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+.cancel-btn:hover {
+  background: linear-gradient(135deg, #ff4757, #e84118);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+}
+</style>
+
+
+
+{% endblock %}

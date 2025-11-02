@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Đăng ký tham gia sự kiện{% endblock %}
+{% block content %}
+<div class="confirm-container">
+  <h2>🐾 Xác nhận đăng ký sự kiện</h2>
+
+  <div class="event-info">
+    <h3>{{ event.title }}</h3>
+    {% if event.image %}
+      <img src="{{ event.image.url }}" alt="{{ event.title }}">
+    {% endif %}
+    <p><strong>📅 Thời gian:</strong> {{ event.date|date:"d/m/Y H:i" }}</p>
+    <p><strong>📍 Địa điểm:</strong> {{ event.location }}</p>
+    <p><strong>📖 Mô tả:</strong> {{ event.description }}</p>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="buttons">
+      <button type="submit" class="confirm-btn">✅ Xác nhận đăng ký</button>
+      <a href="{% url 'danh_sach_su_kien' %}" class="cancel-btn">❌ Hủy</a>
+    </div>
+  </form>
+
+{% if show_success %}
+  <div id="flash-message" class="flash-message success">
+    ✅ Bạn đã đăng ký tham gia sự kiện thành công!
+  </div>
+
+  <script>
+    // Tự ẩn thông báo sau 3.5 giây
+    setTimeout(() => {
+      const msg = document.getElementById("flash-message");
+      if (msg) msg.style.display = "none";
+      // Sau đó tự động chuyển về danh sách sự kiện
+      window.location.href = "{% url 'danh_sach_su_kien' %}";
+    }, 3500);
+  </script>
+
+  <style>
+    .flash-message {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      background: #4caf50;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s ease;
+      z-index: 1000;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+{% endif %}
+
+</div>
+
+<style>
+.confirm-container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff8e1;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.event-info img {
+  width: 100%;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.confirm-btn {
+  background: #003459;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+.cancel-btn {
+  background: #ccc;
+  color: black;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.confirm-btn:hover { background: #00509e; }
+.cancel-btn:hover { background: #b5b5b5; }
+</style>
+{% endblock %}
+
