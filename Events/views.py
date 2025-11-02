@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Event
+from django.urls import reverse
 from .forms import EventForm
 
 # 1️⃣ Tạo sự kiện
@@ -69,7 +70,7 @@ def dang_ky_tham_gia(request, event_id):
 
     if request.method == 'POST':
         event.participants.add(request.user)
-        return redirect(f"/events/danh-sach/?success=1")
+        return redirect(f"{reverse('danh_sach_su_kien')}?success=1")
 
     return render(request, 'events/dang_ky_tham_gia.html', {'event': event})
 
