@@ -11,7 +11,7 @@
 
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
   background: #fff8ed; /* 🌟 nền vàng nhạt */
   color: var(--text);
 }
@@ -140,4 +140,58 @@ html { overflow-y: scroll; }
   .main-content {
     order: 2;
   }
+}
+/* ====== RIGHT PANEL CONTENT ====== */
+.right-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #f2e3b3;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.panel h4 {
+  font-weight: 700;
+  color: #003459;
+  margin-bottom: 10px;
+}
+
+.panel .chip {
+  background: #fff;
+  border: 1px solid #f2e3b3;
+  border-radius: 999px;
+  padding: 6px 12px;
+  color: #003459;
+  font-size: 13px;
+  margin: 4px;
+  display: inline-block;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.panel .chip:hover {
+  background: #f7dba7;
+}
+
+.event {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 8px 0;
+}
+.event:last-child {
+  border-bottom: none;
+}
+.event strong {
+  color: #003459;
+}
+.event small {
+  display: block;
+  color: #666;
+  font-size: 13px;
 }

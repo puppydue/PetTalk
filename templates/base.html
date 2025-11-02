@@ -7,7 +7,7 @@
   <title>{% block title %}PetTalk{% endblock %}</title>
 
   <!-- Google Fonts & Font Awesome -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <!-- Base CSS -->
@@ -49,16 +49,22 @@
   <div class="layout">
     <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="nav-item active" onclick="window.location.href='/forum/'">
+      <div class="nav-item {% if '/forum/' in request.path %}active{% endif %}"
+           onclick="window.location.href='/forum/'">
         <i class="fa-solid fa-comments"></i> Forum
       </div>
-      <div class="nav-item" onclick="window.location.href='/events/'">
+
+      <div class="nav-item {% if '/events/' in request.path %}active{% endif %}"
+           onclick="window.location.href='/events/'">
         <i class="fa-solid fa-calendar-days"></i> Sự kiện
       </div>
-      <div class="nav-item" onclick="window.location.href='/badges/'">
+
+      <div class="nav-item {% if '/badges/' in request.path %}active{% endif %}"
+           onclick="window.location.href='/badges/'">
         <i class="fa-solid fa-trophy"></i> Điểm thưởng
       </div>
     </aside>
+
 
     <!-- Main content -->
     <main class="main-content center-layout">
@@ -66,10 +72,32 @@
     </main>
 
     <!-- Right panel -->
-    <aside class="right-panel">
-      {% block right %}{% endblock %}
-    </aside>
+<aside class="right-panel">
+  {% block right %}
+  <div class="right-panel-content">
+    <div class="panel">
+      <h4>🔥 Chủ đề nổi bật</h4>
+      <div class="chip">Huấn luyện</div>
+      <div class="chip">Chăm sóc</div>
+      <div class="chip">Dinh dưỡng</div>
+      <div class="chip">Cấp cứu</div>
+    </div>
+
+    <div class="panel">
+      <h4>📅 Sự kiện sắp diễn ra</h4>
+      <div class="event">
+        <strong>Workshop Grooming</strong>
+        <small>11/11/2025</small>
+      </div>
+      <div class="event">
+        <strong>Pet Adoption Day</strong>
+        <small>25/11/2025</small>
+      </div>
+    </div>
   </div>
+  {% endblock %}
+</aside>
+
 
   {% block extra_js %}{% endblock %}
 </body>
