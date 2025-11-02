@@ -1,46 +1,35 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
-from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth import login
-from django.contrib.auth.models import Group
-from .forms import CustomLoginForm, CustomRegisterForm
 
-# LoginView đã được khai báo trong urls.py, không cần view login tự viết nữa
 
-def register(request):
+def auth_slider(request):
+    """Trang đăng nhập & đăng ký (chung giao diện)"""
+    login_form = AuthenticationForm()
+    register_form = UserCreationForm()
+
     if request.method == 'POST':
-        form = CustomRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            # Cho vào group "User" mặc định
-            group, _ = Group.objects.get_or_create(name='User')
-            user.groups.add(group)
-            messages.success(request, "Đăng ký thành công! Hãy đăng nhập.")
-            return redirect('accounts:login')
-        else:
-            messages.error(request, "Vui lòng kiểm tra lại thông tin đăng ký.")
-    else:
-        form = CustomRegisterForm()
-    # dùng lại giao diện slider, kích hoạt panel đăng ký bằng class
-    return render(request, 'accounts/auth_slider.html', {
-        'register_form': form,
-        'activate_signup': True,
+        if 'login' in request.POST:
+            login_form = AuthenticationForm(request, data=request.POST)
+            if login_form.is_valid():
+                user = login_form.get_user()
+                login(request, user)
+                messages.success(request, f"Chào mừng {user.username} quay lại!")
+                return redirect('forum:post_list')
+            else:
+                messages.error(request, "Sai tên đăng nhập hoặc mật khẩu.")
+
+        elif 'register' in request.POST:
+            register_form = UserCreationForm(request.POST)
+            if register_form.is_valid():
+                register_form.save()
+                messages.success(request, "Tạo tài khoản thành công! Hãy đăng nhập.")
+                return redirect('login')
+            else:
+                messages.error(request, "Vui lòng kiểm tra lại thông tin đăng ký.")
+
+    return render(request, 'registration/auth_slider.html', {
+        'login_form': login_form,
+        'register_form': register_form,
     })
-
-def forgot_password(request):
-    if request.method == 'POST':
-        form = PasswordResetForm(request.POST)
-        if form.is_valid():
-            form.save(
-                request=request,
-                use_https=request.is_secure(),
-                email_template_name='accounts/reset_email.html',
-            )
-            messages.success(request, "Đã gửi liên kết đặt lại mật khẩu.")
-            return redirect('accounts:login')
-    else:
-        form = PasswordResetForm()
-    return render(request, 'accounts/forgot_password.html', {'form': form})
-
-# Cho LoginView dùng được form tuỳ biến
-CustomLoginForm = CustomLoginForm

@@ -1,14 +1,16 @@
 /* ==== RESET & GLOBAL ==== */
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Poppins', sans-serif;
+body {
   background: #fff8ed;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
   color: #1e293b;
 }
 
-/* ==== WRAPPER - canh giữa toàn bộ ==== */
+/* ==== WRAPPER ==== */
 .auth-wrapper {
   display: flex;
   align-items: center;
@@ -62,21 +64,35 @@ form {
   width: 80%;
   max-width: 340px;
 }
+
 form h2 {
   color: #003459;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   font-size: 22px;
   font-weight: 700;
+  text-align: center;
 }
-form a {
-  color: #003459;
-  font-size: 13px;
-  margin: 10px 0;
-  text-decoration: none;
-}
-form a:hover { text-decoration: underline; }
 
-input {
+/* Django form fields (ul/p wrappers) */
+form ul, form p {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+form li {
+  list-style: none;
+  margin-bottom: 10px;
+}
+
+/* Label styling */
+form label {
+  display: none; /* ẩn label mặc định */
+}
+
+/* Input fields */
+form input {
   width: 100%;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
@@ -85,12 +101,23 @@ input {
   background: #f8fafc;
   outline: none;
   transition: 0.2s ease;
+  font-size: 14px;
 }
-input:focus {
+
+form input:focus {
   border-color: #003459;
   box-shadow: 0 0 0 3px rgba(0, 52, 89, 0.1);
 }
 
+form a {
+  color: #003459;
+  font-size: 13px;
+  margin: 10px 0;
+  text-decoration: none;
+}
+form a:hover { text-decoration: underline; }
+
+/* Button chính */
 .btn {
   border-radius: 10px;
   border: none;
@@ -123,6 +150,7 @@ input:focus {
 .container.right-panel-active .overlay-container {
   transform: translateX(-100%);
 }
+
 .overlay {
   background: #003459;
   color: #fff;
@@ -136,11 +164,12 @@ input:focus {
 .container.right-panel-active .overlay {
   transform: translateX(50%);
 }
+
 .overlay-panel {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* canh giữa tuyệt đối */
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -150,16 +179,9 @@ input:focus {
   height: auto;
   padding: 0 60px;
 }
-.overlay-left {
-  left: 25%; /* dịch đúng nửa vùng xanh */
-  transform: translate(-50%, -50%);
-}
 
-.overlay-right {
-  left: 75%;
-  transform: translate(-50%, -50%);
-}
-
+.overlay-left { left: 25%; transform: translate(-50%, -50%); }
+.overlay-right { left: 75%; transform: translate(-50%, -50%); }
 
 .overlay-panel h2 {
   font-size: 24px;
@@ -175,6 +197,7 @@ input:focus {
   line-height: 1.6;
   max-width: 320px;
 }
+
 .overlay-panel button {
   background: #f7dba7;
   color: #003459;
@@ -190,6 +213,20 @@ input:focus {
   background: #f3c976;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(247, 219, 167, 0.6);
+}
+
+/* ==== MESSAGES ==== */
+ul.messages {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #003459;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 52, 89, 0.3);
+  font-size: 14px;
 }
 
 /* ==== RESPONSIVE ==== */

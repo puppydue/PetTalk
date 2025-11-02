@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký - PetTalk</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="container">
+      <h2>Tạo tài khoản mới 🐾</h2>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn" type="submit">Đăng ký</button>
+      </form>
+      <p style="margin-top:10px;">
+        Đã có tài khoản? <a href="{% url 'login' %}">Đăng nhập</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
