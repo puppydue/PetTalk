@@ -10,8 +10,8 @@ urlpatterns = [
     # 🌐 Forum app
     path('forum/', include('forum.urls')),
 
-    # 👤 Accounts app (nếu có)
-    path('accounts/', include('accounts.urls')),
+    # Toàn bộ hệ thống xác thực có sẵn của Django
+    path('accounts/', include('django.contrib.auth.urls')),
 
     # 🎉 Events app
     path('events/', include('Events.urls')),

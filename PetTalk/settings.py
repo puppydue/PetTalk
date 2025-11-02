@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     # Custom apps
     'forum',
     'Events',       # app sự kiện (E viết hoa theo tên thư mục của bạn)
-    # 'accounts',   # bật lại sau nếu bạn có app này
+    # 'accounts',
 ]
 
 
@@ -133,7 +133,6 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'forum:post_list'
 LOGOUT_REDIRECT_URL = 'login'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_URL = '/admin/login/'
 import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

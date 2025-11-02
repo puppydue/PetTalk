@@ -21,9 +21,27 @@
     <div class="logo" onclick="window.location.href='/'">
       <i class="fa-solid fa-paw"></i> PetTalk
     </div>
+
+    <!-- ✅ Thanh người dùng động -->
     <div class="user-bar">
-      <span>Minh Nguyen</span>
-      <i class="fa-solid fa-user" onclick="window.location.href='/profile/'"></i>
+      {% if user.is_authenticated %}
+        <!-- Khi đã đăng nhập -->
+        <span onclick="window.location.href='/profile/'" style="cursor:pointer; font-weight:600;">
+          {{ user.username }}
+        </span>
+        <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:inline; margin-left:12px;">
+          {% csrf_token %}
+          <button type="submit" title="Đăng xuất"
+                  style="background:none; border:none; color:inherit; cursor:pointer;">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </form>
+      {% else %}
+        <!-- Khi chưa đăng nhập -->
+        <a href="{% url 'login' %}" class="auth-link">
+          <i class="fa-solid fa-user"></i> Đăng nhập
+        </a>
+      {% endif %}
     </div>
   </header>
 
@@ -44,9 +62,8 @@
 
     <!-- Main content -->
     <main class="main-content center-layout">
-  {% block content %}{% endblock %}
-</main>
-
+      {% block content %}{% endblock %}
+    </main>
 
     <!-- Right panel -->
     <aside class="right-panel">

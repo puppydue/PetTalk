@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PetTalk - Đăng nhập</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="container" id="container">
+
+      <!-- Form đăng nhập -->
+      <div class="form-container sign-in">
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          <h2>Đăng nhập</h2>
+          {{ form.non_field_errors }}
+          {{ form.username }}
+          {{ form.password }}
+          <input type="hidden" name="next" value="{{ next }}">
+          <a href="{% url 'password_reset' %}">Quên mật khẩu?</a>
+          <button class="btn" type="submit">Đăng nhập</button>
+        </form>
+      </div>
+
+      <!-- Overlay -->
+      <div class="overlay-container">
+        <div class="overlay">
+          <div class="overlay-panel overlay-right">
+            <h2>🐾 Chào mừng đến PetTalk!</h2>
+            <p>Đăng nhập để kết nối cùng cộng đồng yêu thú cưng</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
