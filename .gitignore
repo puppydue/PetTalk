@@ -9,3 +9,4 @@ Thumbs.db
 media/
 .venv/
 PetTalk/__pycache__/
+*.pyc
