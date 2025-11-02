@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>🗑️ Xoá sự kiện</h2>
+<p>Bạn có chắc muốn xoá sự kiện <strong>"{{ event.title }}"</strong> không?</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn-danger">Xác nhận xoá</button>
+  <a href="{% url 'danh_sach_su_kien' %}" class="btn-cancel">Huỷ</a>
+</form>
+{% endblock %}

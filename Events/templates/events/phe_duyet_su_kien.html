@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>🧾 Phê duyệt sự kiện</h2>
+<p>Moderator có thể xem các sự kiện đang chờ duyệt và thực hiện hành động.</p>
+
+{% if pending_events %}
+  <table class="approval-table">
+    <tr>
+      <th>Tiêu đề</th>
+      <th>Người tạo</th>
+      <th>Ngày</th>
+      <th>Thao tác</th>
+    </tr>
+    {% for e in pending_events %}
+    <tr>
+      <td>{{ e.title }}</td>
+      <td>{{ e.creator.username }}</td>
+      <td>{{ e.date }}</td>
+      <td>
+        <form method="post" action="{% url 'phe_duyet_su_kien' %}">
+          {% csrf_token %}
+          <button name="approve" value="{{ e.id }}" class="btn-approve">Phê duyệt</button>
+          <button name="reject" value="{{ e.id }}" class="btn-reject">Từ chối</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  <p>Không có sự kiện nào đang chờ duyệt.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Danh sách người đăng ký{% endblock %}
+{% block content %}
+<div class="event-list">
+  <h2>👥 Danh sách người đăng ký cho: {{ event.title }}</h2>
+
+  {% if participants %}
+    <ul>
+      {% for p in participants %}
+        <li>{{ p.username }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Chưa có ai đăng ký tham gia sự kiện này.</p>
+  {% endif %}
+
+  <a href="{% url 'danh_sach_su_kien' %}" class="btn btn-secondary">← Quay lại danh sách sự kiện</a>
+</div>
+{% endblock %}

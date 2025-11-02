@@ -1,11 +1,45 @@
-venv/
-.env
-db.sqlite3
+#venv/
+#.env
+#db.sqlite3
+#__pycache__/
+#.idea/
+#.vscode/
+#.DS_Store
+#Thumbs.db
+#media/
+#.venv/
+
+# ===============================
+# 🐍 Python & Django
+# ===============================
 __pycache__/
+*.py[cod]
+*$py.class
+
+# ===============================
+# 🚫 Virtual Environments
+# ===============================
+venv/
+.env/
+.venv/
+
+# ===============================
+# 🧱 Django database & generated files
+# ===============================
+db.sqlite3
+staticfiles/
+media/
+PetTalk/__pycache__/
+
+# ===============================
+# 🧠 IDE / Editor Config
+# ===============================
 .idea/
 .vscode/
+
+# ===============================
+# 💻 OS-generated files
+# ===============================
 .DS_Store
 Thumbs.db
-media/
-.venv/
-PetTalk/__pycache__/
+
