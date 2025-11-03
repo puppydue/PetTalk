@@ -5,9 +5,23 @@ from django.contrib.auth.models import User
 # 1️⃣ BẢNG POST — Bài viết
 # ==============================
 class Post(models.Model):
+    TOPIC_CHOICES = [
+        ('chamsoc', 'Chăm sóc thú cưng'),
+        ('dilac', 'Đi lạc'),
+        ('dinhduong', 'Dinh Dưỡng'),
+        ('kienthuc', 'Kiến thức'),
+        ('lamdep', 'Làm đẹp'),
+    ]
+
     post_id = models.AutoField(primary_key=True)
     username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
-    topic = models.CharField(max_length=100)
+
+    # --- SỬA LẠI: Trường Topic ---
+    topic = models.CharField(
+        max_length=100,
+        choices=TOPIC_CHOICES,
+        default=''  # Đặt một giá trị mặc định
+    )
     title = models.CharField(max_length=255)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
