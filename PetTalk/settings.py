@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -93,15 +93,32 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            # Bỏ 'help_text' ra khỏi đây
+        },
+        'help_text': _('Mật khẩu quá giống với thông tin cá nhân của bạn.'), # <--- Đặt ở đây
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+            # Bỏ 'help_text' ra khỏi đây
+        },
+        'help_text': _('Mật khẩu quá ngắn. Phải chứa ít nhất 8 ký tự.'), # <--- Đặt ở đây
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'OPTIONS': {
+            # Bỏ 'help_text' ra khỏi đây
+        },
+        'help_text': _('Mật khẩu này quá phổ biến, dễ bị đoán ra.'), # <--- Đặt ở đây
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'OPTIONS': {
+            # Bỏ 'help_text' ra khỏi đây
+        },
+        'help_text': _('Mật khẩu không được chứa toàn bộ là số.'), # <--- Đặt ở đây
     },
 ]
 

@@ -1,3 +1,68 @@
+<!--{% load static %}-->
+<!--<!DOCTYPE html>-->
+<!--<html lang="vi">-->
+<!--<head>-->
+<!--  <meta charset="UTF-8" />-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0" />-->
+<!--  <title>PetTalk - Đăng nhập / Đăng ký</title>-->
+<!--  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">-->
+<!--  <link rel="stylesheet" href="{% static 'css/auth.css' %}">-->
+<!--</head>-->
+<!--<body>-->
+<!--  <div class="auth-wrapper">-->
+<!--    <div class="container" id="container">-->
+<!--      &lt;!&ndash; Đăng nhập &ndash;&gt;-->
+<!--      <div class="form-container sign-in">-->
+<!--        <form method="post" action="">-->
+<!--          {% csrf_token %}-->
+<!--          <h2>Đăng nhập</h2>-->
+<!--          {{ login_form.username }}-->
+<!--          {{ login_form.password }}-->
+<!--          <a href="{% url 'password_reset' %}">Quên mật khẩu?</a>-->
+<!--          <button class="btn" type="submit" name="login">Đăng nhập</button>-->
+<!--        </form>-->
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Đăng ký &ndash;&gt;-->
+<!--      <div class="form-container sign-up">-->
+<!--        <form method="post" action="">-->
+<!--          {% csrf_token %}-->
+<!--          <h2>Tạo tài khoản mới</h2>-->
+<!--          {{ register_form.username }}-->
+<!--          {{ register_form.password1 }}-->
+<!--          {{ register_form.password2 }}-->
+<!--          <button class="btn" type="submit" name="register">Đăng ký</button>-->
+<!--        </form>-->
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Overlay &ndash;&gt;-->
+<!--      <div class="overlay-container">-->
+<!--        <div class="overlay">-->
+<!--          <div class="overlay-panel overlay-left">-->
+<!--            <h2>🐾 Bạn đã có tài khoản?</h2>-->
+<!--            <p>Đăng nhập để kết nối cùng cộng đồng yêu thú cưng của PetTalk!</p>-->
+<!--            <button class="btn" id="login">Đăng nhập</button>-->
+<!--          </div>-->
+<!--          <div class="overlay-panel overlay-right">-->
+<!--            <h2>🐾 Chưa có tài khoản?</h2>-->
+<!--            <p>Tham gia PetTalk ngay để chia sẻ & kết nối với mọi người!</p>-->
+<!--            <button class="btn" id="register">Đăng ký</button>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--  <script>-->
+<!--    const registerButton = document.getElementById('register');-->
+<!--    const loginButton = document.getElementById('login');-->
+<!--    const container = document.getElementById('container');-->
+<!--    registerButton.addEventListener('click', () => container.classList.add('right-panel-active'));-->
+<!--    loginButton.addEventListener('click', () => container.classList.remove('right-panel-active'));-->
+<!--  </script>-->
+<!--</body>-->
+<!--</html>-->
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="vi">
@@ -7,15 +72,69 @@
   <title>PetTalk - Đăng nhập / Đăng ký</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+
+  <style>
+    .form-error {
+      color: #b91c1c; /* Màu đỏ đậm */
+      font-size: 13px;
+      margin-top: -4px;
+      margin-bottom: 8px;
+      text-align: left;
+      width: 100%;
+    }
+    .form-error ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    /* Style cho Django messages (đã có trong auth.css của bạn) */
+    ul.messages {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200; /* Đảm bảo nó nổi lên trên */
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul.messages li {
+      background: #003459;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 52, 89, 0.3);
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    ul.messages li.success { background: #059669; } /* Màu xanh lá cho thành công */
+    ul.messages li.error { background: #b91c1c; } /* Màu đỏ cho lỗi */
+  </style>
 </head>
 <body>
   <div class="auth-wrapper">
-    <div class="container" id="container">
-      <!-- Đăng nhập -->
+
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="container {% if active_panel == 'register' %}right-panel-active{% endif %}" id="container">
+
       <div class="form-container sign-in">
         <form method="post" action="">
           {% csrf_token %}
           <h2>Đăng nhập</h2>
+
+          {% if login_form.non_field_errors %}
+            <div class="form-error">
+              {{ login_form.non_field_errors }}
+            </div>
+          {% endif %}
+
           {{ login_form.username }}
           {{ login_form.password }}
           <a href="{% url 'password_reset' %}">Quên mật khẩu?</a>
@@ -23,19 +142,33 @@
         </form>
       </div>
 
-      <!-- Đăng ký -->
       <div class="form-container sign-up">
         <form method="post" action="">
           {% csrf_token %}
           <h2>Tạo tài khoản mới</h2>
+
+          {% if register_form.non_field_errors %}
+            <div class="form-error">
+              {{ register_form.non_field_errors }}
+            </div>
+          {% endif %}
+
           {{ register_form.username }}
+          {% if register_form.username.errors %}
+            <div class="form-error">{{ register_form.username.errors }}</div>
+          {% endif %}
+
           {{ register_form.password1 }}
+
           {{ register_form.password2 }}
+          {% if register_form.password2.errors %}
+            <div class="form-error">{{ register_form.password2.errors }}</div>
+          {% endif %}
+
           <button class="btn" type="submit" name="register">Đăng ký</button>
         </form>
       </div>
 
-      <!-- Overlay -->
       <div class="overlay-container">
         <div class="overlay">
           <div class="overlay-panel overlay-left">

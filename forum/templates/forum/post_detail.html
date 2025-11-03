@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+{% load forum_extras %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum.css' %}">
+{% endblock %}
+{% block title %}Bài viết • {{ post.title }}{% endblock %}
+
+{% block content %}
+{% reaction_of post request.user as me_react %}
+<article class="post-card" style="max-width:780px;margin:0 auto">
+  <div class="user-info" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+    <div class="avatar">{{ post.username.username|slice:":1"|upper }}</div>
+    <div style="display:flex;flex-direction:column;">
+      <span style="font-weight:700;color:#003459;font-size:15px;">{{ post.username.username }}</span>
+      <small style="color:#64748b;font-size:13px;">{{ post.created_at|date:"d/m/Y H:i" }}</small>
+    </div>
+  </div>
+
+  <h1 class="post-title" style="font-size:22px">{{ post.title }}</h1>
+  <div class="post-content">{{ post.content|linebreaksbr }}</div>
+
+  {% if post.images.all %}
+  <div class="post-images" style="margin-top:10px">
+    {% for img in post.images.all %}
+      <img src="{{ img.image.url }}" alt="post image">
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="actions" style="display:flex;align-items:center;gap:12px;margin-top:12px">
+    <div class="vote-box" data-post="{{ post.post_id }}">
+      <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote" title="Upvote">
+        <i class="fa-solid fa-arrow-up"></i>
+      </button>
+      <span class="vote-count js-count">{{ post.total_vote|default:0 }}</span>
+      <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote" title="Downvote">
+        <i class="fa-solid fa-arrow-down"></i>
+      </button>
+    </div>
+
+    <button class="btn-ghost js-open-report" data-target="report-{{ post.post_id }}">
+      <i class="fa-solid fa-flag"></i> Báo cáo
+    </button>
+  </div>
+
+  {% include "forum/_report_modal.html" with post=post %}
+
+  <hr style="border:none;border-top:1px solid #eef2f7;margin:16px 0">
+
+  <h3 style="color:#003459;margin:0 0 8px 0">Bình luận ({{ comments|length }})</h3>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="comment" value="1">
+    {{ comment_form.content }}
+    <div style="display:flex;justify-content:flex-end;margin-top:8px">
+      <button class="btn-primary" type="submit">Đăng</button>
+    </div>
+  </form>
+
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+    {% for c in comments %}
+      <div class="comment-box" style="background:#f9fafb;padding:10px;border-radius:12px">
+        <strong style="color:#003459">{{ c.username.username }}</strong>
+        <small style="color:#64748b"> • {{ c.created_at|date:"d/m/Y H:i" }}</small>
+        <div style="margin-top:4px">{{ c.content|linebreaksbr }}</div>
+      </div>
+    {% empty %}
+      <p>Hãy là người bình luận đầu tiên!</p>
+    {% endfor %}
+  </div>
+</article>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name){let v=null;if(document.cookie&&document.cookie!==''){const c=document.cookie.split(';');for(let i=0;i<c.length;i++){const s=c[i].trim();if(s.substring(0,name.length+1)===(name+'=')){v=decodeURIComponent(s.substring(name.length+1));break}}}return v}
+const csrftoken=getCookie('csrftoken');
+
+document.querySelectorAll('.vote-box').forEach(box=>{
+  const buttons=box.querySelectorAll('.js-vote');
+  const countEl=box.querySelector('.js-count');
+  buttons.forEach(btn=>{
+    btn.addEventListener('click',async()=>{
+      const type=btn.dataset.type;
+      const postId=box.dataset.post;
+      const url=`/forum/${postId}/react/${type}/`;
+      const res=await fetch(url,{method:'POST',headers:{'X-CSRFToken':csrftoken,'X-Requested-With':'XMLHttpRequest'}});
+      if(res.ok){
+        const data=await res.json();
+        countEl.textContent=data.total_votes??0;
+        buttons.forEach(b=>b.classList.remove('active-up','active-down'));
+        if(data.reaction==='upvote')box.querySelector('[data-type="upvote"]').classList.add('active-up');
+        if(data.reaction==='downvote')box.querySelector('[data-type="downvote"]').classList.add('active-down');
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

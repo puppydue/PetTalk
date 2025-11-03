@@ -1,0 +1,22 @@
+{# Modal dùng chung, id theo post để không đụng nhau #}
+{% load static %}
+<div id="report-{{ post.post_id }}" class="modal" style="display:none">
+  <div class="modal__panel">
+    <div class="modal__head">
+      <h3 style="margin:0;color:#003459">Báo cáo bài viết</h3>
+      <button class="close-x" data-close>&times;</button>
+    </div>
+
+    <form class="js-report-form" data-post="{{ post.post_id }}">
+      {% csrf_token %}
+      <div style="display:grid;gap:10px">
+        <input class="form-control" name="reason" placeholder="Lý do (bắt buộc)" required>
+        <textarea class="form-control" rows="4" name="details" placeholder="Chi tiết (tuỳ chọn)…"></textarea>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px">
+        <button type="button" class="btn-ghost" data-close>Hủy</button>
+        <button type="submit" class="btn-primary">Gửi báo cáo</button>
+      </div>
+    </form>
+  </div>
+</div>
