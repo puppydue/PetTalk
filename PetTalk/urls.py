@@ -17,6 +17,10 @@ urlpatterns = [
 
     # 🎉 Events app
     path('events/', include('Events.urls')),
+
+    #Mod
+    path('moderation/', include('moderation.urls')),
+
 ]
 
 # 🖼️ Chỉ bật khi đang DEV để hiển thị ảnh từ media/

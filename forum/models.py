@@ -82,3 +82,42 @@ class PostsImage(models.Model):
 
     def __str__(self):
         return f"Ảnh {self.image_id} của bài {self.post.title}"
+# ==============================
+# 5️⃣ BẢNG REPORTS — Báo cáo bài viết & bình luận
+# ==============================
+class Reports_post(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Chờ xử lý'),
+        ('deleted', 'Đã xóa nội dung'),
+        ('dismissed', 'Bác bỏ'),
+    ]
+
+    rppost_id = models.AutoField(primary_key=True)
+    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_post')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='reports')
+    reason = models.CharField(max_length=255)
+    details = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    def __str__(self):
+        return f"Report #{self.rppost_id} - {self.post.title}"
+
+
+class Reports_comment(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Chờ xử lý'),
+        ('deleted', 'Đã xóa nội dung'),
+        ('dismissed', 'Bác bỏ'),
+    ]
+
+    rpcmt_id = models.AutoField(primary_key=True)
+    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_comment')
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='reports')
+    reason = models.CharField(max_length=255)
+    details = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    def __str__(self):
+        return f"Report #{self.rpcmt_id} - Comment {self.comment.cmt_id}"
