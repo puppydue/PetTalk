@@ -4,12 +4,60 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forum.css' %}">
+<style>
+  /* === BỔ SUNG CSS CHO COMMENT MENU === */
+  .comment-menu {
+    display: none; /* Ẩn ban đầu */
+    position: absolute;
+    right: 0;
+    top: 100%; /* Mặc định: bung xuống dưới */
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    min-width: 150px;
+    z-index: 10;
+    overflow: hidden; /* Để bo góc cho item bên trong */
+  }
+
+  /* Class này sẽ làm menu bung lên trên */
+  .comment-menu.menu-up {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: 4px;
+  }
+
+  .comment-menu .menu-item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    color: #1e293b;
+    white-space: nowrap; /* Đảm bảo không bị xuống dòng */
+  }
+  .comment-menu .menu-item:hover {
+    background-color: #f8fafc;
+  }
+  /* Thêm đường kẻ ngăn cách */
+  .comment-menu .menu-item + .menu-item {
+      border-top: 1px solid #f1f5f9;
+  }
+  /* === HẾT CSS BỔ SUNG === */
+</style>
 {% endblock %}
 {% block title %}Bài viết • {{ post.title }}{% endblock %}
 
 {% block content %}
 {% reaction_of post request.user as me_react %}
-<article class="post-card" style="max-width:780px;margin:0 auto">
+<!-- === THAY ĐỔI 1: Thêm style để đóng khung bài viết === -->
+<article class="post-card" style="max-width:780px; margin:0 auto; background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+
   <div class="user-info" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
     <div class="avatar">{{ post.username.username|slice:":1"|upper }}</div>
     <div style="display:flex;flex-direction:column;">
@@ -47,6 +95,11 @@
 
   {% include "forum/_report_modal.html" with post=post %}
 
+<!-- === THAY ĐỔI 2: Đóng thẻ </article> tại đây để kết thúc khung === -->
+</article>
+
+<!-- === THAY ĐỔI 3: Bọc phần bình luận trong thẻ <section> riêng === -->
+<section class="comment-section" style="max-width:780px; margin: 20px auto 0 auto;">
   <hr style="border:none;border-top:1px solid #eef2f7;margin:16px 0">
 
   <h3 style="color:#003459;margin:0 0 8px 0">Bình luận ({{ comments|length }})</h3>
@@ -94,14 +147,20 @@
 {% endfor %}
 
   </div>
-</article>
+<!-- === THAY ĐỔI 4: Đóng thẻ </section> mới === -->
+</section>
 {% endblock %}
 
 {% block extra_js %}
+<!-- XÓA SCRIPT ĐẦU TIÊN CỦA BẠN VÌ NÓ BỊ LẶP LẠI -->
+
+<!-- GỘP TẤT CẢ LOGIC VÀO SCRIPT NÀY -->
 <script>
+// --- HÀM LẤY CSRF TOKEN ---
 function getCookie(name){let v=null;if(document.cookie&&document.cookie!==''){const c=document.cookie.split(';');for(let i=0;i<c.length;i++){const s=c[i].trim();if(s.substring(0,name.length+1)===(name+'=')){v=decodeURIComponent(s.substring(name.length+1));break}}}return v}
 const csrftoken=getCookie('csrftoken');
 
+// --- LOGIC VOTE BÀI VIẾT (giữ nguyên) ---
 document.querySelectorAll('.vote-box').forEach(box=>{
   const buttons=box.querySelectorAll('.js-vote');
   const countEl=box.querySelector('.js-count');
@@ -121,78 +180,106 @@ document.querySelectorAll('.vote-box').forEach(box=>{
     });
   });
 });
-</script>
-<script>
-document.addEventListener('click', e => {
-  // Toggle menu ba chấm
+
+// --- BỘ LẮNG NGHE SỰ KIỆN CLICK TOÀN TRANG (ĐÃ CẬP NHẬT) ---
+document.addEventListener('click', async (e) => {
+
+  // === LOGIC MỚI: MỞ/ĐÓNG MENU BA CHẤM ===
   const btn = e.target.closest('.comment-menu-btn');
-  document.querySelectorAll('.comment-menu').forEach(m => m.style.display='none');
+
+  // 1. Đóng TẤT CẢ các menu khác
+  document.querySelectorAll('.comment-menu').forEach(m => {
+      if (!m.parentElement.contains(btn)) {
+          m.style.display = 'none';
+          m.classList.remove('menu-up');
+      }
+  });
+
+  // 2. Nếu click trúng nút 3 chấm, xử lý mở/đóng menu đó
   if (btn) {
     const menu = btn.parentElement.querySelector('.comment-menu');
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    const isAlreadyOpen = menu.style.display === 'block';
+
+    if (isAlreadyOpen) {
+      // Nếu đang mở -> đóng lại
+      menu.style.display = 'none';
+      menu.classList.remove('menu-up');
+    } else {
+      // Nếu đang đóng -> mở ra và kiểm tra vị trí
+      menu.style.display = 'block'; // Hiển thị để đo kích thước
+
+      const rect = btn.getBoundingClientRect();
+      const menuHeight = menu.offsetHeight;
+      const viewportHeight = window.innerHeight;
+
+      // Kiểm tra xem có bị tràn không
+      if (rect.bottom + menuHeight + 10 > viewportHeight) { // +10 là khoảng đệm
+        // Bị tràn -> Thêm class để bung lên
+        menu.classList.add('menu-up');
+      } else {
+        // Đủ chỗ -> Xóa class (phòng trường hợp nó còn)
+        menu.classList.remove('menu-up');
+      }
+    }
   }
 
-  // Đóng khi click ngoài menu
+  // === LOGIC CŨ: ĐÓNG MENU KHI CLICK BÊN NGOÀI ===
   if (!e.target.closest('.comment-menu-wrapper')) {
-    document.querySelectorAll('.comment-menu').forEach(m => m.style.display='none');
+    document.querySelectorAll('.comment-menu').forEach(m => {
+        m.style.display='none';
+        m.classList.remove('menu-up');
+    });
   }
 
-  // Mở modal báo cáo bình luận
-  const reportBtn = e.target.closest('.js-open-report-comment');
+  // === LOGIC MỞ MODAL BÁO CÁO (Đã gộp từ script 1) ===
+  const reportBtn = e.target.closest('.js-open-report') || e.target.closest('.js-open-report-comment');
   if (reportBtn) {
     const id = reportBtn.dataset.target;
     const modal = document.getElementById(id);
     if (modal) modal.style.display = 'flex';
   }
 
-  // Đóng modal báo cáo
+  // === LOGIC ĐÓNG MODAL (Đã gộp từ script 1) ===
   const modal = e.target.closest('.modal');
   if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) {
     modal.style.display = 'none';
   }
-});
-</script>
-<script>
-document.addEventListener('click', async (e) => {
-  // Toggle menu ba chấm
-  const btn = e.target.closest('.comment-menu-btn');
-  document.querySelectorAll('.comment-menu').forEach(m => m.style.display = 'none');
-  if (btn) {
-    const menu = btn.parentElement.querySelector('.comment-menu');
-    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-  }
 
-  // Đóng menu khi click ngoài
-  if (!e.target.closest('.comment-menu-wrapper')) {
-    document.querySelectorAll('.comment-menu').forEach(m => m.style.display = 'none');
-  }
-
-  // ==== CHỈNH SỬA COMMENT ====
+  // ==== LOGIC CHỈNH SỬA COMMENT (giữ nguyên) ====
   if (e.target.classList.contains('js-edit-comment')) {
     const id = e.target.dataset.id;
     const commentBox = document.getElementById(`comment-${id}`);
     const contentDiv = commentBox.querySelector('.comment-content');
-    const oldText = contentDiv.textContent.trim();
+    const oldText = contentDiv.textContent.trim(); // Lấy text thô
+
+    // Lấy nội dung HTML gốc (có thể chứa <br>) để hủy cho chuẩn
+    const oldHtml = contentDiv.innerHTML;
+    // Chuyển <br> thành ký tự xuống dòng cho textarea
+    const textForTextarea = oldText.replace(/<br\s*\/?>/ig, "\n");
 
     // Hiển thị form chỉnh sửa
     contentDiv.innerHTML = `
       <form class="edit-form" data-id="${id}" style="margin-top:6px;">
-        <textarea rows="3" class="form-control" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:6px;">${oldText}</textarea>
+        <textarea rows="3" class="form-control" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:6px;">${textForTextarea}</textarea>
         <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px;">
           <button type="button" class="btn-ghost js-cancel-edit">Hủy</button>
           <button type="submit" class="btn-primary">Lưu</button>
         </div>
       </form>
     `;
+    // Lưu lại nội dung HTML cũ vào form để Hủy
+    contentDiv.querySelector('.edit-form').dataset.oldHtml = oldHtml;
   }
 
-  // Hủy chỉnh sửa
+  // ==== LOGIC HỦY CHỈNH SỬA (giữ nguyên, cải tiến 1 chút) ====
   if (e.target.classList.contains('js-cancel-edit')) {
-    e.target.closest('.edit-form').remove();
-    window.location.reload(); // reload lại comment gốc (hoặc có thể fetch lại qua AJAX)
+    const form = e.target.closest('.edit-form');
+    const oldHtml = form.dataset.oldHtml;
+    const contentDiv = form.parentElement;
+    contentDiv.innerHTML = oldHtml; // Trả lại nội dung HTML gốc
   }
 
-  // Submit chỉnh sửa
+  // ==== LOGIC SUBMIT CHỈNH SỬA (giữ nguyên) ====
   if (e.target.closest('.edit-form') && e.target.type === 'submit') {
     e.preventDefault();
     const form = e.target.closest('.edit-form');
@@ -208,11 +295,15 @@ document.addEventListener('click', async (e) => {
       body: JSON.stringify({ content: newContent })
     });
     if (res.ok) {
-      location.reload();
+      // Thay vì reload, cập nhật nội dung mới
+      const data = await res.json();
+      form.parentElement.innerHTML = data.new_content_html; // Giả sử view trả về HTML mới
+    } else {
+      alert("Đã xảy ra lỗi khi cập nhật bình luận.");
     }
   }
 
-  // ==== XÓA COMMENT ====
+  // ==== LOGIC XÓA COMMENT (giữ nguyên) ====
   if (e.target.classList.contains('js-delete-comment')) {
     const id = e.target.dataset.id;
     if (confirm("🗑️ Bạn có chắc muốn xóa bình luận này không?")) {
@@ -223,6 +314,8 @@ document.addEventListener('click', async (e) => {
       });
       if (res.ok) {
         document.getElementById(`comment-${id}`).remove();
+      } else {
+        alert("Đã xảy ra lỗi khi xóa bình luận.");
       }
     }
   }
@@ -230,3 +323,4 @@ document.addEventListener('click', async (e) => {
 </script>
 
 {% endblock %}
+
