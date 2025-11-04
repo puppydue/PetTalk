@@ -11,6 +11,7 @@ urlpatterns = [
     path('forum/', include('forum.urls')),
 
     # Hệ thống xác thực
+    path('', include('accounts.urls')),
     path('accounts/', include('accounts.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 

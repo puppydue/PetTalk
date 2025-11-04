@@ -30,16 +30,12 @@
   .modal__panel{background:#fff;border-radius:16px;max-width:640px;width:100%;padding:18px}
   .modal__head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid #eef2f7;padding-bottom:10px}
   .close-x{background:none;border:none;font-size:24px;cursor:pointer;color:#64748b}
-    .btn-ghost,
-.btn-ghost:visited,
-.btn-ghost:hover,
-.btn-ghost i { text-decoration: none !important; }
-
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="post-list">
+  <!-- Ô tạo nhanh mở modal -->
   <div id="btn-open-create" class="create-post-trigger">
     <div class="trigger-avatar">{{ request.user.username|slice:":1"|upper }}</div>
     <div class="trigger-input">Đặt câu hỏi cho cộng đồng…</div>
@@ -47,6 +43,7 @@
     <button class="btn-primary" type="button">Đăng</button>
   </div>
 
+  <!-- Tìm kiếm + Lọc -->
   <form method="get" class="search-wrap">
     <input name="q" value="{{ request.GET.q|default:'' }}" placeholder="Tìm theo tiêu đề/nội dung…">
     <select name="topic">
@@ -58,6 +55,7 @@
     <button class="btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
   </form>
 
+  <!-- Danh sách bài viết -->
   {% for post in posts %}
   {% reaction_of post request.user as me_react %}
   <article class="post-card" data-post="{{ post.post_id }}">
@@ -82,11 +80,11 @@
 
     <div class="actions">
       <div class="vote-box" data-post="{{ post.post_id }}">
-        <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote" title="Upvote">
+        <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
           <i class="fa-solid fa-arrow-up"></i>
         </button>
         <span class="vote-count js-count">{{ post.total_vote|default:0 }}</span>
-        <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote" title="Downvote">
+        <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote">
           <i class="fa-solid fa-arrow-down"></i>
         </button>
       </div>
@@ -106,6 +104,34 @@
   <p>Chưa có bài viết nào.</p>
   {% endfor %}
 </div>
+
+<!-- Modal tạo bài viết -->
+<div id="create-modal" class="modal">
+  <div class="modal__panel">
+    <div class="modal__head">
+      <h3 style="margin:0;color:#003459">Tạo bài viết mới</h3>
+      <button class="close-x" data-close>&times;</button>
+    </div>
+    <form method="post" action="{% url 'forum:create_post' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div style="display:grid;gap:10px">
+        <input class="form-control" name="title" placeholder="Tiêu đề" required>
+        <select class="form-control" name="topic" required>
+          <option value="" disabled selected>— Chọn chủ đề —</option>
+          {% for value,label in topic_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+        <textarea class="form-control" name="content" rows="4" placeholder="Chia sẻ điều gì đó…"></textarea>
+        <input class="form-control" type="file" name="images" accept="image/*" multiple>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px">
+        <button type="button" class="btn-ghost" data-close>Hủy</button>
+        <button type="submit" class="btn-primary">Đăng</button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -113,7 +139,12 @@
 function getCookie(name){let v=null;if(document.cookie&&document.cookie!==''){const c=document.cookie.split(';');for(let i=0;i<c.length;i++){const s=c[i].trim();if(s.substring(0,name.length+1)===(name+'=')){v=decodeURIComponent(s.substring(name.length+1));break}}}return v}
 const csrftoken=getCookie('csrftoken');
 
-// Vote AJAX
+// === Mở modal tạo bài ===
+const modal=document.getElementById('create-modal');
+document.getElementById('btn-open-create')?.addEventListener('click',()=>modal.style.display='flex');
+modal?.addEventListener('click',e=>{if(e.target===modal||e.target.hasAttribute('data-close'))modal.style.display='none'});
+
+// === Vote AJAX ===
 document.querySelectorAll('.vote-box').forEach(box=>{
   const buttons=box.querySelectorAll('.js-vote');
   const countEl=box.querySelector('.js-count');
@@ -132,6 +163,14 @@ document.querySelectorAll('.vote-box').forEach(box=>{
       }
     });
   });
+});
+
+// === Modal báo cáo ===
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.js-open-report');
+  if(btn){const id=btn.getAttribute('data-target');const m=document.getElementById(id);if(m)m.style.display='flex';}
+  const modal=e.target.closest('.modal');
+  if(modal&&(e.target===modal||e.target.hasAttribute('data-close')))modal.style.display='none';
 });
 </script>
 {% endblock %}
