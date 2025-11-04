@@ -38,12 +38,17 @@
               {% endif %}
             </p>
 
-            <div class="event-actions">
-              <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">🔧 Chỉnh sửa</a>
-              {% if e.status == 'approved' %}
-                <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem danh sách người đăng ký</a>
-              {% endif %}
-            </div>
+            {% if not e.is_past %}
+              <div class="event-actions">
+                <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">🔧 Chỉnh sửa</a>
+                {% if e.status == 'approved' %}
+                  <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem danh sách người đăng ký</a>
+                {% endif %}
+                <a href="{% url 'xoa_su_kien' e.id %}" class="delete-btn">🗑️ Xóa sự kiện</a>
+              </div>
+            {% else %}
+              <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
+            {% endif %}
           </div>
         {% endfor %}
       </div>
@@ -72,12 +77,16 @@
           <p><strong>📍 Địa điểm:</strong> {{ e.location }}</p>
           <p><strong>🕓 Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
 
-          {% if e.creator == user %}
-            <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem danh sách người đăng ký</a>
-          {% elif user in e.participants.all %}
-            <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn">❌ Hủy đăng ký</a>
+          {% if e.is_past %}
+            <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
           {% else %}
-            <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn">🐾 Đăng ký tham gia</a>
+            {% if e.creator == user %}
+              <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem danh sách người đăng ký</a>
+            {% elif user in e.participants.all %}
+              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn">❌ Hủy đăng ký</a>
+            {% else %}
+              <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn">🐾 Đăng ký tham gia</a>
+            {% endif %}
           {% endif %}
         </div>
       {% endfor %}
@@ -163,7 +172,7 @@
 }
 
 /* ====== BUTTONS ====== */
-.edit-btn, .join-btn, .view-btn, .cancel-btn {
+.edit-btn, .join-btn, .view-btn, .cancel-btn, .delete-btn {
   display: inline-block;
   font-size: 14px;
   font-weight: 600;
@@ -178,13 +187,17 @@
   background: linear-gradient(135deg, #ffb84d, #ff9800);
   color: white;
 }
+.delete-btn {
+  background: linear-gradient(135deg, #b71c1c, #f44336);
+  color: white;
+}
 .join-btn, .view-btn { background: #003459; color: white; }
 .view-btn { background: linear-gradient(135deg, #6ba6ff, #1e88e5); }
 .cancel-btn {
   background: linear-gradient(135deg, #ff6b6b, #ff4757);
   color: white;
 }
-.edit-btn:hover, .join-btn:hover, .view-btn:hover, .cancel-btn:hover {
+.edit-btn:hover, .join-btn:hover, .view-btn:hover, .cancel-btn:hover, .delete-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
 }
@@ -228,6 +241,18 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-top: auto;
+}
+
+/* ====== EVENT ENDED LABEL ====== */
+.event-ended {
+  text-align: center;
+  font-weight: 600;
+  color: #666;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px dashed #bbb;
 }
 </style>
 
