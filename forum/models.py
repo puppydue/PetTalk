@@ -84,7 +84,6 @@ class PostsImage(models.Model):
         return f"Ảnh {self.image_id} của bài {self.post.title}"
         return f"{self.username} {self.type} {self.post}"
 
-
 # ============================
 # 4️⃣ COMMENT
 # ============================
@@ -114,7 +113,6 @@ class ReportsPost(models.Model):
 
     def __str__(self):
         return f"Report {self.post} by {self.reporter}"
-<<<<<<< HEAD
 
 class Reports_comment(models.Model):
     cmt = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -127,5 +125,4 @@ class Reports_post(models.Model):
 
     def __str__(self):
         return f"Post {self.pst}"
-=======
->>>>>>> 2641cd7621980638d4c3cd1224fde80e50f0c91d
+
