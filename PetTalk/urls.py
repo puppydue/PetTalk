@@ -17,6 +17,9 @@ urlpatterns = [
 
     # 🎉 Events app
     path('events/', include('Events.urls')),
+
+    path('badge/', include('badge.urls')),
+
 ]
 
 # 🖼️ Chỉ bật khi đang DEV để hiển thị ảnh từ media/
