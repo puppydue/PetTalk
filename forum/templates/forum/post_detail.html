@@ -62,30 +62,37 @@
 
   <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
     {% for c in comments %}
-<div class="comment-box" style="background:#f9fafb;padding:10px;border-radius:12px;position:relative;">
+<div class="comment-box" id="comment-{{ c.id }}" style="background:#f9fafb;padding:10px 12px;border-radius:12px;position:relative;">
+
   <div style="display:flex;align-items:center;justify-content:space-between;">
     <div>
       <strong style="color:#003459">{{ c.username.username }}</strong>
       <small style="color:#64748b"> • {{ c.created_at|date:"d/m/Y H:i" }}</small>
     </div>
+
+    {% if c.username == request.user %}
     <!-- Nút ba chấm -->
     <div class="comment-menu-wrapper" style="position:relative;">
       <button class="comment-menu-btn" style="background:none;border:none;font-size:18px;color:#64748b;cursor:pointer;">⋯</button>
-      <div class="comment-menu" style="display:none;position:absolute;right:0;top:20px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.1);z-index:10;">
-        {% if c.username == request.user %}
-          <button class="menu-item js-edit-comment" data-id="{{ c.id }}" style="padding:8px 14px;width:100%;text-align:left;border:none;background:none;">Chỉnh sửa</button>
-          <button class="menu-item js-delete-comment" data-id="{{ c.id }}" style="padding:8px 14px;width:100%;text-align:left;border:none;background:none;color:#dc2626;">Xóa</button>
-        {% else %}
-          <button class="menu-item js-open-report-comment" data-target="report-comment-{{ c.id }}" style="padding:8px 14px;width:100%;text-align:left;border:none;background:none;color:#003459;">Báo cáo</button>
-        {% endif %}
+      <div class="comment-menu">
+        <button class="menu-item js-edit-comment" data-id="{{ c.id }}">✏️ Chỉnh sửa</button>
+        <button class="menu-item js-delete-comment" data-id="{{ c.id }}">🗑️ Xóa</button>
       </div>
     </div>
+    {% else %}
+    <div class="comment-menu-wrapper" style="position:relative;">
+      <button class="comment-menu-btn" style="background:none;border:none;font-size:18px;color:#64748b;cursor:pointer;">⋯</button>
+      <div class="comment-menu">
+        <button class="menu-item js-open-report-comment" data-target="report-comment-{{ c.id }}">🚩 Báo cáo</button>
+      </div>
+    </div>
+    {% endif %}
   </div>
-  <div style="margin-top:4px">{{ c.content|linebreaksbr }}</div>
-
+  <div class="comment-content" style="margin-top:6px;">{{ c.content|linebreaksbr }}</div>
   {% include "forum/_report_comment_modal.html" with comment=c %}
 </div>
 {% endfor %}
+
   </div>
 </article>
 {% endblock %}
@@ -142,6 +149,82 @@ document.addEventListener('click', e => {
   const modal = e.target.closest('.modal');
   if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) {
     modal.style.display = 'none';
+  }
+});
+</script>
+<script>
+document.addEventListener('click', async (e) => {
+  // Toggle menu ba chấm
+  const btn = e.target.closest('.comment-menu-btn');
+  document.querySelectorAll('.comment-menu').forEach(m => m.style.display = 'none');
+  if (btn) {
+    const menu = btn.parentElement.querySelector('.comment-menu');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+  }
+
+  // Đóng menu khi click ngoài
+  if (!e.target.closest('.comment-menu-wrapper')) {
+    document.querySelectorAll('.comment-menu').forEach(m => m.style.display = 'none');
+  }
+
+  // ==== CHỈNH SỬA COMMENT ====
+  if (e.target.classList.contains('js-edit-comment')) {
+    const id = e.target.dataset.id;
+    const commentBox = document.getElementById(`comment-${id}`);
+    const contentDiv = commentBox.querySelector('.comment-content');
+    const oldText = contentDiv.textContent.trim();
+
+    // Hiển thị form chỉnh sửa
+    contentDiv.innerHTML = `
+      <form class="edit-form" data-id="${id}" style="margin-top:6px;">
+        <textarea rows="3" class="form-control" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:6px;">${oldText}</textarea>
+        <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px;">
+          <button type="button" class="btn-ghost js-cancel-edit">Hủy</button>
+          <button type="submit" class="btn-primary">Lưu</button>
+        </div>
+      </form>
+    `;
+  }
+
+  // Hủy chỉnh sửa
+  if (e.target.classList.contains('js-cancel-edit')) {
+    e.target.closest('.edit-form').remove();
+    window.location.reload(); // reload lại comment gốc (hoặc có thể fetch lại qua AJAX)
+  }
+
+  // Submit chỉnh sửa
+  if (e.target.closest('.edit-form') && e.target.type === 'submit') {
+    e.preventDefault();
+    const form = e.target.closest('.edit-form');
+    const id = form.dataset.id;
+    const newContent = form.querySelector('textarea').value;
+    const csrftoken = getCookie('csrftoken');
+    const res = await fetch(`/forum/comment/${id}/edit/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({ content: newContent })
+    });
+    if (res.ok) {
+      location.reload();
+    }
+  }
+
+  // ==== XÓA COMMENT ====
+  if (e.target.classList.contains('js-delete-comment')) {
+    const id = e.target.dataset.id;
+    if (confirm("🗑️ Bạn có chắc muốn xóa bình luận này không?")) {
+      const csrftoken = getCookie('csrftoken');
+      const res = await fetch(`/forum/comment/${id}/delete/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken }
+      });
+      if (res.ok) {
+        document.getElementById(`comment-${id}`).remove();
+      }
+    }
   }
 });
 </script>

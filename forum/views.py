@@ -4,6 +4,11 @@ from django.db.models import Q
 from django.http import JsonResponse
 from .models import Post, Reaction, Comment, ReportsPost, PostsImage
 from .forms import PostForm, CommentForm, ReportForm
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Comment
+
 
 
 # ========== 🧭 DANH SÁCH BÀI VIẾT ==========
@@ -122,3 +127,23 @@ def toggle_reaction(request, post_id, react_type):
     current = post.reactions.filter(username=request.user).first()
     current_type = current.type if current else None
     return JsonResponse({'total_votes': total, 'reaction': current_type})
+
+@csrf_exempt
+def edit_comment(request, id):
+    if request.method == 'POST':
+        comment = Comment.objects.get(pk=id)
+        data = json.loads(request.body)
+        if comment.username == request.user:
+            comment.content = data.get('content', '')
+            comment.save()
+            return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+@csrf_exempt
+def delete_comment(request, id):
+    if request.method == 'POST':
+        comment = Comment.objects.get(pk=id)
+        if comment.username == request.user:
+            comment.delete()
+            return JsonResponse({'status': 'deleted'})
+    return JsonResponse({'status': 'error'}, status=400)
