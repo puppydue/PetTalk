@@ -1,470 +1,176 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% load forum_extras %}
 {% block title %}Diễn đàn PetTalk{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum.css' %}">
 <style>
-/* ĐÃ XÓA BỎ: .forum-layout, .left-panel, và .right-panel (phần CSS cho container)
-  vì base.html đã xử lý layout chính.
-  Chúng ta CHỈ GIỮ LẠI CSS cho nội dung bên trong.
-*/
-
-/* ====== DANH SÁCH BÀI VIẾT (CỘT GIỮA) ====== */
-.post-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  /* Thêm một chút padding để không bị dính sát lề */
-  padding: 20px 0;
-  max-width: 800px; /* Giới hạn độ rộng cột giữa cho dễ đọc */
-  margin: 0 auto; /* Căn giữa post-list nếu nó hẹp hơn main-content */
-}
-
-/* ====== KHUNG BÀI VIẾT ====== */
-.post-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  border-left: 6px solid #003459;
-  transition: all 0.3s ease;
-}
-.post-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-}
-
-/* ====== AVATAR + USER INFO ====== */
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.avatar {
-  background: #003459;
-  color: #fff;
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 16px;
-  box-shadow: 0 2px 4px rgba(0, 52, 89, 0.2);
-}
-.user-meta {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.3;
-}
-.username {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 700;
-  color: #003459;
-}
-.badge {
-  background: linear-gradient(90deg, #f7dba7, #fff2cc);
-  color: #7c3b00;
-  padding: 3px 8px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 600;
-  box-shadow: 0 1px 4px rgba(247,219,167,0.4);
-}
-
-/* ====== NỘI DUNG BÀI ====== */
-.post-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-top: 5px;
-  color: #222;
-}
-.post-content {
-  margin-top: 10px;
-  line-height: 1.5;
-  color: #333;
-}
-.post-images {
-  margin-top: 12px;
-  display: flex;
-  gap: 10px;
-}
-.post-images img {
-  width: 130px;
-  height: 130px;
-  border-radius: 12px;
-  object-fit: cover;
-  border: 2px solid #eee;
-}
-
-/* ====== NÚT HÀNH ĐỘNG ====== */
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 14px;
-}
-.vote-btn {
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #003459;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.vote-btn:hover {
-  background: #f7dba7;
-  border-color: #f7dba7;
-}
-.vote-count {
-  font-weight: 600;
-  color: #003459;
-  font-size: 15px;
-  min-width: 28px;
-  text-align: center;
-}
-.btn-report {
-  background: #fff;
-  color: #ef4444;
-  border: 1px solid #ef4444;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-report:hover {
-  background: #fee2e2;
-}
-
-/* ====== COMMENT ====== */
-.comment-form {
-  margin-top: 10px;
-  display: none;
-}
-.comment-form textarea {
-  width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 14px;
-  resize: none;
-}
-.comment-form button {
-  margin-top: 8px;
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: none;
-  background: #003459;
-  color: #fff;
-  cursor: pointer;
-}
-.comment-box {
-  margin-top: 8px;
-  background: #f9f9f9;
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 14px;
-}
-.comment-box strong {
-  color: #003459;
-}
-
-/* ====== CSS CHO NỘI DUNG CỘT PHẢI ====== */
-.right-panel-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 20px 0; /* Thêm padding cho đồng bộ */
-}
-.panel {
-  background: #fff;
-  border: 1px solid #f2e3b3;
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.panel h4 {
-  font-weight: 700;
-  color: #003459;
-  margin-bottom: 10px;
-}
-.panel .chip {
-  background: #fff;
-  border: 1px solid #f2e3b3;
-  border-radius: 999px;
-  padding: 6px 12px;
-  color: #003459;
-  font-size: 13px;
-  margin: 4px;
-  display: inline-block;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.panel .chip:hover {
-  background: #f7dba7;
-}
-.event {
-  border-bottom: 1px solid #f1f5f9;
-  padding: 8px 0;
-}
-.event:last-child {
-  border-bottom: none;
-}
-.event strong {
-  color: #003459;
-}
-.event small {
-  display: block;
-  color: #666;
-  font-size: 13px;
-}
-
-/* ====== CSS MỚI CHO NÚT BÌNH LUẬN ====== */
-.vote-btn.with-count {
-  width: auto; /* Cho phép nút tự co giãn theo nội dung */
-  padding: 0 12px; /* Thêm padding ngang cho đẹp */
-  gap: 8px; /* Khoảng cách giữa icon và số lượng */
-}
-
-.comment-count-inside {
-  font-weight: 600;
-  font-size: 15px;
-  color: #003459; /* Đồng bộ màu với vote-count */
-}
-
-/* CSS cho trạng thái đã vote (thêm bởi Javascript) */
-.vote-btn.voted {
-  opacity: 0.7;
-  cursor: not-allowed;
-  background: #f7dba7; /* Giữ màu vàng khi đã vote */
-  border-color: #f7dba7;
-}
-    /* ... (Toàn bộ CSS cũ của bạn giữ nguyên) ... */
-
-/* ====== CSS CHO THANH TÌM KIẾM ====== */
-.search-form {
-  display: flex;
-  width: 100%;
-}
-.search-input {
-  flex-grow: 1; /* Input chiếm phần lớn không gian */
-  border: 2px solid #e0e0e0;
-  padding: 12px 16px;
-  font-size: 15px;
-  border-radius: 10px 0 0 10px; /* Bo góc trái */
-  border-right: none; /* Bỏ border phải */
-  outline: none;
-  transition: border-color 0.2s;
-  background: #fff;
-}
-.search-input:focus {
-  border-color: #003459; /* Highlight khi focus */
-}
-.search-button {
-  border: 2px solid #003459;
-  background: #003459;
-  color: #fff;
-  padding: 0 18px;
-  border-radius: 0 10px 10px 0; /* Bo góc phải */
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.2s;
-}
-.search-button:hover {
-  background: #005086; /* Màu đậm hơn khi hover */
-}
-
-/* ====== DANH SÁCH BÀI VIẾT (CỘT GIỮA) ====== */
-/* ... (Phần CSS còn lại của bạn) ... */
+  .create-post-trigger{background:#fff;border-radius:16px;padding:18px;box-shadow:0 4px 10px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:16px}
+  .trigger-avatar{width:40px;height:40px;border-radius:9999px;background:#003459;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .trigger-input{flex:1;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;color:#475569}
+  .post-list{display:flex;flex-direction:column;gap:16px;max-width:780px;margin:0 auto;padding:8px 0}
+  .post-card{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 4px 10px rgba(0,0,0,.08);border-left:6px solid #003459}
+  .avatar{width:40px;height:40px;border-radius:9999px;background:#003459;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .post-title{font-weight:700;color:#0f172a;margin:6px 0}
+  .post-images{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .post-images img{width:132px;height:132px;border-radius:12px;object-fit:cover;border:2px solid #eef2f7}
+  .actions{display:flex;align-items:center;gap:12px;margin-top:12px}
+  .vote-btn{width:42px;height:42px;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#003459;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .25s}
+  .vote-btn:hover{background:#f7dba7}
+  .vote-count{font-weight:700;font-size:15px;min-width:28px;text-align:center;color:#003459;text-decoration:none !important}
+  .vote-btn.active-up{background:#ff4500;color:#fff;border-color:#ff4500}
+  .vote-btn.active-down{background:#6a5cff;color:#fff;border-color:#6a5cff}
+  .btn-ghost{border:1px solid #003459;color:#003459;background:#fff;padding:8px 14px;border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none !important;display:flex;align-items:center;gap:6px}
+  .btn-ghost:hover{background:#f7dba7}
+  .btn-primary{border:none;color:#fff;background:#003459;padding:8px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+  .search-wrap{display:flex;gap:8px;margin-bottom:12px}
+  .search-wrap input,.search-wrap select{border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#fff;flex:1}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+  .modal__panel{background:#fff;border-radius:16px;max-width:640px;width:100%;padding:18px}
+  .modal__head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid #eef2f7;padding-bottom:10px}
+  .close-x{background:none;border:none;font-size:24px;cursor:pointer;color:#64748b}
 </style>
-
 {% endblock %}
-
 
 {% block content %}
 <div class="post-list">
-    <div class="search-bar-container">
-    <form action="" method="GET" class="search-form">
-      <input type="text" name="q" placeholder="Tìm kiếm bài viết theo tiêu đề..." class="search-input" value="{{ request.GET.q | default:'' }}">
-      <button type="submit" class="search-button">
-        <i class="fa-solid fa-search"></i>
-      </button>
-    </form>
+  <!-- Ô tạo nhanh mở modal -->
+  <div id="btn-open-create" class="create-post-trigger">
+    <div class="trigger-avatar">{{ request.user.username|slice:":1"|upper }}</div>
+    <div class="trigger-input">Đặt câu hỏi cho cộng đồng…</div>
+    <button class="btn-ghost" type="button"><i class="fa-regular fa-image"></i> Ảnh</button>
+    <button class="btn-primary" type="button">Đăng</button>
   </div>
-  <h2 style="margin-bottom: 10px; color:#003459;">🐾 Bài viết nổi bật trên PetTalk</h2>
 
+  <!-- Tìm kiếm + Lọc -->
+  <form method="get" class="search-wrap">
+    <input name="q" value="{{ request.GET.q|default:'' }}" placeholder="Tìm theo tiêu đề/nội dung…">
+    <select name="topic">
+      <option value="">— Tất cả chủ đề —</option>
+      {% for value,label in topic_choices %}
+        <option value="{{ value }}" {% if request.GET.topic == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+  </form>
+
+  <!-- Danh sách bài viết -->
   {% for post in posts %}
-  <div class="post-card">
-
-    <div class="user-info">
+  {% reaction_of post request.user as me_react %}
+  <article class="post-card" data-post="{{ post.post_id }}">
+    <div class="user-info" style="display:flex;gap:10px;align-items:center;">
       <div class="avatar">{{ post.username.username|slice:":1"|upper }}</div>
-      <div class="user-meta">
-        <div class="username">
-          {{ post.username.username }}
-          <span class="badge">Cộng tác viên Spa</span>
-        </div>
-        <div class="meta">{{ post.created_at|date:"d/m/Y H:i" }}</div>
+      <div>
+        <div style="font-weight:700;color:#003459">{{ post.username.username }}</div>
+        <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
       </div>
     </div>
 
-    <div class="post-title">{{ post.title }}</div>
-    <div class="post-content">{{ post.content }}</div>
+    <h3 class="post-title">{{ post.title }}</h3>
+    <div class="post-content">{{ post.content|linebreaksbr }}</div>
 
     {% if post.images.all %}
     <div class="post-images">
       {% for img in post.images.all %}
-        <img src="{{ img.image.url }}" alt="Ảnh bài viết">
+        <img src="{{ img.image.url }}" alt="post image">
       {% endfor %}
     </div>
     {% endif %}
 
     <div class="actions">
-      <button class="vote-btn up"><i class="fa-solid fa-thumbs-up"></i></button>
-      <span class="vote-count">{{ post.upvotes }}</span>
-
-      <button class="vote-btn down"><i class="fa-solid fa-thumbs-down"></i></button>
-      <span class="vote-count">{{ post.downvotes }}</span>
-
-      <button class="vote-btn comment-btn with-count">
-        <i class="fa-regular fa-comment"></i>
-        <span class="comment-count-inside">{{ post.comments.all|length }}</span>
-      </button>
-
-      <button class="btn-report"><i class="fa-solid fa-flag"></i> Báo cáo</button>
-    </div>
-
-    <div class="comment-form">
-      <textarea placeholder="Viết bình luận..."></textarea>
-      <button>Đăng</button>
-    </div>
-
-    {% if post.comments.all %}
-    <div style="margin-top:10px;">
-      {% for cmt in post.comments.all %}
-      <div class="comment-box">
-        <strong>{{ cmt.username.username }}</strong>: {{ cmt.content }}
+      <div class="vote-box" data-post="{{ post.post_id }}">
+        <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
+          <i class="fa-solid fa-arrow-up"></i>
+        </button>
+        <span class="vote-count js-count">{{ post.total_vote|default:0 }}</span>
+        <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote">
+          <i class="fa-solid fa-arrow-down"></i>
+        </button>
       </div>
-      {% endfor %}
-    </div>
-    {% endif %}
 
-  </div>
+      <a class="btn-ghost" href="{% url 'forum:post_detail' post.post_id %}">
+        <i class="fa-regular fa-comment"></i> {{ post.comments.count }}
+      </a>
+
+      <button class="btn-ghost js-open-report" data-target="report-{{ post.post_id }}">
+        <i class="fa-solid fa-flag"></i> Báo cáo
+      </button>
+    </div>
+
+    {% include "forum/_report_modal.html" with post=post %}
+  </article>
   {% empty %}
-  <p>Chưa có bài viết nào được đăng.</p>
+  <p>Chưa có bài viết nào.</p>
   {% endfor %}
 </div>
-{% endblock %}
 
-
-{% block right %}
-<div class="right-panel-content">
-  <div class="panel">
-    <h4>🔥 Chủ đề nổi bật</h4>
-    <div class="chip">Huấn luyện</div>
-    <div class="chip">Chăm sóc</div>
-    <div class="chip">Dinh dưỡng</div>
-    <div class="chip">Cấp cứu</div>
-  </div>
-
-  <div class="panel">
-    <h4>📅 Sự kiện sắp diễn ra</h4>
-    <div class="event">
-      <strong>Workshop Grooming</strong>
-      <small>11/11/2025</small>
+<!-- Modal tạo bài viết -->
+<div id="create-modal" class="modal">
+  <div class="modal__panel">
+    <div class="modal__head">
+      <h3 style="margin:0;color:#003459">Tạo bài viết mới</h3>
+      <button class="close-x" data-close>&times;</button>
     </div>
-    <div class="event">
-      <strong>Pet Adoption Day</strong>
-      <small>25/11/2025</small>
-    </div>
+    <form method="post" action="{% url 'forum:create_post' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div style="display:grid;gap:10px">
+        <input class="form-control" name="title" placeholder="Tiêu đề" required>
+        <select class="form-control" name="topic" required>
+          <option value="" disabled selected>— Chọn chủ đề —</option>
+          {% for value,label in topic_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+        <textarea class="form-control" name="content" rows="4" placeholder="Chia sẻ điều gì đó…"></textarea>
+        <input class="form-control" type="file" name="images" accept="image/*" multiple>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px">
+        <button type="button" class="btn-ghost" data-close>Hủy</button>
+        <button type="submit" class="btn-primary">Đăng</button>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}
-
 
 {% block extra_js %}
 <script>
-document.addEventListener("click", e => {
+function getCookie(name){let v=null;if(document.cookie&&document.cookie!==''){const c=document.cookie.split(';');for(let i=0;i<c.length;i++){const s=c[i].trim();if(s.substring(0,name.length+1)===(name+'=')){v=decodeURIComponent(s.substring(name.length+1));break}}}return v}
+const csrftoken=getCookie('csrftoken');
 
-  // --- 1. XỬ LÝ TOGGLE FORM BÌNH LUẬN ---
-  const commentBtn = e.target.closest(".comment-btn");
-  if (commentBtn) {
-    // Tìm thẻ .post-card cha gần nhất
-    const postCard = commentBtn.closest(".post-card");
-    if (postCard) {
-      const form = postCard.querySelector(".comment-form");
-      if (form) {
-        // Toggle (hiện/ẩn) form
-        form.style.display = form.style.display === "block" ? "none" : "block";
+// === Mở modal tạo bài ===
+const modal=document.getElementById('create-modal');
+document.getElementById('btn-open-create')?.addEventListener('click',()=>modal.style.display='flex');
+modal?.addEventListener('click',e=>{if(e.target===modal||e.target.hasAttribute('data-close'))modal.style.display='none'});
+
+// === Vote AJAX ===
+document.querySelectorAll('.vote-box').forEach(box=>{
+  const buttons=box.querySelectorAll('.js-vote');
+  const countEl=box.querySelector('.js-count');
+  buttons.forEach(btn=>{
+    btn.addEventListener('click',async()=>{
+      const type=btn.dataset.type;
+      const postId=box.dataset.post;
+      const url=`/forum/${postId}/react/${type}/`;
+      const res=await fetch(url,{method:'POST',headers:{'X-CSRFToken':csrftoken,'X-Requested-With':'XMLHttpRequest'}});
+      if(res.ok){
+        const data=await res.json();
+        countEl.textContent=data.total_votes??0;
+        buttons.forEach(b=>b.classList.remove('active-up','active-down'));
+        if(data.reaction==='upvote')box.querySelector('[data-type="upvote"]').classList.add('active-up');
+        if(data.reaction==='downvote')box.querySelector('[data-type="downvote"]').classList.add('active-down');
       }
-    }
-  }
+    });
+  });
+});
 
-  // --- 2. XỬ LÝ UPVOTE ---
-  const upvoteBtn = e.target.closest(".vote-btn.up");
-  if (upvoteBtn) {
-    // Kiểm tra xem đã vote chưa (bằng class 'voted')
-    if (upvoteBtn.classList.contains('voted')) {
-      return; // Nếu đã vote thì không làm gì cả
-    }
-
-    // Tìm span đếm số ngay bên cạnh nút upvote
-    const countSpan = upvoteBtn.nextElementSibling;
-
-    if (countSpan && countSpan.classList.contains("vote-count")) {
-      // Lấy số hiện tại, chuyển sang số nguyên, và + 1
-      let currentVotes = parseInt(countSpan.textContent, 10);
-      countSpan.textContent = currentVotes + 1;
-
-      // Thêm class 'voted' để đánh dấu và vô hiệu hóa
-      upvoteBtn.classList.add('voted');
-
-      // Vô hiệu hóa luôn nút downvote
-      const actions = upvoteBtn.closest('.actions');
-      const downvoteBtn = actions.querySelector('.vote-btn.down');
-      if (downvoteBtn) {
-        downvoteBtn.classList.add('voted');
-      }
-    }
-  }
-
-  // --- 3. XỬ LÝ DOWNVOTE ---
-  const downvoteBtn = e.target.closest(".vote-btn.down");
-  if (downvoteBtn) {
-    // Kiểm tra xem đã vote chưa
-    if (downvoteBtn.classList.contains('voted')) {
-      return;
-    }
-
-    // Tìm span đếm số ngay bên cạnh nút downvote
-    const countSpan = downvoteBtn.nextElementSibling;
-
-    if (countSpan && countSpan.classList.contains("vote-count")) {
-      let currentVotes = parseInt(countSpan.textContent, 10);
-      countSpan.textContent = currentVotes + 1;
-
-      // Đánh dấu và vô hiệu hóa
-      downvoteBtn.classList.add('voted');
-
-      // Vô hiệu hóa luôn nút upvote
-      const actions = downvoteBtn.closest('.actions');
-      const upvoteBtn = actions.querySelector('.vote-btn.up');
-      if (upvoteBtn) {
-        upvoteBtn.classList.add('voted');
-      }
-    }
-  }
-
+// === Modal báo cáo ===
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.js-open-report');
+  if(btn){const id=btn.getAttribute('data-target');const m=document.getElementById(id);if(m)m.style.display='flex';}
+  const modal=e.target.closest('.modal');
+  if(modal&&(e.target===modal||e.target.hasAttribute('data-close')))modal.style.display='none';
 });
 </script>
 {% endblock %}
