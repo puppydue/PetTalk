@@ -19,6 +19,11 @@ urlpatterns = [
     path('events/', include('Events.urls')),
     # mod
     path('moderation/', include('moderation.urls')),
+
+    #Mod
+    path('moderation/', include('moderation.urls')),
+    path('badge/', include('badge.urls')),
+
 ]
 
 # 🖼️ Chỉ bật khi đang DEV để hiển thị ảnh từ media/
