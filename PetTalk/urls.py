@@ -19,6 +19,8 @@ urlpatterns = [
     # 🎉 Events app
     path('events/', include('Events.urls')),
 
+    #Mod
+    path('moderation/', include('moderation.urls')),
     path('badge/', include('badge.urls')),
 
 ]

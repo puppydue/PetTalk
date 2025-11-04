@@ -23,3 +23,21 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Event_Registration(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Chờ duyệt'),
+        ('approved', 'Đã duyệt'),
+        ('rejected', 'Từ chối'),
+    ]
+
+    event_regis_id = models.AutoField(primary_key=True)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='registrations')
+    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='event_registrations')
+    requested_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    def __str__(self):
+        return f"{self.username.username} - {self.event.title}"

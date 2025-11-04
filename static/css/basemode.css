@@ -1,0 +1,486 @@
+/* ----------- Color Variables ----------- */
+:root {
+  --primary: #003459;         /* Xanh dương đậm */
+  --secondary: #F7DBA7;       /* Vàng nhạt */
+  --bg: #FFF8ED;              /* Nền chung */
+  --card: #ffffff;            /* Nền khối content */
+  --line: #e2e8f0;            /* Đường viền */
+  --text: #0f172a;            /* Màu chữ chính */
+  --muted: #475569;           /* Màu chữ phụ */
+  --radius: 14px;             /* Bo góc */
+}
+
+/* ----------- Global Style ----------- */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* -------- Header -------- */
+.main-header {
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+}
+.logo {
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.user-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+/* -------- Layout (Sidebar - Content) -------- */
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+  background: #fFF8ED;
+}
+
+/* -------- Sidebar -------- */
+.sidebar {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  height: fit-content;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  color: var(--text);
+  font-weight: 500;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.nav-item:hover,
+.nav-item.active {
+  background: var(--secondary);
+  color: var(--primary);
+}
+
+/* -------- Main Content Wrapper -------- */
+.main-content {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+/* -------- Table Styling -------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+th, td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+/* -------- Status Badge -------- */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.status-approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+.status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* -------- Action Button -------- */
+.action-btn {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.action-btn:hover {
+  text-decoration: underline;
+}
+
+/* -------- Responsive -------- */
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  .sidebar {
+    display: none;
+  }
+}
+.tab-wrapper {
+  display: inline-flex;
+  background: var(--card);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.tab-btn:not(.active):hover {
+  background: var(--secondary);
+  color: var(--primary);
+}
+/* Thẻ hàng có bóng nhẹ */
+.styled-table tbody tr {
+  background: var(--card);
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+.styled-table tbody tr:hover {
+  background: #f9fafb;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Nút kiểm tra */
+.btn-check {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.btn-check:hover {
+  background: #00263e;
+}
+
+/* Popup (modal) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 450px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.modal h3 {
+  margin-top: 0;
+  color: var(--primary);
+}
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.btn-approve, .btn-reject {
+  flex: 1;
+  margin: 0 5px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+.btn-approve { background: #22c55e; }
+.btn-approve:hover { background: #16a34a; }
+.btn-reject { background: #ef4444; }
+.btn-reject:hover { background: #b91c1c; }
+
+/* Cải thiện badge */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+.status-pending {
+  background: #fef9c3;
+  color: #854d0e;
+  border-color: #fde68a;
+}
+.status-approved {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+.status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+<script>
+function openModal(id) {
+  const modal = document.getElementById("modal");
+  modal.style.display = "flex";
+  // có thể thêm AJAX load chi tiết nếu cần
+}
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+}
+</script>
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal box */
+.modal-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 350px;
+  max-width: 90%;
+}
+
+/* Close button */
+.close-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-close {
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--muted);
+}
+.modal-close:hover {
+  color: red;
+}
+
+/* Footer buttons */
+.modal-footer {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-approve {
+  background: #16a34a;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.btn-reject {
+  background: #dc2626;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.btn-close {
+  background: #475569;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+/* Khung chứa 2 thẻ hành động */
+.action-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+}
+
+/* Style chung cho thẻ Duyệt / Từ chối */
+.action-card {
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 500;
+    border: 1px solid var(--line);
+    cursor: default; /* Không bấm được */
+}
+
+/* Thẻ màu xanh - Duyệt */
+.approve-card {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #34d399;
+}
+
+/* Thẻ màu đỏ - Từ chối */
+.reject-card {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #f87171;
+}
+/* Card filter */
+.filter-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    margin-bottom: 20px;
+}
+
+.filter-title {
+    font-weight: 600;
+}
+
+.filter-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+    border: 1px solid var(--line);
+    background: #fff;
+    transition: 0.2s;
+}
+
+.filter-btn:hover {
+    background: var(--secondary);
+    color: var(--primary);
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+/* Nút Kiểm tra */
+.btn-check {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--primary);
+    background: var(--primary);
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-check:hover {
+    background: #00263d;
+}
+
+/* Giới hạn độ rộng lý do để không phá bố cục */
+.table-reports td.reason-column {
+    max-width: 450px;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.5;
+}
+
+/* Bộ lọc */
+.filter-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+/* Badge trạng thái trong bảng báo cáo */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    height: 30px;                 /* Cố định chiều cao để không bị bung dòng */
+    padding: 0 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+/* Các màu ứng với trạng thái */
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-approved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Căn giữa ô trạng thái của bảng */
+table.styled-table td {
+    vertical-align: middle;
+}
