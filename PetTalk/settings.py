@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'forum',
     'Events',       # app sự kiện (E viết hoa theo tên thư mục của bạn)
     'accounts',
-    'moderation',
+    'badge',
 ]
 
 
@@ -94,15 +94,32 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            # Bỏ 'help_text' ra khỏi đây
+        },
+        'help_text': _('Mật khẩu quá giống với thông tin cá nhân của bạn.'), # <--- Đặt ở đây
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+            # Bỏ 'help_text' ra khỏi đây
+        },
+        'help_text': _('Mật khẩu quá ngắn. Phải chứa ít nhất 8 ký tự.'), # <--- Đặt ở đây
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'OPTIONS': {
+            # Bỏ 'help_text' ra khỏi đây
+        },
+        'help_text': _('Mật khẩu này quá phổ biến, dễ bị đoán ra.'), # <--- Đặt ở đây
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'OPTIONS': {
+            # Bỏ 'help_text' ra khỏi đây
+        },
+        'help_text': _('Mật khẩu không được chứa toàn bộ là số.'), # <--- Đặt ở đây
     },
 ]
 
@@ -130,9 +147,10 @@ STATICFILES_DIRS = [
 TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'forum:post_list'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = '/'                     # trang login chính (auth_slider ở accounts.urls)
+LOGIN_REDIRECT_URL = 'forum:post_list'   # sau khi đăng nhập → forum
+LOGOUT_REDIRECT_URL = '/'           # sau khi đăng xuất → quay về login
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import os
 MEDIA_URL = '/media/'

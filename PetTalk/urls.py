@@ -11,14 +11,16 @@ urlpatterns = [
     path('forum/', include('forum.urls')),
 
     # Hệ thống xác thực
+    path('', include('accounts.urls')),
     path('accounts/', include('accounts.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 
 
     # 🎉 Events app
     path('events/', include('Events.urls')),
-    # mod
-    path('moderation/', include('moderation.urls')),
+
+    path('badge/', include('badge.urls')),
+
 ]
 
 # 🖼️ Chỉ bật khi đang DEV để hiển thị ảnh từ media/

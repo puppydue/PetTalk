@@ -1,19 +1,113 @@
 {% extends "base.html" %}
 {% block title %}Danh sách người đăng ký{% endblock %}
 {% block content %}
-<div class="event-list">
-  <h2>👥 Danh sách người đăng ký cho: {{ event.title }}</h2>
 
-  {% if participants %}
-    <ul>
-      {% for p in participants %}
-        <li>{{ p.username }}</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>Chưa có ai đăng ký tham gia sự kiện này.</p>
-  {% endif %}
+<div class="participants-container">
+  <div class="participants-card">
+    <h2>👥 Danh sách người đăng ký</h2>
+    <p><strong>Sự kiện:</strong> {{ event.title }}</p>
+    <hr>
 
-  <a href="{% url 'danh_sach_su_kien' %}" class="btn btn-secondary">← Quay lại danh sách sự kiện</a>
+    {% if participants %}
+      <table class="participants-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tên người dùng</th>
+            <th>Ngày tham gia</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in participants %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.date_joined|date:"d/m/Y H:i" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty-msg">😿 Chưa có ai đăng ký sự kiện này.</p>
+    {% endif %}
+
+    <div class="back-btn">
+      <a href="{% url 'danh_sach_su_kien' %}">← Quay lại danh sách sự kiện</a>
+    </div>
+  </div>
 </div>
+
+<style>
+.participants-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+}
+
+.participants-card {
+  background: #fffef7;
+  border-radius: 16px;
+  border: 2px solid #ffe082;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  padding: 30px 50px;
+  width: 700px;
+  text-align: center;
+}
+
+.participants-card h2 {
+  color: #003459;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.participants-card p {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.participants-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 15px;
+}
+
+.participants-table th {
+  background: #003459;
+  color: white;
+  padding: 10px;
+  border-radius: 8px 8px 0 0;
+}
+
+.participants-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.participants-table tr:nth-child(even) {
+  background: #fdf6e4;
+}
+
+.empty-msg {
+  font-style: italic;
+  color: #777;
+  margin-top: 20px;
+}
+
+.back-btn {
+  margin-top: 25px;
+}
+.back-btn a {
+  color: #1e88e5;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.back-btn a:hover {
+  color: #003459;
+  text-decoration: underline;
+}
+</style>
+
 {% endblock %}

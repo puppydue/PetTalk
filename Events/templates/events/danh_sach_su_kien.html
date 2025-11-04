@@ -2,47 +2,6 @@
 {% block title %}Danh sách sự kiện{% endblock %}
 {% block content %}
 
-{% if messages %}
-  {% for message in messages %}
-    <div class="center-toast {{ message.tags }}">
-      {{ message }}
-    </div>
-  {% endfor %}
-  <script>
-    setTimeout(() => {
-      document.querySelectorAll('.center-toast').forEach(msg => {
-        msg.style.opacity = '0';
-        msg.style.transform = 'translate(-50%, -40%) scale(0.9)';
-      });
-    }, 3000);
-  </script>
-  <style>
-    .center-toast {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1);
-      background: #4caf50;
-      color: white;
-      font-weight: 600;
-      padding: 14px 26px;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.25);
-      z-index: 9999;
-      min-width: 360px;
-      transition: all 0.8s ease;
-      animation: fadeInPop 0.4s ease-out;
-    }
-    .center-toast.error { background: #f44336; }
-    .center-toast.warning { background: #ff9800; }
-    @keyframes fadeInPop {
-      from { opacity: 0; transform: translate(-50%, -60%) scale(0.9); }
-      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    }
-  </style>
-{% endif %}
-
 <div class="event-list">
 
   <div class="create-event-wrapper">
@@ -61,32 +20,37 @@
 
       <div class="carousel-container" id="myEventsCarousel">
         {% for e in su_kien_cua_toi %}
-            <div class="event-card">
-                {% if e.image %}
-            <img src="{{ e.image.url }}" alt="{{ e.title }}">
-        {% endif %}
-        <h4>{{ e.title }}</h4>
-        <p>{{ e.description|truncatechars:80 }}</p>
-        <p><strong>Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
-        <p>
-            <strong>Trạng thái:</strong>
-            {% if e.status == 'approved' %}
+          <div class="event-card">
+            {% if e.image %}
+              <img src="{{ e.image.url }}" alt="{{ e.title }}">
+            {% endif %}
+            <h4>{{ e.title }}</h4>
+            <p>{{ e.description|truncatechars:80 }}</p>
+            <p><strong>Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
+            <p>
+              <strong>Trạng thái:</strong>
+              {% if e.status == 'approved' %}
                 ✅ Đã phê duyệt
-            {% else %}
+              {% elif e.status == 'rejected' %}
+                ❌ Bị từ chối
+              {% else %}
                 ⏳ Chờ phê duyệt
+              {% endif %}
+            </p>
+
+            {% if not e.is_past %}
+              <div class="event-actions">
+                <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">🔧 Chỉnh sửa</a>
+                {% if e.status == 'approved' %}
+                  <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem danh sách người đăng ký</a>
+                {% endif %}
+                <a href="{% url 'xoa_su_kien' e.id %}" class="delete-btn">🗑️ Xóa sự kiện</a>
+              </div>
+            {% else %}
+              <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
             {% endif %}
-        </p>
-
-        <div class="event-actions">
-            <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">🔧 Chỉnh sửa</a>
-
-            {% if e.status == 'approved' %}
-                <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem danh sách người đăng ký</a>
-            {% endif %}
-        </div>
-      </div>
-    {% endfor %}
-
+          </div>
+        {% endfor %}
       </div>
 
       <button class="carousel-btn right" onclick="scrollRight()">&#10095;</button>
@@ -96,223 +60,161 @@
     {% endif %}
   </section>
 
-  <style>
-  /* ====== CAROUSEL ====== */
-  .carousel-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 40px;
-  }
-  .carousel-container {
-    display: flex;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    gap: 25px;
-    padding: 10px;
-    scrollbar-width: none;
-  }
-  .carousel-container::-webkit-scrollbar { display: none; }
-  .carousel-btn {
-    background: #ffb84d;
-    border: none;
-    color: white;
-    font-size: 24px;
-    padding: 10px 15px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: 0.3s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  }
-  .carousel-btn:hover {
-    background: #ff9800;
-    transform: scale(1.1);
-  }
-  .left { position: absolute; left: -45px; }
-  .right { position: absolute; right: -45px; }
-
-  /* ====== CARD ====== */
-  .event-card {
-    flex: 0 0 280px;
-    background: #fffef7;
-    border-radius: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    padding: 18px;
-    text-align: left;
-    border: 1.5px solid #ffe082;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 380px;
-  }
-  .event-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-  }
-  .event-card img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 12px;
-  }
-  .edit-btn {
-    align-self: flex-start;
-    margin-top: auto;
-    background: linear-gradient(135deg, #ffb84d, #ff9800);
-    color: white;
-    font-weight: 600;
-    padding: 10px 16px;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: 0.3s;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  }
-  .edit-btn:hover {
-    background: linear-gradient(135deg, #ffa726, #fb8c00);
-    transform: translateY(-2px);
-  }
-  </style>
-
-  <script>
-  function scrollLeft() {
-    document.getElementById('myEventsCarousel').scrollBy({ left: -300, behavior: 'smooth' });
-  }
-  function scrollRight() {
-    document.getElementById('myEventsCarousel').scrollBy({ left: 300, behavior: 'smooth' });
-  }
-  </script>
-
   <!-- 🌍 DANH SÁCH SỰ KIỆN -->
   <section class="community-events">
     <h3>🌍 Danh sách sự kiện</h3>
 
-    {% if request.GET.success %}
-      <div id="flash-message" class="flash-message success">✅ Bạn đã đăng ký tham gia sự kiện thành công!</div>
-    {% elif request.GET.cancel %}
-      <div id="flash-message" class="flash-message warning">❌ Bạn đã hủy đăng ký sự kiện thành công!</div>
-    {% endif %}
-
     {% if danh_sach_su_kien %}
     <div class="event-grid">
-     {% for e in danh_sach_su_kien %}
+      {% for e in danh_sach_su_kien %}
         <div class="event-card">
-            {% if e.image %}
-                <img src="{{ e.image.url }}" alt="{{ e.title }}">
+          {% if e.image %}
+            <img src="{{ e.image.url }}" alt="{{ e.title }}">
+          {% endif %}
+          <h4>{{ e.title }}</h4>
+          <p class="creator">👤 Tạo bởi: <strong>{{ e.creator.username }}</strong></p>
+          <p>{{ e.description|truncatechars:80 }}</p>
+          <p><strong>📍 Địa điểm:</strong> {{ e.location }}</p>
+          <p><strong>🕓 Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
+
+          {% if e.is_past %}
+            <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
+          {% else %}
+            {% if e.creator == user %}
+              <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem danh sách người đăng ký</a>
+            {% elif user in e.participants.all %}
+              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn">❌ Hủy đăng ký</a>
+            {% else %}
+              <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn">🐾 Đăng ký tham gia</a>
             {% endif %}
-
-            <h4>{{ e.title }}</h4>
-            <p class="creator">👤 Tạo bởi: <strong>{{ e.creator.username }}</strong></p>
-
-            <p>{{ e.description|truncatechars:80 }}</p>
-            <p><strong>📍 Địa điểm:</strong> {{ e.location }}</p>
-            <p><strong>🕓 Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
-
-
-        {% if e.creator == user %}
-            <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem danh sách người đăng ký</a>
-        {% elif user in e.participants.all %}
-            <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn">❌ Hủy đăng ký</a>
-        {% else %}
-            <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn">🐾 Đăng ký tham gia</a>
-        {% endif %}
-
-      </div>
+          {% endif %}
+        </div>
       {% endfor %}
     </div>
     {% else %}
       <p>Chưa có sự kiện nào được phê duyệt.</p>
     {% endif %}
   </section>
-
-  <script>
-  setTimeout(() => {
-    const msg = document.getElementById("flash-message");
-    if (msg) msg.style.display = "none";
-  }, 3500);
-  </script>
-
-  <style>
-    .flash-message {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #4caf50;
-      color: white;
-      padding: 14px 28px;
-      border-radius: 10px;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      z-index: 1000;
-      animation: fadeInOut 3.5s ease forwards;
-      text-align: center;
-      min-width: 360px;
-    }
-    .flash-message.warning { background: #ff9800; }
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translate(-50%, -60%); }
-      10%, 90% { opacity: 1; transform: translate(-50%, -50%); }
-      100% { opacity: 0; transform: translate(-50%, -40%); }
-    }
-  </style>
-
 </div>
 
+<!-- ✅ CSS -->
 <style>
+.event-list {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 20px;
+  background: none;
+  border: none;
+  box-sizing: border-box;
+}
 
+/* ====== CAROUSEL ====== */
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+.carousel-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 25px;
+  padding: 10px;
+  scrollbar-width: none;
+}
+.carousel-container::-webkit-scrollbar { display: none; }
+.carousel-btn {
+  background: #ffb84d;
+  border: none;
+  color: white;
+  font-size: 24px;
+  padding: 10px 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+.carousel-btn:hover {
+  background: #ff9800;
+  transform: scale(1.1);
+}
+.left { position: absolute; left: -45px; }
+.right { position: absolute; right: -45px; }
+
+/* ====== CARD ====== */
+.event-card {
+  flex: 0 0 280px;
+  background: #fffef7;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 18px;
+  text-align: left;
+  border: 1.5px solid #ffe082;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 350px;
+}
+.event-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+.event-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+/* ====== BUTTONS ====== */
+.edit-btn, .join-btn, .view-btn, .cancel-btn, .delete-btn {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: 0.25s;
+  padding: 8px 14px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  width: fit-content;
+}
+.edit-btn {
+  background: linear-gradient(135deg, #ffb84d, #ff9800);
+  color: white;
+}
+.delete-btn {
+  background: linear-gradient(135deg, #b71c1c, #f44336);
+  color: white;
+}
+.join-btn, .view-btn { background: #003459; color: white; }
+.view-btn { background: linear-gradient(135deg, #6ba6ff, #1e88e5); }
+.cancel-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ff4757);
+  color: white;
+}
+.edit-btn:hover, .join-btn:hover, .view-btn:hover, .cancel-btn:hover, .delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+/* ====== GRID ====== */
 .event-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 2fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 16px;
   margin-top: 10px;
 }
-.event-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: 0.3s;
-}
-.event-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-.join-btn {
-  display: inline-block;
-  background: #003459;
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 14px;
-}
-.join-btn:hover { background: #0056a3; }
-.cancel-btn {
-  display: inline-block;
-  background: linear-gradient(135deg, #ff6b6b, #ff4757);
-  color: #fff;
-  padding: 7px 14px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  border: none;
-  transition: all 0.25s ease;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-}
-.cancel-btn:hover {
-  background: linear-gradient(135deg, #ff4757, #e84118);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 12px rgba(0,0,0,0.25);
-}
+
+/* ====== CREATE BUTTON ====== */
 .create-event-wrapper {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 10px;
-  margin-right: 15px;
 }
 .create-event-btn {
   background: linear-gradient(135deg, #4CAF50, #2E7D32);
@@ -322,61 +224,45 @@
   border-radius: 10px;
   text-decoration: none;
   transition: 0.3s;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 .create-event-btn:hover {
   background: linear-gradient(135deg, #43A047, #1B5E20);
   transform: translateY(-2px);
 }
-</style>
-<style>
 .creator {
   font-size: 14px;
   color: #444;
   margin-bottom: 6px;
 }
-.creator strong {
-  color: #003459;
-  font-weight: 600;
-}
-</style>
-
-<style>
-.join-btn, .view-btn {
-  display: inline-block;
-  background: #003459;
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  transition: 0.25s;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-  width: fit-content; /* ✅ nút tự co theo độ dài chữ */
-}
-
-.join-btn:hover, .view-btn:hover {
-  background: #0056a3;
-  transform: translateY(-2px);
-}
-
-.view-btn {
-  background: linear-gradient(135deg, #6ba6ff, #1e88e5);
-}
-
-.view-btn:hover {
-  background: linear-gradient(135deg, #4a90e2, #1565c0);
-}
-</style>
-
-<style>
+.creator strong { color: #003459; font-weight: 600; }
 .event-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: auto;
 }
+
+/* ====== EVENT ENDED LABEL ====== */
+.event-ended {
+  text-align: center;
+  font-weight: 600;
+  color: #666;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px dashed #bbb;
+}
 </style>
+
+<script>
+function scrollLeft() {
+  document.getElementById('myEventsCarousel').scrollBy({ left: -300, behavior: 'smooth' });
+}
+function scrollRight() {
+  document.getElementById('myEventsCarousel').scrollBy({ left: 300, behavior: 'smooth' });
+}
+</script>
 
 {% endblock %}
