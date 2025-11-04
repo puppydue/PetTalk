@@ -103,3 +103,31 @@ class ReportsPost(models.Model):
 
     def __str__(self):
         return f"Report {self.post} by {self.reporter}"
+class ReportsComment(models.Model):
+    rpcmt_id = models.AutoField(primary_key=True)  # Khóa chính
+    username = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reported_comments'
+    )  # Người báo cáo
+    comment = models.ForeignKey(
+        'Comment',
+        on_delete=models.CASCADE,
+        related_name='reports',
+        null=True,  # 👈 tạm cho phép null để migrate
+        blank=True
+    ) # Bình luận bị báo cáo
+    reason = models.CharField(max_length=255)  # Lý do báo cáo
+    details = models.TextField(blank=True, null=True)  # Chi tiết bổ sung
+    created_at = models.DateTimeField(auto_now_add=True)  # Ngày giờ tạo
+    status = models.CharField(max_length=20, default='pending')  # Trạng thái xử lý
+
+    class Meta:
+        db_table = 'reports_comment'  # Giữ đúng tên bảng như ERD
+        ordering = ['-created_at']
+        verbose_name = "Báo cáo bình luận"
+        verbose_name_plural = "Danh sách báo cáo bình luận"
+        unique_together = ('username', 'comment')  # Mỗi người chỉ báo cáo 1 lần/1 bình luận
+
+    def __str__(self):
+        return f"ReportComment #{self.rpcmt_id} - {self.username} → Comment {self.comment.id}"

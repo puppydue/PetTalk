@@ -62,14 +62,30 @@
 
   <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
     {% for c in comments %}
-      <div class="comment-box" style="background:#f9fafb;padding:10px;border-radius:12px">
-        <strong style="color:#003459">{{ c.username.username }}</strong>
-        <small style="color:#64748b"> • {{ c.created_at|date:"d/m/Y H:i" }}</small>
-        <div style="margin-top:4px">{{ c.content|linebreaksbr }}</div>
+<div class="comment-box" style="background:#f9fafb;padding:10px;border-radius:12px;position:relative;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <strong style="color:#003459">{{ c.username.username }}</strong>
+      <small style="color:#64748b"> • {{ c.created_at|date:"d/m/Y H:i" }}</small>
+    </div>
+    <!-- Nút ba chấm -->
+    <div class="comment-menu-wrapper" style="position:relative;">
+      <button class="comment-menu-btn" style="background:none;border:none;font-size:18px;color:#64748b;cursor:pointer;">⋯</button>
+      <div class="comment-menu" style="display:none;position:absolute;right:0;top:20px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.1);z-index:10;">
+        {% if c.username == request.user %}
+          <button class="menu-item js-edit-comment" data-id="{{ c.id }}" style="padding:8px 14px;width:100%;text-align:left;border:none;background:none;">Chỉnh sửa</button>
+          <button class="menu-item js-delete-comment" data-id="{{ c.id }}" style="padding:8px 14px;width:100%;text-align:left;border:none;background:none;color:#dc2626;">Xóa</button>
+        {% else %}
+          <button class="menu-item js-open-report-comment" data-target="report-comment-{{ c.id }}" style="padding:8px 14px;width:100%;text-align:left;border:none;background:none;color:#003459;">Báo cáo</button>
+        {% endif %}
       </div>
-    {% empty %}
-      <p>Hãy là người bình luận đầu tiên!</p>
-    {% endfor %}
+    </div>
+  </div>
+  <div style="margin-top:4px">{{ c.content|linebreaksbr }}</div>
+
+  {% include "forum/_report_comment_modal.html" with comment=c %}
+</div>
+{% endfor %}
   </div>
 </article>
 {% endblock %}
@@ -99,4 +115,35 @@ document.querySelectorAll('.vote-box').forEach(box=>{
   });
 });
 </script>
+<script>
+document.addEventListener('click', e => {
+  // Toggle menu ba chấm
+  const btn = e.target.closest('.comment-menu-btn');
+  document.querySelectorAll('.comment-menu').forEach(m => m.style.display='none');
+  if (btn) {
+    const menu = btn.parentElement.querySelector('.comment-menu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // Đóng khi click ngoài menu
+  if (!e.target.closest('.comment-menu-wrapper')) {
+    document.querySelectorAll('.comment-menu').forEach(m => m.style.display='none');
+  }
+
+  // Mở modal báo cáo bình luận
+  const reportBtn = e.target.closest('.js-open-report-comment');
+  if (reportBtn) {
+    const id = reportBtn.dataset.target;
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'flex';
+  }
+
+  // Đóng modal báo cáo
+  const modal = e.target.closest('.modal');
+  if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) {
+    modal.style.display = 'none';
+  }
+});
+</script>
+
 {% endblock %}
