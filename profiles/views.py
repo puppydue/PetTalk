@@ -59,8 +59,9 @@ def pet_create(request):
             pet = form.save(commit=False)
             pet.user = request.user
             pet.save()
-            url = reverse("profiles:my_profile") + "?added_pet=1#add-pet-form"
-            return redirect(url)
+            # ✅ dùng messages thay vì query string
+            messages.success(request, "✅ Đã thêm thú cưng thành công!")
+            return redirect("profiles:my_profile")
     return redirect("profiles:my_profile")
 
 @login_required
