@@ -10,6 +10,17 @@ class UserProfile(models.Model):
     birthdate = models.DateField(blank=True, null=True)
     location = models.CharField(max_length=120, blank=True)
 
+    def get_role_display(self):
+        """✅ Trả về vai trò thực tế dựa theo quyền user"""
+        if self.user.is_superuser:
+            return "Admin"
+        elif self.user.is_staff:
+            return "Moderator"
+        return "Thành viên"
+
+    def __str__(self):
+        return f"{self.user.username} ({self.get_role_display()})"
+
     def __str__(self):
         return f"UserProfile: {self.user.username}"
 
