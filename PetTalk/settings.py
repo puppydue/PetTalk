@@ -41,7 +41,7 @@ INSTALLED_APPS = [
 
     # Custom apps
     'forum',
-    'Events',       # app sự kiện (E viết hoa theo tên thư mục của bạn)
+    'Events',  # app sự kiện (E viết hoa theo tên thư mục của bạn)
     'accounts',
     'badge',
     'profiles',
