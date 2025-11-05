@@ -1,11 +1,94 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Xóa sự kiện{% endblock %}
 {% block content %}
-<h2>🗑️ Xoá sự kiện</h2>
-<p>Bạn có chắc muốn xoá sự kiện <strong>"{{ event.title }}"</strong> không?</p>
 
-<form method="post">
-  {% csrf_token %}
-  <button type="submit" class="btn-danger">Xác nhận xoá</button>
-  <a href="{% url 'danh_sach_su_kien' %}" class="btn-cancel">Huỷ</a>
-</form>
+<div class="delete-event-container">
+  <div class="delete-card">
+    <h2> Xóa sự kiện</h2>
+    <p>Bạn có chắc muốn xóa sự kiện <strong>"{{ event.title }}"</strong> không?</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="btn-group">
+        <button type="submit" class="confirm-btn"> Xác nhận xóa</button>
+        <a href="{% url 'danh_sach_su_kien' %}" class="cancel-btn"> Hủy</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.delete-event-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+}
+
+.delete-card {
+  background: #fffef7;
+  padding: 40px 60px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  border: 2px solid #ffe082;
+  text-align: center;
+  width: 480px;
+  transition: transform 0.3s ease;
+}
+.delete-card:hover {
+  transform: translateY(-3px);
+}
+
+.delete-card h2 {
+  color: #003459;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.delete-card p {
+  font-size: 16px;
+  margin-bottom: 28px;
+  color: #333;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #f44336, #e53935);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+.confirm-btn:hover {
+  background: linear-gradient(135deg, #e53935, #c62828);
+  transform: translateY(-2px);
+}
+
+.cancel-btn {
+  background: linear-gradient(135deg, #6ba6ff, #1e88e5);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  transition: 0.3s;
+}
+.cancel-btn:hover {
+  background: linear-gradient(135deg, #4a90e2, #1565c0);
+  transform: translateY(-2px);
+}
+</style>
+
 {% endblock %}

@@ -6,7 +6,7 @@
 <!-- 🟥 KHỐI GIAO DIỆN XÁC NHẬN HUỶ -->
 <div class="cancel-wrapper">
   <div class="cancel-box">
-    <h2>❌ Xác nhận huỷ đăng ký sự kiện</h2>
+    <h2> Xác nhận huỷ đăng ký sự kiện</h2>
 
     <h3>{{ event.title }}</h3>
     <p><strong>🗓 Thời gian:</strong> {{ event.date|date:"d/m/Y H:i" }}</p>
@@ -14,14 +14,14 @@
     <p><strong>📖 Mô tả:</strong> {{ event.description }}</p>
 
     <div class="warning-text">
-      ⚠️ Bạn có chắc chắn muốn huỷ đăng ký tham gia sự kiện này không?<br>
+       Bạn có chắc chắn muốn huỷ đăng ký tham gia sự kiện này không?<br>
       Hành động này sẽ xoá tên bạn khỏi danh sách người tham gia.
     </div>
 
     <form method="post" class="action-buttons">
       {% csrf_token %}
-      <button type="submit" class="confirm-btn">✅ Xác nhận huỷ</button>
-      <a href="{% url 'danh_sach_su_kien' %}" class="back-btn">↩ Quay lại</a>
+      <button type="submit" class="confirm-btn"> Xác nhận huỷ</button>
+      <a href="{% url 'danh_sach_su_kien' %}" class="back-btn"> Quay lại</a>
     </form>
   </div>
 </div>

@@ -2,7 +2,7 @@
 {% block title %}Đăng ký tham gia sự kiện{% endblock %}
 {% block content %}
 <div class="confirm-container">
-  <h2>🐾 Xác nhận đăng ký sự kiện</h2>
+  <h2> Xác nhận đăng ký sự kiện</h2>
 
   <div class="event-info">
     <h3>{{ event.title }}</h3>
@@ -17,14 +17,14 @@
   <form method="POST">
     {% csrf_token %}
     <div class="buttons">
-      <button type="submit" class="confirm-btn">✅ Xác nhận đăng ký</button>
-      <a href="{% url 'danh_sach_su_kien' %}" class="cancel-btn">❌ Hủy</a>
+      <button type="submit" class="confirm-btn"> Xác nhận đăng ký</button>
+      <a href="{% url 'danh_sach_su_kien' %}" class="cancel-btn"> Hủy</a>
     </div>
   </form>
 
 {% if show_success %}
   <div id="flash-message" class="flash-message success">
-    ✅ Bạn đã đăng ký tham gia sự kiện thành công!
+     Bạn đã đăng ký tham gia sự kiện thành công!
   </div>
 
   <script>

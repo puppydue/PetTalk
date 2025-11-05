@@ -195,3 +195,22 @@ html { overflow-y: scroll; }
   color: #666;
   font-size: 13px;
 }
+.logo {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.logo-img {
+  height: 150px;       /* hoặc 40px nếu bạn muốn to hơn */
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}
+.main-header {
+  height: 50px; /* hoặc giá trị bạn đang dùng */
+}

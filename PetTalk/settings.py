@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'accounts',
     'badge',
     'profiles',
+    'moderation'
 ]
 
 
@@ -148,9 +149,10 @@ STATICFILES_DIRS = [
 TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'forum:post_list'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = '/'                     # trang login chính (auth_slider ở accounts.urls)
+LOGIN_REDIRECT_URL = 'forum:post_list'   # sau khi đăng nhập → forum
+LOGOUT_REDIRECT_URL = '/'           # sau khi đăng xuất → quay về login
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import os
 MEDIA_URL = '/media/'

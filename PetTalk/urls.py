@@ -11,14 +11,15 @@ urlpatterns = [
     path('forum/', include('forum.urls')),
 
     # Hệ thống xác thực
+    path('', include('accounts.urls')),
     path('accounts/', include('accounts.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 
 
     # 🎉 Events app
     path('events/', include('Events.urls')),
-
     path('badge/', include('badge.urls')),
+    path('moderation/', include('moderation.urls')),
 
     path('profile/', include('profiles.urls', namespace='profiles')),
 
