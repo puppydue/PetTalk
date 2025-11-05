@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'Events',       # app sự kiện (E viết hoa theo tên thư mục của bạn)
     'accounts',
     'badge',
-    'moderation'
+    'moderation',
 ]
 
 

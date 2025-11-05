@@ -8,6 +8,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Comment
+from django.utils.html import linebreaks, escape
+from django.views.decorators.http import require_POST
 
 
 
@@ -108,8 +110,10 @@ def report_post(request, post_id):
             return JsonResponse({'status': 'ok'})
     return JsonResponse({'status': 'error'})
 
+
 @login_required
 def toggle_reaction(request, post_id, react_type):
+    # ... (giữ nguyên logic toggle_reaction)
     post = get_object_or_404(Post, pk=post_id)
     reaction, created = Reaction.objects.get_or_create(username=request.user, post=post)
     if not created:
@@ -128,22 +132,34 @@ def toggle_reaction(request, post_id, react_type):
     current_type = current.type if current else None
     return JsonResponse({'total_votes': total, 'reaction': current_type})
 
-@csrf_exempt
+
+# ===== SỬA LỖI Ở ĐÂY =====
+
+@login_required
 def edit_comment(request, id):
     if request.method == 'POST':
-        comment = Comment.objects.get(pk=id)
+        comment = get_object_or_404(Comment, pk=id)
         data = json.loads(request.body)
+
         if comment.username == request.user:
-            comment.content = data.get('content', '')
+            comment.content = data.get('content', '').strip()
             comment.save()
-            return JsonResponse({'status': 'ok'})
+
+            # An toàn: escape để chống XSS, linebreaks để xuống dòng
+            new_content_html = linebreaks(escape(comment.content))
+
+            return JsonResponse({
+                'status': 'ok',
+                'new_content_html': new_content_html
+            })
+        else:
+            return JsonResponse({'status': 'forbidden'}, status=403)
+
     return JsonResponse({'status': 'error'}, status=400)
 
-@csrf_exempt
+@login_required
+@require_POST
 def delete_comment(request, id):
-    if request.method == 'POST':
-        comment = Comment.objects.get(pk=id)
-        if comment.username == request.user:
-            comment.delete()
-            return JsonResponse({'status': 'deleted'})
-    return JsonResponse({'status': 'error'}, status=400)
+    comment = get_object_or_404(Comment, pk=id, username=request.user)
+    comment.delete()
+    return JsonResponse({'status': 'deleted'})
