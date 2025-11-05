@@ -21,6 +21,8 @@ urlpatterns = [
     path('badge/', include('badge.urls')),
     path('moderation/', include('moderation.urls')),
 
+    path('profile/', include('profiles.urls', namespace='profiles')),
+
 ]
 
 # 🖼️ Chỉ bật khi đang DEV để hiển thị ảnh từ media/

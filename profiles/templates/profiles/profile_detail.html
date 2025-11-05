@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Hồ sơ cá nhân{% endblock %}
+
+{% block extra_css %}
+<style>
+{{ block.super }}
+body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
+
+/* Tổng thể */
+.profile-wrapper {
+  max-width: 950px;
+  margin: 0 auto;
+}
+
+/* Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.profile-header img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.profile-header h2 {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+}
+.profile-header p { color: #6c757d; margin: 4px 0; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 16px;
+  margin: 24px 0;
+}
+.tab {
+  background: #fff;
+  border: 1px solid #dcdcdc;
+  border-radius: 50px;
+  padding: 8px 22px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #555;
+  transition: 0.2s;
+}
+.tab.active {
+  background: #003459;
+  color: #fff;
+  border-color: #003459;
+}
+
+/* Card */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #003459;
+  margin-bottom: 20px;
+}
+
+/* Form */
+.info-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 28px;
+  background: #fff;
+  border: 1.8px solid #cfd9e2;
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin-top: 16px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+  transition: all 0.2s ease-in-out;
+}
+.info-form:hover {
+  border-color: #003459;
+  box-shadow: 0 6px 12px rgba(0,52,89,0.08);
+}
+.info-form input,
+.info-form select,
+.info-form textarea {
+  width: 100%;
+  border: 1.5px solid #e2e2e2;
+  border-radius: 10px;
+  background: #fafafa;
+  padding: 15px 1px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+.info-form input:focus,
+.info-form select:focus,
+.info-form textarea:focus {
+  border-color: #003459;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.08);
+}
+.info-form .full-width { grid-column: 1 / -1; }
+
+/* Nút */
+.btn-primary {
+  background: #003459;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary:hover { background: #0056a3; }
+
+/* Thẻ thú cưng */
+.pet-item {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  border-radius: 12px;
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+}
+
+/* Form “Thêm thú cưng mới” */
+.card.add-pet {
+  border: 2px dashed #003459 !important;
+  border-radius: 16px;
+}
+.card.add-pet h3 { color: #003459; }
+
+/* Popup */
+.popup {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.25);
+  z-index: 9999;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+.popup-content {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px 36px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  font-size: 18px;
+  color: #003459;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeUp 0.4s ease-out;
+}
+@keyframes fadeUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+
+  <!-- HEADER -->
+  <div class="profile-header">
+    <img src="{% if user_info.avatar_image %}{{ user_info.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Avatar">
+    <div>
+      <h2>{{ request.user.get_full_name|default:request.user.username }}</h2>
+      <p>@{{ request.user.username }}</p>
+      <p>Thành viên từ: {{ request.user.date_joined|date:"Y" }} · {{ posts_count|default:"0" }} bài viết · {{ comments_count|default:"0" }} bình luận</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('overview')">Overview</div>
+    <div class="tab" onclick="showTab('posts')">Posts</div>
+    <div class="tab" onclick="showTab('comments')">Comments</div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div id="overview" class="section active">
+    <!-- FORM THÔNG TIN CÁ NHÂN -->
+    <div class="card">
+      <h3>Thông tin cá nhân</h3>
+      <form method="POST" action="{% url 'profiles:my_profile' %}" enctype="multipart/form-data" class="info-form">
+        {% csrf_token %}
+        <input type="hidden" name="form_name" value="user_form">
+
+        <div><label>Họ và tên</label><input type="text" name="first_name" value="{{ request.user.first_name }}"></div>
+        <div><label>Ngày sinh</label>{{ form.birthdate }}</div>
+        <div><label>Số điện thoại</label>{{ form.phone }}</div>
+        <div><label>Email</label><input type="email" name="email" value="{{ request.user.email }}"></div>
+        <div><label>Địa chỉ</label>{{ form.location }}</div>
+        <div><label>Vai trò</label>{{ form.role }}</div>
+        <div class="full-width"><label>Ảnh đại diện</label>{{ form.avatar_image }}</div>
+
+        <div class="full-width" style="display:flex;align-items:center;gap:10px;">
+          <button type="submit" class="btn-primary">💾 Lưu thông tin</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- DANH SÁCH THÚ CƯNG -->
+    <div class="card">
+      <h3>Thông tin thú cưng</h3>
+      {% for pet, pform in pet_form_pairs %}
+        <div class="pet-item">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:16px;">
+              <div style="width:70px;height:70px;border-radius:14px;overflow:hidden;background:#f0f0f0;">
+                {% if pet.avatar_image %}
+                  <img src="{{ pet.avatar_image.url }}" style="width:100%;height:100%;object-fit:cover;">
+                {% endif %}
+              </div>
+              <div>
+                <h4 style="margin:0;">{{ pet.name }}</h4>
+                <small>{{ pet.species }}{% if pet.sex %} · {{ pet.get_sex_display }}{% endif %}</small>
+              </div>
+            </div>
+            <div style="display:flex;gap:24px;text-align:center;">
+              <div><h4 style="margin:0;color:#003459;">{{ pet.age_years|default:"—" }}</h4><p style="margin:0;color:#6c757d;font-size:14px;">Tuổi</p></div>
+              <div><h4 style="margin:0;color:#003459;">{{ pet.weight_kg|default:"—" }}</h4><p style="margin:0;color:#6c757d;font-size:14px;">Kg</p></div>
+            </div>
+          </div>
+
+          <form method="POST" action="{% url 'profiles:pet_update' pet.id %}" enctype="multipart/form-data" class="info-form" style="margin-top:0;">
+            {% csrf_token %}
+            <input type="hidden" name="form_name" value="pet_form_{{ pet.id }}">
+            <div><label>Tên thú cưng</label>{{ pform.name }}</div>
+            <div><label>Giới tính</label>{{ pform.sex }}</div>
+            <div><label>Loài</label>{{ pform.species }}</div>
+            <div><label>Ngày sinh</label>{{ pform.birthdate }}</div>
+            <div><label>Cân nặng (kg)</label>{{ pform.weight_kg }}</div>
+            <div class="full-width"><label>Ảnh đại diện</label>{{ pform.avatar_image }}</div>
+            <div class="full-width" style="display:flex;align-items:center;gap:10px;">
+              <button type="submit" class="btn-primary">💾 Lưu thú cưng</button>
+            </div>
+          </form>
+        </div>
+      {% empty %}
+        <p style="text-align:center;color:#6c757d;">Chưa có thú cưng nào. Hãy thêm mới bên dưới 🐾</p>
+      {% endfor %}
+    </div>
+
+    <!-- FORM THÊM THÚ CƯNG -->
+    <div class="card add-pet">
+      <h3>Thêm thú cưng mới</h3>
+      <form method="POST" action="{% url 'profiles:pet_create' %}" enctype="multipart/form-data" class="info-form">
+        {% csrf_token %}
+        <input type="hidden" name="form_name" value="new_pet_form">
+        <div><label>Tên thú cưng</label>{{ add_pet_form.name }}</div>
+        <div><label>Loài</label>{{ add_pet_form.species }}</div>
+        <div><label>Giới tính</label>{{ add_pet_form.sex }}</div>
+        <div><label>Ngày sinh</label>{{ add_pet_form.birthdate }}</div>
+        <div><label>Cân nặng (kg)</label>{{ add_pet_form.weight_kg }}</div>
+        <div class="full-width"><label>Ảnh đại diện</label>{{ add_pet_form.avatar_image }}</div>
+        <div class="full-width" style="display:flex;align-items:center;gap:10px;">
+          <button type="submit" class="btn-primary">➕ Thêm thú cưng</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- POSTS / COMMENTS -->
+  <div id="posts" class="section" style="display:none;">
+    <div class="card"><p>Chưa có bài viết nào.</p></div>
+  </div>
+  <div id="comments" class="section" style="display:none;">
+    <div class="card"><p>Chưa có bình luận nào.</p></div>
+  </div>
+</div>
+
+<!-- ✅ POPUP THÔNG BÁO -->
+<div id="successPopup" class="popup">
+  <div class="popup-content">
+    <span id="popupMessage">🎉 Thao tác thành công!</span>
+  </div>
+</div>
+
+<script>
+function showTab(tabName){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+  document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+  document.getElementById(tabName).style.display='block';
+}
+
+// ✅ Popup tự động hiển thị theo nội dung Django message
+function showPopup(message, icon) {
+  const popup = document.getElementById("successPopup");
+  const text = document.getElementById("popupMessage");
+  text.textContent = icon + " " + message;
+  popup.style.display = "flex";
+  setTimeout(() => popup.style.opacity = 1, 50);
+  setTimeout(() => {
+    popup.style.opacity = 0;
+    setTimeout(() => popup.style.display = "none", 300);
+  }, 2500);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  {% if messages %}
+    {% for message in messages %}
+      {% if "thú cưng" in message %}
+        showPopup("{{ message|escapejs }}", "🐾");
+      {% elif "thông tin" in message %}
+        showPopup("{{ message|escapejs }}", "💾");
+      {% else %}
+        showPopup("{{ message|escapejs }}", "🎉");
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+});
+</script>
+{% endblock %}
