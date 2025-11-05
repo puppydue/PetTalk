@@ -267,4 +267,46 @@ document.addEventListener('click', async (e)=>{
   }
 });
 </script>
+<script>
+function getCookie(name){
+  // ... (code getCookie của bạn) ...
+}
+const csrftoken=getCookie('csrftoken');
+
+// =============================================
+// === SỬA LỖI: TỰ ĐỘNG TĂNG CHIỀU CAO Ô COMMENT ===
+// =============================================
+const textarea = document.querySelector('textarea[name="content"]');
+// Hoặc dùng: const textarea = document.getElementById('id_content');
+
+if (textarea) {
+  textarea.style.resize = 'none';     // Tắt thanh kéo resize
+  textarea.style.overflowY = 'hidden'; // Ẩn thanh cuộn dọc
+
+  const autoGrow = (el) => {
+    el.style.height = 'auto'; // Reset chiều cao về auto
+    el.style.height = (el.scrollHeight) + 'px'; // Đặt chiều cao bằng chiều cao nội dung
+  };
+
+  // Lắng nghe sự kiện gõ phím
+  textarea.addEventListener('input', () => autoGrow(textarea));
+
+  // Tự chỉnh chiều cao 1 lần khi tải trang (phòng trường hợp form lỗi)
+  autoGrow(textarea);
+}
+// =============================================
+// === HẾT PHẦN SỬA LỖI ===
+// =============================================
+
+
+// --- Vote (giữ nguyên logic) ---
+document.querySelectorAll('.vote-box').forEach(box=>{
+  // ... (code vote của bạn) ...
+});
+
+// --- Lắng nghe click toàn trang ---
+document.addEventListener('click', async (e)=>{
+  // ... (code xử lý comment menu của bạn) ...
+});
+</script>
 {% endblock %}

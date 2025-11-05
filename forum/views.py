@@ -53,12 +53,17 @@ def create_post(request):
 
 
 # ========== 💬 XEM CHI TIẾT + COMMENT ==========
+# ========== 💬 XEM CHI TIẾT + COMMENT ==========
 @login_required
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     comments = post.comments.all()
     comment_form = CommentForm()
     report_form = ReportForm()
+
+    # === THÊM DÒNG NÀY ĐỂ TÍNH TỔNG VOTE ===
+    post.total_vote = post.total_votes()
+    # =======================================
 
     if request.method == 'POST' and 'comment' in request.POST:
         comment_form = CommentForm(request.POST)
@@ -77,23 +82,6 @@ def post_detail(request, post_id):
     })
 
 
-# ========== ⚡ REACTION (UP/DOWN) ==========
-@login_required
-def toggle_reaction(request, post_id, react_type):
-    post = get_object_or_404(Post, pk=post_id)
-    reaction, created = Reaction.objects.get_or_create(username=request.user, post=post)
-    if not created:
-        if reaction.type == react_type:
-            reaction.delete()  # gỡ vote
-        else:
-            reaction.type = react_type
-            reaction.save()
-    else:
-        reaction.type = react_type
-        reaction.save()
-
-    total = post.total_votes()
-    return JsonResponse({'total_votes': total})
 
 
 # ========== 🚨 BÁO CÁO BÀI VIẾT ==========

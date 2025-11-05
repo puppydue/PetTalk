@@ -18,7 +18,14 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ['content']
         widgets = {
-            'content': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Viết bình luận...', 'class': 'form-control'})
+            'content': forms.Textarea(attrs={
+                'class': 'form-control', # Thêm class này
+                'rows': 2,               # Đặt số dòng ban đầu là 2
+                'placeholder': 'Viết bình luận của bạn...' # Thêm chữ gợi ý
+            }),
+        }
+        labels = {
+            'content': '', # Ẩn nhãn "Content"
         }
 
 
