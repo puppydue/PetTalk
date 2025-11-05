@@ -11,7 +11,7 @@
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
     max-width: 700px;
     margin: 40px auto;
-    font-family: "Poppins", sans-serif;
+    font-family: "Be Vietnam Pro", sans-serif;
     color: #222;
 }
 
@@ -94,6 +94,25 @@
     margin-top: 10px;
     border: 1px solid #ddd;
 }
+
+/* ⚠️ Thông báo lỗi */
+.error-text {
+    color: #d32f2f;
+    font-size: 14px;
+    margin-top: 3px;
+    margin-left: 3px;
+}
+
+/* Lỗi chung toàn form */
+.errorlist.nonfield {
+    background: #ffeaea;
+    color: #b71c1c;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    list-style: none;
+}
 </style>
 
 <div class="form-wrapper">
@@ -105,23 +124,52 @@
 
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
+
+    {# ⚠️ Lỗi chung (như ngày kết thúc < ngày bắt đầu) #}
+    {% if form.non_field_errors %}
+      <ul class="errorlist nonfield">
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
     <label for="id_title">Tiêu đề:</label>
     {{ form.title }}
+    {% if form.title.errors %}
+      <div class="error-text">{{ form.title.errors.0 }}</div>
+    {% endif %}
 
     <label for="id_description">Mô tả:</label>
     {{ form.description }}
+    {% if form.description.errors %}
+      <div class="error-text">{{ form.description.errors.0 }}</div>
+    {% endif %}
 
     <label for="id_date">Thời gian bắt đầu:</label>
     {{ form.date }}
+    {% if form.date.errors %}
+      <div class="error-text">{{ form.date.errors.0 }}</div>
+    {% endif %}
 
     <label for="id_end_date">Thời gian kết thúc:</label>
     {{ form.end_date }}
+    {% if form.end_date.errors %}
+      <div class="error-text">{{ form.end_date.errors.0 }}</div>
+    {% endif %}
 
     <label for="id_location">Địa điểm:</label>
     {{ form.location }}
+    {% if form.location.errors %}
+      <div class="error-text">{{ form.location.errors.0 }}</div>
+    {% endif %}
 
     <label for="id_image">Ảnh bìa:</label>
     {{ form.image }}
+    {% if form.image.errors %}
+      <div class="error-text">{{ form.image.errors.0 }}</div>
+    {% endif %}
+
     <div class="preview" id="imagePreview">
       <p><em>Ảnh sẽ hiển thị tại đây sau khi chọn</em></p>
     </div>

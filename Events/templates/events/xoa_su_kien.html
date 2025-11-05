@@ -4,14 +4,14 @@
 
 <div class="delete-event-container">
   <div class="delete-card">
-    <h2>🗑️ Xóa sự kiện</h2>
+    <h2> Xóa sự kiện</h2>
     <p>Bạn có chắc muốn xóa sự kiện <strong>"{{ event.title }}"</strong> không?</p>
 
     <form method="post">
       {% csrf_token %}
       <div class="btn-group">
-        <button type="submit" class="confirm-btn">✅ Xác nhận xóa</button>
-        <a href="{% url 'danh_sach_su_kien' %}" class="cancel-btn">❌ Hủy</a>
+        <button type="submit" class="confirm-btn"> Xác nhận xóa</button>
+        <a href="{% url 'danh_sach_su_kien' %}" class="cancel-btn"> Hủy</a>
       </div>
     </form>
   </div>

@@ -28,13 +28,6 @@ class Event(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # ==============================
-    # 🧩 KIỂM TRA RÀNG BUỘC HỢP LỆ
-    # ==============================
-    def clean(self):
-        """Ràng buộc logic: Ngày kết thúc không được trước ngày bắt đầu."""
-        if self.end_date and self.date and self.end_date < self.date:
-            raise ValidationError("⛔ Thời gian kết thúc không được trước thời gian bắt đầu.")
 
     # ==============================
     # 🕓 HÀM KIỂM TRA SỰ KIỆN ĐÃ KẾT THÚC CHƯA

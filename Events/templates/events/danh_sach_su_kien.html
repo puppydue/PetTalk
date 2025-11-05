@@ -5,13 +5,13 @@
 <div class="event-list">
 
   <div class="create-event-wrapper">
-    <a href="{% url 'tao_su_kien' %}" class="create-event-btn">➕ Tạo sự kiện mới</a>
+    <a href="{% url 'tao_su_kien' %}" class="create-event-btn"> Tạo sự kiện mới</a>
   </div>
 
-  <h2>🎉 Danh sách sự kiện</h2>
+  <h2> Danh sách sự kiện</h2>
 
   <!-- 👤 SỰ KIỆN CỦA TÔI --><section class="my-events">
-    <h3>👤 Sự kiện của tôi</h3>
+    <h3> Sự kiện của tôi</h3>
 
     {% if su_kien_cua_toi %}
     <div class="carousel-wrapper"> {# Bỏ class 'has-scroll' ở đây #}
@@ -30,24 +30,30 @@
             <div class="status-wrapper"> {# Đã thêm margin-top qua CSS #}
               <strong>Trạng thái:</strong>
               {% if e.status == 'approved' %}
-                <span class="status-badge status-approved">✅ Đã phê duyệt</span>
+                <span class="status-badge status-approved"> Đã phê duyệt</span>
               {% elif e.status == 'rejected' %}
-                <span class="status-badge status-rejected">❌ Bị từ chối</span>
+                <span class="status-badge status-rejected"> Bị từ chối</span>
               {% else %}
-                <span class="status-badge status-pending">⏳ Chờ phê duyệt</span>
+                <span class="status-badge status-pending"> Chờ phê duyệt</span>
               {% endif %}
             </div>
 
             {% if not e.is_past %}
-              <div class="event-actions"> {# Đã thêm margin-top qua CSS #}
-                <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">🔧 Chỉnh sửa</a>
-                {% if e.status == 'approved' %}
-                  <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem DS</a>
-                {% endif %}
-                <a href="{% url 'xoa_su_kien' e.id %}" class="delete-btn">🗑️ Xóa</a>
-              </div>
+              <div class="event-actions">
+                  <div>
+                    <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">Chỉnh sửa</a>
+                    <a href="{% url 'xoa_su_kien' e.id %}" class="cancel-btn">Xóa</a>
+                  </div>
+
+                  {% if e.status == 'approved' %}
+                    <div style="margin-top: 10px;">
+                      <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">Xem danh sách người tham gia</a>
+                    </div>
+                  {% endif %}
+                </div>
+
             {% else %}
-              <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
+              <div class="event-ended"> Sự kiện đã kết thúc</div>
             {% endif %}
           </div>
         {% endfor %}
@@ -64,7 +70,7 @@
   </section>
 
   <!-- 🌍 DANH SÁCH SỰ KIỆN --><section class="community-events">
-    <h3>🌍 Danh sách sự kiện</h3>
+    <h3> Danh sách sự kiện</h3>
 
     {% if danh_sach_su_kien %}
     <div class="event-grid">
@@ -88,11 +94,11 @@
             <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
           {% else %}
             {% if e.creator == user %}
-              <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">👥 Xem DS</a>
+              <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn"> Xem danh sách người tham gia</a>
             {% elif user in e.participants.all %}
-              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn">❌ Hủy ĐK</a>
+              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn"> Hủy ĐK</a>
             {% else %}
-              <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn">🐾 Tham gia</a>
+              <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn"> Tham gia</a>
             {% endif %}
           {% endif %}
         </div>
