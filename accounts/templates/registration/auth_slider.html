@@ -128,15 +128,9 @@
         <form method="post" action="">
           {% csrf_token %}
           <h2>Đăng nhập</h2>
-
-          {% if login_form.non_field_errors %}
-            <div class="form-error">
-              {{ login_form.non_field_errors }}
-            </div>
-          {% endif %}
-
           {{ login_form.username }}
           {{ login_form.password }}
+          <input type="hidden" name="next" value="{{ request.GET.next }}">
           <a href="{% url 'password_reset' %}">Quên mật khẩu?</a>
           <button class="btn" type="submit" name="login">Đăng nhập</button>
         </form>
