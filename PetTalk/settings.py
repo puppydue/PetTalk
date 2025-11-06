@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'accounts',
     'badge',
     'profiles',
-    'moderation'
+    'moderation',
+    'badges',
 ]
 
 

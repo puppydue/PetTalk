@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Điểm thưởng & Danh hiệu{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #fff8ed; /* NỀN VÀNG GIỐNG PROFILE */
+    }
+
+    /* ... (CSS cũ cho :root, card, title, muted, btn, toolbar, brow, etc. giữ nguyên) ... */
+    :root{
+      /* ... (biến màu) ... */
+      --primary: #003459;
+      --secondary: #F7DBA7;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --line: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
+      --radius: 14px;
+      --success:#16a34a;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --shadow:0 14px 34px rgba(16,24,40,.10);
+    }
+    *{box-sizing:border-box}
+    a{color:inherit;text-decoration:none}
+
+    .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 24px;
+    }
+     .header-card {
+       padding: 20px;
+       border-radius: var(--radius);
+       background: var(--card);
+       border: 1px solid var(--line);
+       margin-bottom: 16px;
+       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .title{font-weight:900;font-size:18px;margin:0 0 12px}
+    .muted{color:var(--muted);font-size:13px}
+    .btn{
+        padding:10px 14px;
+        border:1px solid var(--line);
+        background:#fff;
+        border-radius:12px;
+        cursor:pointer;
+        box-shadow:var(--shadow);
+        font-family: inherit;
+        font-weight: 500;
+    }
+    .btn.primary{
+        background: var(--primary);
+        color:#fff;
+        border-color:transparent
+    }
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .toolbar .btn{padding:8px 12px}
+    .brow{display:grid;grid-template-columns:56px 1fr 120px;gap:14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#ffffff,#fafcff);box-shadow:var(--shadow);margin:10px 0}
+    .bicon{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:26px;background:conic-gradient(from 180deg, #e6f0ff, #f8fbff);border:1px solid #e3e8ff}
+    .bname{font-weight:900}
+    .bmeta{color:#475569;font-size:13px;margin-top:2px}
+    .bar{height:12px;background:#eef2ff;border:1px solid #dbe3ff;border-radius:999px;overflow:hidden;margin-top:8px;position:relative}
+    .bar>div{height:100%;background:linear-gradient(90deg,#93c5fd,#2563eb);position:relative}
+    .bar>div:after{content:"";position:absolute;right:0;top:0;height:100%;width:10px;background:radial-gradient(circle at 70% 50%, rgba(255,255,255,.9), rgba(255,255,255,0));mix-blend-mode:overlay}
+    .bstat{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#334155;margin-top:8px}
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f0f9ff;border:1px solid #bae6fd;font-size:12px}
+    .ok-chip{display:inline-flex;align-items:center;gap:6px;background:#ecfdf5;border:1px solid #86efac;color:#166534;border-radius:999px;padding:4px 10px;font-weight:800}
+    .chip-warn{background:#fff7ed;border:1px solid #fed7aa;color:#b45309;border-radius:999px;padding:4px 10px;font-size:12px}
+
+    /* CSS CHO PANEL BÊN PHẢI */
+    .display-badge-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+    }
+    .display-badge-option:hover {
+        background-color: #f1f5f9;
+    }
+    .display-badge-option input[type="radio"] {
+        appearance: none;
+        -webkit-appearance: none;
+        margin: 0;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--line);
+        border-radius: 50%;
+        cursor: pointer;
+        position: relative;
+        transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+    .display-badge-option input[type="radio"]:checked {
+        border-color: var(--primary);
+        background-color: var(--primary);
+    }
+    .display-badge-option input[type="radio"]:checked::after {
+        content: '';
+        display: block;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        transform: rotate(45deg);
+        position: absolute;
+        left: 6px;
+        top: 2px;
+    }
+    .display-badge-option label {
+        font-weight: 500;
+        cursor: pointer;
+        flex-grow: 1;
+    }
+    .selected-badge-info {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 10px;
+        border-top: 1px solid var(--line);
+        padding-top: 10px;
+    }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<main id="center">
+    <div class="header-card">
+        <h2 class="title">Danh hiệu hệ thống</h2>
+        <p class="muted">Chu kỳ: <span id="periodStartLbl">1/1/2025</span> → <span id="periodEndLbl">1/1/2026</span>. Khi hết hạn, tiến trình <b>tự động về 0</b>.</p>
+        <div class="toolbar">
+            <span class="tag">🎯 Mục tiêu năm nay</span>
+            <span class="chip-warn" id="daysLeftLbl">⏳ Còn 71 ngày trong kỳ</span>
+        </div>
+    </div>
+
+    <section id="tab-badges">
+        <div id="badgesList">
+            <div class="brow" style="border-left:6px solid #f59e0b20"> <div class="bicon" style="background:conic-gradient(from 180deg, #f59e0b22, #fff); border-color:#f59e0b33">🏅</div>
+                <div>
+                  <div class="bname">Vua sẻ chia</div>
+                  <div class="bmeta">Đăng ≥ 50 bài · <b>312</b> người đã đạt</div>
+                  <div class="bar"><div style="width:100%; background:linear-gradient(90deg, #f59e0b, #fbbf24)"></div></div>
+                  <div class="bstat">
+                    <span>Tiến trình của bạn: <b>60/50</b> bài viết</span>
+                    <span><span class="ok-chip">ĐÃ HOÀN THÀNH</span></span>
+                  </div>
+                </div>
+                <div style="display:grid;gap:8px;justify-items:end">
+                  <span class="tag">Mục tiêu: 50 bài viết</span>
+                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Vua sẻ chia')">💡 Mẹo</button>
+                </div>
+            </div>
+            <div class="brow" style="border-left:6px solid #0891b220"> <div class="bicon" style="background:conic-gradient(from 180deg, #0891b222, #fff); border-color:#0891b233">💬</div>
+                <div>
+                  <div class="bname">Bình luận hữu ích</div>
+                  <div class="bmeta">100 like cho bình luận · <b>198</b> người đã đạt</div>
+                  <div class="bar"><div style="width:76%; background:linear-gradient(90deg, #0891b2, #60a5fa)"></div></div>
+                  <div class="bstat">
+                    <span>Tiến trình của bạn: <b>76/100</b> like</span>
+                    <span>Còn 24 để đạt</span>
+                  </div>
+                </div>
+                <div style="display:grid;gap:8px;justify-items:end">
+                  <span class="tag">Mục tiêu: 100 like</span>
+                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Bình luận hữu ích')">💡 Mẹo</button>
+                </div>
+            </div>
+            <div class="brow" style="border-left:6px solid #16a34a20"> <div class="bicon" style="background:conic-gradient(from 180deg, #16a34a22, #fff); border-color:#16a34a33">🧭</div>
+                <div>
+                  <div class="bname">Người dẫn đường</div>
+                  <div class="bmeta">Ghép cặp tìm thú thành công (10 ca) · <b>24</b> người đã đạt</div>
+                  <div class="bar"><div style="width:40%; background:linear-gradient(90deg, #16a34a, #60a5fa)"></div></div>
+                  <div class="bstat">
+                    <span>Tiến trình của bạn: <b>4/10</b> ca</span>
+                    <span>Còn 6 để đạt</span>
+                  </div>
+                </div>
+                <div style="display:grid;gap:8px;justify-items:end">
+                  <span class="tag">Mục tiêu: 10 ca</span>
+                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Người dẫn đường')">💡 Mẹo</button>
+                </div>
+            </div>
+            <div class="brow" style="border-left:6px solid #ef444420"> <div class="bicon" style="background:conic-gradient(from 180deg, #ef444422, #fff); border-color:#ef444433">📈</div>
+                <div>
+                  <div class="bname">Chuyên gia diễn đàn</div>
+                  <div class="bmeta">Upvote câu trả lời ≥ 200 · <b>67</b> người đã đạt</div>
+                  <div class="bar"><div style="width:62%; background:linear-gradient(90deg, #ef4444, #fb7185)"></div></div>
+                  <div class="bstat">
+                    <span>Tiến trình của bạn: <b>123/200</b> upvote</span>
+                    <span>Còn 77 để đạt</span>
+                  </div>
+                </div>
+                <div style="display:grid;gap:8px;justify-items:end">
+                  <span class="tag">Mục tiêu: 200 upvote</span>
+                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Chuyên gia diễn đàn')">💡 Mẹo</button>
+                </div>
+            </div>
+            <div class="brow" style="border-left:6px solid #0ea5e920"> <div class="bicon" style="background:conic-gradient(from 180deg, #0ea5e922, #fff); border-color:#0ea5e933">🎪</div>
+                <div>
+                  <div class="bname">Nhà tổ chức sự kiện</div>
+                  <div class="bmeta">3 sự kiện được duyệt · <b>15</b> người đã đạt</div>
+                  <div class="bar"><div style="width:33%; background:linear-gradient(90deg, #0ea5e9, #60a5fa)"></div></div>
+                  <div class="bstat">
+                    <span>Tiến trình của bạn: <b>1/3</b> sự kiện</span>
+                    <span>Còn 2 để đạt</span>
+                  </div>
+                </div>
+                <div style="display:grid;gap:8px;justify-items:end">
+                  <span class="tag">Mục tiêu: 3 sự kiện</span>
+                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Nhà tổ chức sự kiện')">💡 Mẹo</button>
+                </div>
+            </div>
+            <div class="brow" style="border-left:6px solid #22c55e20"> <div class="bicon" style="background:conic-gradient(from 180deg, #22c55e22, #fff); border-color:#22c55e33">🤝</div>
+                <div>
+                  <div class="bname">Người tốt bụng</div>
+                  <div class="bmeta">5 ca nhận nuôi thành công · <b>9</b> người đã đạt</div>
+                  <div class="bar"><div style="width:60%; background:linear-gradient(90deg, #22c55e, #60a5fa)"></div></div>
+                  <div class="bstat">
+                    <span>Tiến trình của bạn: <b>3/5</b> trường hợp</span>
+                    <span>Còn 2 để đạt</span>
+                  </div>
+                </div>
+                <div style="display:grid;gap:8px;justify-items:end">
+                  <span class="tag">Mục tiêu: 5 trường hợp</span>
+                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Người tốt bụng')">💡 Mẹo</button>
+                </div>
+            </div>
+        </div>
+    </section>
+  </main>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const BADGES = [
+    { id: "share-king", icon: "🏅", name: "Vua sẻ chia", target: 50 },
+    { id: "helpful-comment", icon: "💬", name: "Bình luận hữu ích", target: 100 },
+    { id: "match-guide", icon: "🧭", name: "Người dẫn đường", target: 10 },
+    { id: "forum-expert", icon: "📈", name: "Chuyên gia diễn đàn", target: 200 },
+    { id: "event-host", icon: "🎪", name: "Nhà tổ chức sự kiện", target: 3 },
+    { id: "good-samaritan", icon: "🤝", name: "Người tốt bụng", target: 5 },
+  ];
+
+  const USER_PROGRESS = {
+    "share-king": 60, // ✅ đạt
+    "helpful-comment": 76,
+    "match-guide": 4,
+    "forum-expert": 123,
+    "event-host": 1,
+    "good-samaritan": 3,
+  };
+
+  const box = document.getElementById("display-badge-options");
+  const label = document.getElementById("currently-selected-badge");
+  if (!box || !label) {
+    console.error("Không tìm thấy phần hiển thị danh hiệu (#display-badge-options)");
+    return;
+  }
+
+  const achieved = BADGES.filter((b) => (USER_PROGRESS[b.id] || 0) >= b.target);
+
+  box.innerHTML = `
+    <div class="display-badge-option">
+      <input type="radio" id="display-badge-none" name="display-badge" value="none" checked>
+      <label for="display-badge-none">Không hiển thị danh hiệu</label>
+    </div>
+  `;
+
+  if (achieved.length === 0) {
+    box.innerHTML += `<p class="muted">Bạn chưa đạt được danh hiệu nào để hiển thị.</p>`;
+  } else {
+    achieved.forEach((b) => {
+      box.innerHTML += `
+        <div class="display-badge-option">
+          <input type="radio" id="display-badge-${b.id}" name="display-badge" value="${b.id}">
+          <label for="display-badge-${b.id}">${b.icon} ${b.name}</label>
+        </div>`;
+    });
+  }
+
+  box.querySelectorAll('input[name="display-badge"]').forEach((r) => {
+    r.addEventListener("change", (e) => {
+      if (e.target.value === "none") {
+        label.textContent = "Chưa chọn danh hiệu nào.";
+      } else {
+        const picked = BADGES.find((b) => b.id === e.target.value);
+        label.textContent = `Đang hiển thị: ${picked.icon} ${picked.name}`;
+      }
+    });
+  });
+
+  console.log("✅ Danh hiệu đã đạt:", achieved.map((b) => b.name).join(", "));
+});
+</script>
+{% endblock %}
