@@ -19,11 +19,6 @@
     z-index: 10;
     overflow: hidden;
   }
-  .comment-menu.menu-up {
-    top: auto;
-    bottom: 100%;
-    margin-bottom: 4px;
-  }
   .comment-menu .menu-item {
     display: block;
     width: 100%;
@@ -39,9 +34,23 @@
   .comment-menu .menu-item:hover {
     background-color: #f8fafc;
   }
+.comment-menu.menu-up {
+  top: auto !important;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 6px;
+  transform-origin: bottom right;
+}
+
   .comment-menu .menu-item + .menu-item {
     border-top: 1px solid #f1f5f9;
   }
+    .comment-content {
+  white-space: pre-wrap; /* giữ xuống dòng gốc và cho phép xuống dòng tự động */
+  word-break: break-word; /* cắt từ quá dài */
+  overflow-wrap: anywhere; /* hỗ trợ trình duyệt mới */
+}
+
 </style>
 {% endblock %}
 {% block title %}Bài viết • {{ post.title }}{% endblock %}
@@ -138,175 +147,214 @@
 
 {% block extra_js %}
 <script>
-function getCookie(name){
-  let v=null;
-  if(document.cookie&&document.cookie!==''){
-    const c=document.cookie.split(';');
-    for(let i=0;i<c.length;i++){
-      const s=c[i].trim();
-      if(s.substring(0,name.length+1)===(name+'=')){
-        v=decodeURIComponent(s.substring(name.length+1));break;
+document.addEventListener("DOMContentLoaded", () => {
+
+  // === HÀM LẤY CSRF TOKEN ===
+  function getCookie(name) {
+    let v = null;
+    if (document.cookie && document.cookie !== '') {
+      const c = document.cookie.split(';');
+      for (let i = 0; i < c.length; i++) {
+        const s = c[i].trim();
+        if (s.substring(0, name.length + 1) === (name + '=')) {
+          v = decodeURIComponent(s.substring(name.length + 1));
+          break;
+        }
       }
     }
+    return v;
   }
-  return v;
-}
-const csrftoken=getCookie('csrftoken');
+  const csrftoken = getCookie('csrftoken');
 
-// --- Vote (giữ nguyên logic) ---
-document.querySelectorAll('.vote-box').forEach(box=>{
-  const buttons=box.querySelectorAll('.js-vote');
-  const countEl=box.querySelector('.js-count');
-  buttons.forEach(btn=>{
-    btn.addEventListener('click',async()=>{
-      const type=btn.dataset.type;
-      const postId=box.dataset.post;
-      const url=`/forum/${postId}/react/${type}/`;
-      const res=await fetch(url,{
-        method:'POST',
-        headers:{'X-CSRFToken':csrftoken,'X-Requested-With':'XMLHttpRequest'}
+  // === VOTE BÀI VIẾT ===
+  document.querySelectorAll('.vote-box').forEach(box => {
+    const buttons = box.querySelectorAll('.js-vote');
+    const countEl = box.querySelector('.js-count');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const type = btn.dataset.type;
+        const postId = box.dataset.post;
+        const url = `/forum/${postId}/react/${type}/`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          countEl.textContent = data.total_votes ?? 0;
+          buttons.forEach(b => b.classList.remove('active-up', 'active-down'));
+          if (data.reaction === 'upvote') box.querySelector('[data-type="upvote"]').classList.add('active-up');
+          if (data.reaction === 'downvote') box.querySelector('[data-type="downvote"]').classList.add('active-down');
+        }
       });
-      if(res.ok){
-        const data=await res.json();
-        countEl.textContent=data.total_votes??0;
-        buttons.forEach(b=>b.classList.remove('active-up','active-down'));
-        if(data.reaction==='upvote')box.querySelector('[data-type="upvote"]').classList.add('active-up');
-        if(data.reaction==='downvote')box.querySelector('[data-type="downvote"]').classList.add('active-down');
-      }
     });
   });
-});
 
-// --- Lắng nghe click toàn trang ---
-document.addEventListener('click', async (e)=>{
-  const btn = e.target.closest('.comment-menu-btn');
-  const allMenus=document.querySelectorAll('.comment-menu');
+  // === CLICK TOÀN TRANG ===
+  document.addEventListener('click', async (e) => {
+    const allMenus = document.querySelectorAll('.comment-menu');
+    const btn = e.target.closest('.comment-menu-btn');
 
-  // Mở/đóng menu ba chấm
-  if(btn){
-    e.stopPropagation();
-    const menu=btn.parentElement.querySelector('.comment-menu');
-    allMenus.forEach(m=>{if(m!==menu)m.style.display='none';});
-    const isOpen=menu.style.display==='block';
-    menu.style.display=isOpen?'none':'block';
-    return;
+// 1️⃣ Menu ba chấm
+if (btn) {
+  e.stopPropagation();
+  const menu = btn.parentElement.querySelector('.comment-menu');
+  allMenus.forEach(m => { if (m !== menu) m.style.display = 'none'; });
+  const isOpen = menu.style.display === 'block';
+  menu.style.display = isOpen ? 'none' : 'block';
+
+  if (!isOpen) {
+    // 💡 Kiểm tra xem menu có bị tràn khỏi màn hình hay không
+    // Bật tạm để đo chính xác kích thước thực tế
+    menu.style.visibility = 'hidden';
+    menu.style.display = 'block';
+
+    const rect = menu.getBoundingClientRect();
+    const bottomOverflow = rect.bottom > window.innerHeight;
+
+    // Nếu bị tràn xuống hoặc gần mép dưới => mở lên trên
+    if (bottomOverflow || (window.innerHeight - rect.bottom) < 20) {
+      menu.classList.add('menu-up');
+    } else {
+      menu.classList.remove('menu-up');
+    }
+
+    // Ẩn lại, sẽ hiển thị đúng khi click xong
+    menu.style.display = 'none';
+    menu.style.visibility = '';
+    menu.style.display = 'block';
   }
+  return;
+}
+    // 2️⃣ Click ngoài menu → đóng
+    if (!e.target.closest('.comment-menu-wrapper')) {
+      allMenus.forEach(m => m.style.display = 'none');
+    }
 
-  // Click ngoài menu → đóng lại
-  if(!e.target.closest('.comment-menu-wrapper')){
-    allMenus.forEach(m=>m.style.display='none');
-  }
+    // 3️⃣ Mở modal báo cáo
+    const reportBtn = e.target.closest('.js-open-report') || e.target.closest('.js-open-report-comment');
+    if (reportBtn) {
+      const id = reportBtn.getAttribute('data-target');
+      const modal = document.getElementById(id);
+      if (modal) modal.style.display = 'flex';
+      return;
+    }
 
-  // Chỉnh sửa bình luận
-  if(e.target.classList.contains('js-edit-comment')){
-    const id=e.target.dataset.id;
-    const box=document.getElementById(`comment-${id}`);
-    const div=box.querySelector('.comment-content');
-    const oldHtml=div.innerHTML;
-    const text=oldHtml.replace(/<br\s*\/?>/ig,"\n").trim();
-    div.innerHTML=`
-      <form class="edit-form" data-id="${id}">
-        <textarea rows="3" class="form-control"
-          style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:6px;">${text}</textarea>
-        <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px;">
-          <button type="button" class="btn-ghost js-cancel-edit">Hủy</button>
-          <button type="submit" class="btn-primary">Lưu</button>
-        </div>
-      </form>`;
-    div.querySelector('.edit-form').dataset.oldHtml=oldHtml;
-  }
+    // 4️⃣ Đóng modal
+    const modal = e.target.closest('.modal');
+    if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) {
+      modal.style.display = 'none';
+      return;
+    }
 
-  // Hủy chỉnh sửa
-  if(e.target.classList.contains('js-cancel-edit')){
-    const form=e.target.closest('.edit-form');
-    const old=form.dataset.oldHtml;
-    form.parentElement.innerHTML=old;
-  }
+    // 5️⃣ Chỉnh sửa bình luận
+    if (e.target.classList.contains('js-edit-comment')) {
+      const id = e.target.dataset.id;
+      const box = document.getElementById(`comment-${id}`);
+      const div = box.querySelector('.comment-content');
+      const oldHtml = div.innerHTML;
+      const text = oldHtml.replace(/<br\s*\/?>/ig, "\n").trim();
+      div.innerHTML = `
+        <form class="edit-form" data-id="${id}">
+          <textarea rows="3" class="form-control" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:6px;">${text}</textarea>
+          <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px;">
+            <button type="button" class="btn-ghost js-cancel-edit">Hủy</button>
+            <button type="submit" class="btn-primary">Lưu</button>
+          </div>
+        </form>`;
+      div.querySelector('.edit-form').dataset.oldHtml = oldHtml;
+      return;
+    }
 
-  // Submit chỉnh sửa
-  if(e.target.closest('.edit-form') && e.target.type==='submit'){
-    e.preventDefault();
-    const form=e.target.closest('.edit-form');
-    const id=form.dataset.id;
-    const newContent=form.querySelector('textarea').value;
-    const res=await fetch(`/forum/comment/${id}/edit/`,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-CSRFToken':csrftoken,
-        'X-Requested-With':'XMLHttpRequest'
-      },
-      body:JSON.stringify({content:newContent})
+    // 6️⃣ Hủy chỉnh sửa
+    if (e.target.classList.contains('js-cancel-edit')) {
+      const form = e.target.closest('.edit-form');
+      const old = form.dataset.oldHtml;
+      form.parentElement.innerHTML = old;
+      return;
+    }
+
+    // 7️⃣ Submit chỉnh sửa
+    if (e.target.closest('.edit-form') && e.target.type === 'submit') {
+      e.preventDefault();
+      const form = e.target.closest('.edit-form');
+      const id = form.dataset.id;
+      const newContent = form.querySelector('textarea').value;
+      const res = await fetch(`/forum/comment/${id}/edit/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ content: newContent })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        form.parentElement.innerHTML = data.new_content_html;
+      } else alert('Đã xảy ra lỗi khi cập nhật bình luận.');
+      return;
+    }
+
+    // 8️⃣ Xóa bình luận
+    if (e.target.classList.contains('js-delete-comment')) {
+      const id = e.target.dataset.id;
+      if (!confirm('🗑️ Bạn có chắc muốn xóa bình luận này không?')) return;
+      const res = await fetch(`/forum/comment/${id}/delete/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.status === 'deleted') {
+          const el = document.getElementById(`comment-${id}`);
+          el.style.transition = 'opacity .3s';
+          el.style.opacity = '0';
+          setTimeout(() => el.remove(), 300);
+        } else alert('Không thể xóa bình luận.');
+      } else alert('Đã xảy ra lỗi khi xóa bình luận.');
+      return;
+    }
+  });
+
+  // === GỬI FORM BÁO CÁO (AJAX) ===
+  document.querySelectorAll('.js-report-form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const postId = form.dataset.post;
+      const formData = new FormData(form);
+      const res = await fetch(`/forum/${postId}/report/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+      });
+      if (res.ok) {
+        alert('✅ Báo cáo của bạn đã được gửi. Cảm ơn bạn!');
+        form.closest('.modal').style.display = 'none';
+        form.reset();
+      } else alert('⚠️ Lỗi khi gửi báo cáo.');
     });
-    if(res.ok){
-      const data=await res.json();
-      form.parentElement.innerHTML=data.new_content_html;
-    }else alert('Đã xảy ra lỗi khi cập nhật bình luận.');
+  });
+
+  // === AUTO RESIZE TEXTAREA ===
+  const textarea = document.querySelector('textarea[name="content"]');
+  if (textarea) {
+    textarea.style.resize = 'none';
+    textarea.style.overflowY = 'hidden';
+    const autoGrow = el => {
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    };
+    textarea.addEventListener('input', () => autoGrow(textarea));
+    autoGrow(textarea);
   }
 
-  // Xóa bình luận
-  if(e.target.classList.contains('js-delete-comment')){
-    const id=e.target.dataset.id;
-    if(!confirm('🗑️ Bạn có chắc muốn xóa bình luận này không?'))return;
-    const res=await fetch(`/forum/comment/${id}/delete/`,{
-      method:'POST',
-      headers:{
-        'X-CSRFToken':csrftoken,
-        'X-Requested-With':'XMLHttpRequest'
-      }
-    });
-    if(res.ok){
-      const data=await res.json();
-      if(data.status==='deleted'){
-        const el=document.getElementById(`comment-${id}`);
-        el.style.transition='opacity .3s';
-        el.style.opacity='0';
-        setTimeout(()=>el.remove(),300);
-      }else alert('Không thể xóa bình luận.');
-    }else alert('Đã xảy ra lỗi khi xóa bình luận.');
-  }
 });
 </script>
-<script>
-function getCookie(name){
-  // ... (code getCookie của bạn) ...
+
+<style>
+/* 👇 Fix comment dài bị tràn, tự xuống dòng */
+.comment-content {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
-const csrftoken=getCookie('csrftoken');
-
-// =============================================
-// === SỬA LỖI: TỰ ĐỘNG TĂNG CHIỀU CAO Ô COMMENT ===
-// =============================================
-const textarea = document.querySelector('textarea[name="content"]');
-// Hoặc dùng: const textarea = document.getElementById('id_content');
-
-if (textarea) {
-  textarea.style.resize = 'none';     // Tắt thanh kéo resize
-  textarea.style.overflowY = 'hidden'; // Ẩn thanh cuộn dọc
-
-  const autoGrow = (el) => {
-    el.style.height = 'auto'; // Reset chiều cao về auto
-    el.style.height = (el.scrollHeight) + 'px'; // Đặt chiều cao bằng chiều cao nội dung
-  };
-
-  // Lắng nghe sự kiện gõ phím
-  textarea.addEventListener('input', () => autoGrow(textarea));
-
-  // Tự chỉnh chiều cao 1 lần khi tải trang (phòng trường hợp form lỗi)
-  autoGrow(textarea);
-}
-// =============================================
-// === HẾT PHẦN SỬA LỖI ===
-// =============================================
-
-
-// --- Vote (giữ nguyên logic) ---
-document.querySelectorAll('.vote-box').forEach(box=>{
-  // ... (code vote của bạn) ...
-});
-
-// --- Lắng nghe click toàn trang ---
-document.addEventListener('click', async (e)=>{
-  // ... (code xử lý comment menu của bạn) ...
-});
-</script>
+</style>
 {% endblock %}
+
