@@ -5,7 +5,7 @@ from .models import UserProfile, PetProfile
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ["avatar_image", "phone", "birthdate", "location", "role"]
+        fields = ["avatar_image", "phone", "birthdate", "location"]
         widgets = {
             "birthdate": forms.DateInput(attrs={"type": "date"}),
         }

@@ -5,10 +5,12 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from .models import UserProfile, PetProfile
 from .forms import UserProfileForm, PetProfileForm
+from forum.models import Post, Comment
+
 
 @login_required
 def my_profile(request):
-    # tạo profile trống cho user mới đăng ký
+    # Tạo profile trống cho user mới đăng ký
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
     pets = PetProfile.objects.filter(user=request.user).order_by("created_at")
 
@@ -16,25 +18,29 @@ def my_profile(request):
     saved_pet_id = request.GET.get("saved_pet")
     added_pet = request.GET.get("added_pet") == "1"
 
-    # form thông tin cá nhân (không update username; chỉ update first_name/last_name/email + UserProfile)
+    # ======= CẬP NHẬT THÔNG TIN CÁ NHÂN =======
     if request.method == "POST" and request.POST.get("form_name") == "user_form":
         form = UserProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
             u: User = request.user
             u.first_name = request.POST.get("first_name", u.first_name)
-            u.last_name  = request.POST.get("last_name",  u.last_name)
-            u.email      = request.POST.get("email",      u.email)
+            u.last_name = request.POST.get("last_name", u.last_name)
+            u.email = request.POST.get("email", u.email)
             u.save()
-            url = reverse("profiles:my_profile") + "?saved_user=1#user-form"
+
+            # ✅ Hiển thị popup “Lưu thông tin thành công”
+            messages.success(request, "💾 Lưu thông tin cá nhân thành công!")
+            url = reverse("profiles:my_profile") + "?saved_user=1"
             return redirect(url)
+
     else:
         form = UserProfileForm(instance=profile)
 
-    # form thêm pet (trống)
+    # ======= FORM THÊM PET TRỐNG =======
     add_pet_form = PetProfileForm(prefix="new")
 
-    # ghép (pet, form) để template lặp không cần truy cập dict phức tạp
+    # ======= GHÉP PET + FORM =======
     pet_form_pairs = []
     for p in pets:
         f = PetProfileForm(instance=p, prefix=f"pet{p.id}")
@@ -48,8 +54,13 @@ def my_profile(request):
         "saved_user": saved_user,
         "saved_pet_id": saved_pet_id,
         "added_pet": added_pet,
+        # "posts": posts,
+        # "comments": comments,
+        # "posts_count": posts.count(),
+        # "comments_count": comments.count(),
     }
     return render(request, "profiles/profile_detail.html", ctx)
+
 
 @login_required
 def pet_create(request):
@@ -59,10 +70,10 @@ def pet_create(request):
             pet = form.save(commit=False)
             pet.user = request.user
             pet.save()
-            # ✅ dùng messages thay vì query string
-            messages.success(request, "✅ Đã thêm thú cưng thành công!")
+            messages.success(request, "🐾 Đã thêm thú cưng thành công!")
             return redirect("profiles:my_profile")
     return redirect("profiles:my_profile")
+
 
 @login_required
 def pet_update(request, pk):
@@ -71,6 +82,7 @@ def pet_update(request, pk):
         form = PetProfileForm(request.POST, request.FILES, instance=pet, prefix=f"pet{pk}")
         if form.is_valid():
             form.save()
-            url = reverse("profiles:my_profile") + f"?saved_pet={pk}#pet-{pk}"
-            return redirect(url)
+            # ✅ Thêm thông báo popup
+            messages.success(request, "💾 Lưu thông tin thú cưng thành công!")
+            return redirect("profiles:my_profile")
     return redirect("profiles:my_profile")
