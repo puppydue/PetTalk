@@ -26,6 +26,8 @@
             <h4>{{ e.title }}</h4>
             <p>{{ e.description|truncatechars:80 }}</p>
             <p><strong>Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
+            <p><strong>👥 Số lượng:</strong> {{ e.participants.count }} / {{ e.capacity|default:"∞" }}</p>
+
 
             <div class="status-wrapper"> {# Đã thêm margin-top qua CSS #}
               <strong>Trạng thái:</strong>
@@ -89,6 +91,11 @@
           <p>{{ e.description|truncatechars:80 }}</p>
           <p><strong>📍 Địa điểm:</strong> {{ e.location }}</p>
           <p><strong>🕓 Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
+          <p>
+              <strong>👥 Số lượng:</strong>
+              {{ e.participants.count }} / {{ e.capacity|default:"∞" }} người tham gia
+          </p>
+
 
           {% if e.is_past %}
             <div class="event-ended">🕓 Sự kiện đã kết thúc</div>

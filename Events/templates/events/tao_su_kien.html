@@ -164,6 +164,10 @@
       <div class="error-text">{{ form.location.errors.0 }}</div>
     {% endif %}
 
+    <label for="id_capacity">Số lượng người tham gia tối đa:</label>
+    {{ form.capacity }}
+
+
     <label for="id_image">Ảnh bìa:</label>
     {{ form.image }}
     {% if form.image.errors %}
