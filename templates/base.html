@@ -112,17 +112,24 @@
         {% endfor %}
       </div>
     </div>
-
-    <div class="panel">
-      <h4>📅 Sự kiện sắp diễn ra</h4>
-      <div class="event">
-        <strong>Workshop Grooming</strong>
-        <small>11/11/2025</small>
-      </div>
-      <div class="event">
-        <strong>Pet Adoption Day</strong>
-        <small>25/11/2025</small>
-      </div>
+        <div class="panel">
+          <h4>📅 Sự kiện sắp diễn ra</h4>
+          <div class="event-list">
+            {% for e in upcoming_events %}
+              <a href="{% url 'dang_ky_tham_gia' e.id %}" class="event-item">
+                <div class="event-info">
+                  <i class="fa-solid fa-calendar-day"></i>
+                  <div class="event-text">
+                    <strong>{{ e.title }}</strong>
+                    <small>{{ e.date|date:"d/m/Y" }}</small>
+                  </div>
+                </div>
+              </a>
+            {% empty %}
+              <p style="color:#64748b;font-size:13px;">Không có sự kiện sắp diễn ra.</p>
+            {% endfor %}
+          </div>
+        </div>
     </div>
   </div>
   {% endblock %}
