@@ -102,10 +102,15 @@
   <div class="right-panel-content">
     <div class="panel">
       <h4>🔥 Chủ đề nổi bật</h4>
-      <div class="chip">Huấn luyện</div>
-      <div class="chip">Chăm sóc</div>
-      <div class="chip">Dinh dưỡng</div>
-      <div class="chip">Cấp cứu</div>
+      <div class="chip-list">
+        {% for value,label in topic_choices %}
+          <a href="{% url 'forum:post_list' %}?topic={{ value }}" class="chip chip-anim">
+            <i class="fa-solid fa-paw"></i> {{ label }}
+          </a>
+        {% empty %}
+          <p style="color:#64748b; font-size:13px;">Không có chủ đề nào</p>
+        {% endfor %}
+      </div>
     </div>
 
     <div class="panel">
