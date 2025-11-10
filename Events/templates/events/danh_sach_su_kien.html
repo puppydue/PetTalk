@@ -103,7 +103,7 @@
             {% if e.creator == user %}
               <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn"> Xem danh sách người tham gia</a>
             {% elif user in e.participants.all %}
-              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn"> Hủy ĐK</a>
+              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn"> Hủy đăng ký</a>
             {% else %}
               <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn"> Tham gia</a>
             {% endif %}
@@ -246,12 +246,12 @@
 /* ====== CARD ====== */
 .event-card {
   flex: 0 0 280px;
-  background: #fffef7;
+  background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   padding: 18px;
   text-align: left;
-  border: 1.5px solid #ffe082;
+  border: 1.5px solid ##003459;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;

@@ -5,273 +5,323 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forum.css' %}">
 <style>
-  .comment-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 4px;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    min-width: 150px;
-    z-index: 10;
-    overflow: hidden;
-  }
-  .comment-menu .menu-item {
-    display: block;
-    width: 100%;
-    padding: 8px 12px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 14px;
-    cursor: pointer;
-    color: #1e293b;
-    white-space: nowrap;
-  }
-  .comment-menu .menu-item:hover {
-    background-color: #f8fafc;
-  }
+/* === MENU COMMENT - ĐẸP HƠN === */
+.comment-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  min-width: 160px;
+  z-index: 20;
+  overflow: hidden;
+  font-size: 14px;
+}
+.comment-menu .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Tăng gap để có không gian cho icon */
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #334155;
+  transition: background 0.2s;
+}
+.comment-menu .menu-item i {
+  width: 16px; /* Cố định độ rộng icon */
+  text-align: center;
+  color: #64748b;
+}
+.comment-menu .menu-item:hover {
+  background-color: #f8fafc;
+}
+.comment-menu .menu-item.danger:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+.comment-menu .menu-item.danger:hover i {
+  color: #dc2626;
+}
+.comment-menu .menu-item + .menu-item {
+  border-top: 1px solid #f1f5f9;
+}
 .comment-menu.menu-up {
   top: auto !important;
   bottom: 100%;
-  margin-top: 0;
   margin-bottom: 6px;
-  transform-origin: bottom right;
 }
 
-  .comment-menu .menu-item + .menu-item {
-    border-top: 1px solid #f1f5f9;
-  }
-    .comment-content {
-  white-space: pre-wrap; /* giữ xuống dòng gốc và cho phép xuống dòng tự động */
-  word-break: break-word; /* cắt từ quá dài */
-  overflow-wrap: anywhere; /* hỗ trợ trình duyệt mới */
+/* === NÚT ... (TRIGGER MENU) - NÂNG CẤP GIỐNG HÌNH ẢNH === */
+.comment-menu-btn {
+  background: #fff;
+  border: 1px solid #e2e8f0; /* Thêm viền */
+  font-size: 14px; /* Chỉnh size icon */
+  color: #64748b; /* Màu icon */
+  cursor: pointer;
+  padding: 0; /* Reset padding */
+  border-radius: 10px; /* Bo tròn giống hình */
+  transition: all 0.2s;
+  width: 36px; /* Kích thước nút */
+  height: 36px;
+  display: flex; /* Căn giữa icon */
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.comment-menu-btn:hover {
+  background-color: #f8fafc; /* Đổi màu nền khi hover */
+  color: #003459;
+  border-color: #cbd5e1;
 }
 
-  /* === ⭐️ TỐI ƯU LƯỚI ẢNH (Facebook-style) ⭐️ === */
+/* === AVATAR === */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: #003459;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* ... (Phần CSS còn lại giữ nguyên) ... */
+/* === COMMENT TEXT === */
+.comment-content {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+  color: #1e293b;
+  margin-top: 6px;
+}
 
-  .post-images {
-      display: grid;
-      gap: 4px; /* Khoảng cách giữa các ảnh */
-      border-radius: 12px; /* Bo góc cho cả khối ảnh */
-      overflow: hidden; /* Bắt buộc để bo góc các ảnh bên trong */
-      margin-top: 15px;
-      height: auto; /* Để chiều cao tự động theo nội dung */
-  }
-  .image-wrapper {
-      position: relative;
-      width: 100%;
-      height: 100%; /* Height sẽ được set bởi grid row */
-      background: #f8fafc; /* Nền mờ khi tải */
-  }
-  .post-images img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover; /* ⭐️ Đây là chìa khóa: TỰ CROP ẢNH VỪA KHUNG */
-      cursor: pointer;
-      transition: transform 0.2s ease;
-  }
-  .post-images img:hover {
-      transform: scale(1.03); /* Hiệu ứng zoom nhẹ khi di chuột */
-  }
+/* === TEXTAREA CHÍNH === */
+textarea[name="content"] {
+  width: 100%;
+  min-height: 50px;
+  max-height: 500px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.5;
+  overflow-y: hidden;
+}
 
-  /* --- Lưới 1 ảnh (Nhỏ hơn) --- */
-  .images-count-1 {
-      display: flex;
-      justify-content: center;
-      max-height: 450px; /* Giới hạn chiều cao "nhỏ hơn nữa" */
-  }
-  .images-count-1 .image-wrapper {
-      height: auto;
-  }
-  .images-count-1 img {
-      position: relative;
-      object-fit: contain; /* 1 ảnh thì không crop, chỉ thu nhỏ */
-      max-height: 450px;
-      width: auto;
-      max-width: 100%;
-      cursor: zoom-in;
-  }
+/* === EDIT FORM - ĐẸP, TRỰC QUAN === */
+.edit-form-container {
+  margin-top: 10px;
+  animation: slideDown 0.2s ease;
+}
 
-  /* --- Lưới 2 ảnh (1x2) --- */
-  .images-count-2 {
-      grid-template-columns: 1fr 1fr;
-      height: 300px; /* Cố định chiều cao tổng */
-  }
+.edit-form {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
 
-  /* --- Lưới 3 ảnh (1 to, 2 nhỏ) --- */
-  .images-count-3 {
-      grid-template-columns: 2fr 1fr; /* Cột trái 66%, cột phải 33% */
-      grid-template-rows: 1fr 1fr; /* 2 hàng */
-      height: 400px; /* Cố định chiều cao tổng */
-  }
-  .images-count-3 .image-wrapper:first-child {
-      grid-row: span 2; /* Ảnh đầu tiên chiếm 2 hàng */
-  }
+.edit-form textarea {
+  width: 100%;
+  min-height: 80px;
+  max-height: 180px;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  outline: none;
+  transition: border 0.2s;
+}
+.edit-form textarea:focus {
+  border-color: #003459;
+}
 
-  /* --- Lưới 4 ảnh (2x2) --- */
-  .images-count-4 {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      height: 400px; /* Cố định chiều cao tổng */
-  }
+.edit-help-text {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 
-  /* --- Lưới 5+ ảnh --- */
-  .images-count-more { /* Dùng class chung cho 5+ */
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      height: 400px;
-  }
-  /* Ẩn ảnh thứ 5 trở đi */
-  .images-count-more .image-wrapper:nth-child(n+5) {
-      display: none;
-  }
-  /* Overlay cho ảnh thứ 4, hiển thị số ảnh còn lại */
-  .images-count-more .image-wrapper:nth-child(4) {
-      position: relative;
-  }
-  .images-count-more .image-wrapper:nth-child(4)::after {
-      content: attr(data-more-count); /* Sẽ là "+3" */
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: bold;
-      cursor: pointer;
-  }
+.edit-help-text .old {
+  color: #94a3b8;
+  font-style: italic;
+}
 
-  /* === ⭐️ CSS CHO LIGHTBOX (MODAL ẢNH) ⭐️ === */
-  .lightbox {
-    position: fixed;
-    z-index: 9990; /* Nằm trên mọi thứ */
-    padding-top: 50px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.9);
-    display: none; /* Ẩn ban đầu */
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  .lightbox-content {
-    margin: auto;
-    display: block;
-    max-width: 90%;
-    max-height: 85vh;
-    animation: zoom 0.3s ease;
-  }
-  @keyframes zoom {
-    from {transform: scale(0.8); opacity: 0;}
-    to {transform: scale(1); opacity: 1;}
-  }
-  .lightbox-close {
-    position: absolute;
-    top: 15px;
-    right: 35px;
-    color: #f1f1f1;
-    font-size: 40px;
-    font-weight: bold;
-    transition: 0.3s;
-    cursor: pointer;
-  }
-  .lightbox-close:hover { color: #bbb; }
-  .lightbox-prev, .lightbox-next {
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    width: auto;
-    padding: 16px;
-    margin-top: -50px;
-    color: white;
-    font-weight: bold;
-    font-size: 30px;
-    transition: 0.3s;
-    border-radius: 0 3px 3px 0;
-    user-select: none;
-    display: none; /* Ẩn khi chỉ có 1 ảnh */
-  }
-  .lightbox-next { right: 0; border-radius: 3px 0 0 3px; }
-  .lightbox-prev { left: 0; }
-  .lightbox-prev:hover, .lightbox-next:hover {
-    background-color: rgba(255,255,255,0.2);
-  }
-  /* === HẾT CSS LIGHTBOX === */
+.edit-form .btn-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
 
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === (BẮT ĐẦU) CSS SAO CHÉP TỪ POST_LIST.HTML === */
+
+/* === Khu vực vote + actions === */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.vote-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #003459;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.vote-btn:hover { background: #f7dba7; }
+.vote-count {
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 28px;
+  text-align: center;
+  color: #003459;
+}
+.vote-btn.active-up { background: #ff4500; color: #fff; border-color: #ff4500; }
+.vote-btn.active-down { background: #6a5cff; color: #fff; border-color: #6a5cff; }
+
+/* === Nút và button (cho nút Báo cáo) === */
+.btn-ghost {
+  border: 1px solid #003459;
+  color: #003459;
+  background: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+}
+.btn-ghost:hover { background: #f7dba7; border-color: #003459; }
+/* Nút primary để đảm bảo tính nhất quán cho các nút khác */
+.btn-primary {
+  border: none;
+  color: #fff;
+  background: #003459;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+.btn-primary:hover { background: #00509e; }
+
+/* === (KẾT THÚC) CSS SAO CHÉP TỪ POST_LIST.HTML === */
+
+
+/* === LIGHTBOX === */
+.post-images { display: grid; gap: 4px; border-radius: 12px; overflow: hidden; margin-top: 15px; }
+.image-wrapper { position: relative; width: 100%; height: 100%; background: #f8fafc; }
+.post-images img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.2s; }
+.post-images img:hover { transform: scale(1.03); }
+
+.images-count-1 { display: flex; justify-content: center; max-height: 450px; }
+.images-count-1 img { position: relative; object-fit: contain; max-height: 450px; width: auto; max-width: 100%; cursor: zoom-in; }
+.images-count-2 { grid-template-columns: 1fr 1fr; height: 300px; }
+.images-count-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
+.images-count-3 .image-wrapper:first-child { grid-row: span 2; }
+.images-count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
+.images-count-more { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
+.images-count-more .image-wrapper:nth-child(n+5) { display: none; }
+.images-count-more .image-wrapper:nth-child(4)::after {
+  content: attr(data-more-count);
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); color: white; display: flex;
+  align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; cursor: pointer;
+}
+
+.lightbox {
+  position: fixed; z-index: 9990; padding-top: 50px; left: 0; top: 0;
+  width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9);
+  display: none; animation: fadeIn 0.3s ease;
+}
+.lightbox-content { margin: auto; display: block; max-width: 90%; max-height: 85vh; animation: zoom 0.3s ease; }
+.lightbox-close { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; }
+.lightbox-close:hover { color: #bbb; }
+.lightbox-prev, .lightbox-next { cursor: pointer; position: absolute; top: 50%; width: auto; padding: 16px; margin-top: -50px; color: white; font-weight: bold; font-size: 30px; user-select: none; display: none; }
+.lightbox-next { right: 0; border-radius: 3px 0 0 3px; }
+.lightbox-prev { left: 0; }
+.lightbox-prev:hover, .lightbox-next:hover { background-color: rgba(255,255,255,0.2); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zoom { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 </style>
 {% endblock %}
+
 {% block title %}Bài viết • {{ post.title }}{% endblock %}
 
 {% block content %}
 {% reaction_of post request.user as me_react %}
 
-<article class="post-card" style="max-width:780px; margin:0 auto; background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
-
-  <div class="user-info" style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-    <div class="avatar">{{ post.username.username|slice:":1"|upper }}</div>
+<article class="post-card" style="max-width:780px;margin:0 auto;background:#fff;border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+  <!-- ... (Phần thông tin post giữ nguyên) ... -->
+  <div class="user-info" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+    <div class="avatar">
+      {% if post.username.userprofile.avatar_image %}
+        <img src="{{ post.username.userprofile.avatar_image.url }}" alt="avatar">
+      {% else %}
+        {{ post.username.username|slice:":1"|upper }}
+      {% endif %}
+    </div>
     <div style="display:flex;flex-direction:column;">
       <span style="font-weight:700;color:#003459;font-size:15px;">{{ post.username.username }}</span>
       <small style="color:#64748b;font-size:13px;">{{ post.created_at|date:"d/m/Y H:i" }}</small>
     </div>
   </div>
 
-  <h1 class="post-title" style="font-size:22px">{{ post.title }}</h1>
-  <div class="post-content">{{ post.content|linebreaksbr }}</div>
+  <h1 class="post-title" style="font-size:22px;margin:8px 0">{{ post.title }}</h1>
+  <div class="post-content" style="line-height:1.6;color:#1e293b;">{{ post.content|linebreaksbr }}</div>
 
-  <!-- === ⭐️ KHỐI CODE ĐÚNG (ĐÃ TỐI ƯU) ⭐️ === -->
   {% if post.images.all %}
     {% with image_count=post.images.all|length %}
-      {% if image_count == 1 %}
-        {% with class_name="images-count-1" %}
-          {% include "forum/_post_images.html" %}
-        {% endwith %}
-      {% elif image_count == 2 %}
-        {% with class_name="images-count-2" %}
-          {% include "forum/_post_images.html" %}
-        {% endwith %}
-      {% elif image_count == 3 %}
-        {% with class_name="images-count-3" %}
-          {% include "forum/_post_images.html" %}
-        {% endwith %}
-      {% elif image_count == 4 %}
-        {% with class_name="images-count-4" %}
-          {% include "forum/_post_images.html" %}
-        {% endwith %}
-      {% else %}
-        {% with class_name="images-count-more" %}
-          {% include "forum/_post_images.html" %}
-        {% endwith %}
-      {% endif %}
+      {% if image_count == 1 %}{% with class_name="images-count-1" %}{% include "forum/_post_images.html" %}{% endwith %}
+      {% elif image_count == 2 %}{% with class_name="images-count-2" %}{% include "forum/_post_images.html" %}{% endwith %}
+      {% elif image_count == 3 %}{% with class_name="images-count-3" %}{% include "forum/_post_images.html" %}{% endwith %}
+      {% elif image_count == 4 %}{% with class_name="images-count-4" %}{% include "forum/_post_images.html" %}{% endwith %}
+      {% else %}{% with class_name="images-count-more" %}{% include "forum/_post_images.html" %}{% endwith %}{% endif %}
     {% endwith %}
   {% endif %}
 
-  <!-- === ⭐️ XÓA KHỐI CODE BỊ LẶP Ở ĐÂY ⭐️ === -->
-  <!--
-      {% if image_count == 1 %}
-        ... (TOÀN BỘ KHỐI CODE CŨ ĐÃ BỊ XÓA) ...
-      {% endif %}
-  -->
-  <!-- === HẾT XÓA === -->
-
-
-  <div class="actions" style="display:flex;align-items:center;gap:12px;margin-top:12px">
+  <!-- (BẮT ĐẦU) HTML ĐÃ CẬP NHẬT -->
+  <div class="actions">
+    <!-- VOTE BOX (STYLE TỪ POST_LIST) -->
     <div class="vote-box" data-post="{{ post.post_id }}">
       <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
         <i class="fa-solid fa-arrow-up"></i>
@@ -282,94 +332,109 @@
       </button>
     </div>
 
+    <!-- NÚT BÁO CÁO (STYLE VÀ HTML TỪ POST_LIST) -->
     <button class="btn-ghost js-open-report" data-target="report-{{ post.post_id }}">
       <i class="fa-solid fa-flag"></i> Báo cáo
     </button>
   </div>
+  <!-- (KẾT THÚC) HTML ĐÃ CẬP NHẬT -->
 
   {% include "forum/_report_modal.html" with post=post %}
 </article>
 
-<!-- ... (Phần bình luận giữ nguyên) ... -->
-<section class="comment-section" style="max-width:780px; margin:20px auto 0 auto;">
+<section class="comment-section" style="max-width:780px;margin:20px auto 0;">
   <hr style="border:none;border-top:1px solid #eef2f7;margin:16px 0">
-  <h3 style="color:#003459;margin:0 0 8px 0">Bình luận ({{ comments|length }})</h3>
+  <h3 style="color:#003459;margin:0 0 8px 0;font-size:18px">Bình luận ({{ comments|length }})</h3>
 
-  <form method="post">
+  <form method="post" style="margin-bottom:16px">
     {% csrf_token %}
     <input type="hidden" name="comment" value="1">
     {{ comment_form.content }}
     <div style="display:flex;justify-content:flex-end;margin-top:8px">
+      <!-- Nút này giờ cũng sẽ dùng style .btn-primary đã copy qua -->
       <button class="btn-primary" type="submit">Đăng</button>
     </div>
   </form>
 
-  <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+  <div style="display:flex;flex-direction:column;gap:12px">
     {% for c in comments %}
-    <div class="comment-box" id="comment-{{ c.id }}" style="background:#f9fafb;padding:10px 12px;border-radius:12px;position:relative;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <strong style="color:#003459">{{ c.username.username }}</strong>
-          <small style="color:#64748b"> • {{ c.created_at|date:"d/m/Y H:i" }}</small>
+    <div class="comment-box" id="comment-{{ c.id }}" style="background:#f9fafb;padding:12px 14px;border-radius:16px;position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="avatar">
+            {% if c.username.userprofile.avatar_image %}
+              <img src="{{ c.username.userprofile.avatar_image.url }}" alt="avatar">
+            {% else %}
+              {{ c.username.username|slice:":1"|upper }}
+            {% endif %}
+          </div>
+          <div>
+            <strong style="color:#003459;font-size:15px">{{ c.username.username }}</strong>
+            <small style="color:#94a3b8;font-size:13px"> • {{ c.created_at|date:"d/m/Y H:i" }}</small>
+          </div>
         </div>
 
-        {% if c.username == request.user %}
+        <!-- (BẮT ĐẦU) HTML NÚT MENU ĐÃ NÂNG CẤP -->
         <div class="comment-menu-wrapper" style="position:relative;">
-          <button class="comment-menu-btn" style="background:none;border:none;font-size:18px;color:#64748b;cursor:pointer;">⋯</button>
+          <button class="comment-menu-btn" aria-label="Menu">
+            <i class="fa-solid fa-ellipsis"></i>
+          </button>
           <div class="comment-menu">
-            <button class="menu-item js-edit-comment" data-id="{{ c.id }}">✏️ Chỉnh sửa</button>
-            <button class="menu-item js-delete-comment" data-id="{{ c.id }}">🗑️ Xóa</button>
+            {% if c.username == request.user %}
+              <button type="button" class="menu-item js-edit-comment" data-id="{{ c.id }}">
+                <i class="fa-solid fa-pen"></i> Chỉnh sửa
+              </button>
+              <button type="button" class="menu-item danger js-delete-comment" data-id="{{ c.id }}">
+                <i class="fa-solid fa-trash"></i> Xóa
+              </button>
+            {% else %}
+              <button type="button" class="menu-item js-open-report-comment" data-target="report-comment-{{ c.id }}">
+                <i class="fa-solid fa-flag"></i> Báo cáo
+              </button>
+            {% endif %}
           </div>
         </div>
-        {% else %}
-        <div class="comment-menu-wrapper" style="position:relative;">
-          <button class="comment-menu-btn" style="background:none;border:none;font-size:18px;color:#64748b;cursor:pointer;">⋯</button>
-          <div class="comment-menu">
-            <button class="menu-item js-open-report-comment" data-target="report-comment-{{ c.id }}">🚩 Báo cáo</button>
-          </div>
-        </div>
-        {% endif %}
+        <!-- (KẾT THÚC) HTML NÚT MENU ĐÃ NÂNG CẤP -->
       </div>
-      <div class="comment-content" style="margin-top:6px;">{{ c.content|linebreaksbr }}</div>
+
+      <div class="comment-content">{{ c.content|linebreaksbr }}</div>
       {% include "forum/_report_comment_modal.html" with comment=c %}
     </div>
     {% endfor %}
   </div>
 </section>
 
-<!-- === ⭐️ THÊM HTML CHO LIGHTBOX (MODAL ẢNH) ⭐️ === -->
 <div id="image-lightbox" class="lightbox">
-  <span class="lightbox-close">&times;</span>
+  <span class="lightbox-close">×</span>
   <img class="lightbox-content" id="lightbox-img">
-  <a class="lightbox-prev" id="lightbox-prev">&#10094;</a>
-  <a class="lightbox-next" id="lightbox-next">&#10095;</a>
+  <a class="lightbox-prev" id="lightbox-prev"></a>
+  <a class="lightbox-next" id="lightbox-next"></a>
 </div>
-<!-- === HẾT HTML LIGHTBOX === -->
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  const csrftoken = document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
 
-  // === HÀM LẤY CSRF TOKEN ===
-  function getCookie(name) {
-    let v = null;
-    if (document.cookie && document.cookie !== '') {
-      const c = document.cookie.split(';');
-      for (let i = 0; i < c.length; i++) {
-        const s = c[i].trim();
-        if (s.substring(0, name.length + 1) === (name + '=')) {
-          v = decodeURIComponent(s.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return v;
+  // Auto grow
+  const autoGrow = el => {
+    if (!el) return;
+    const maxHeight = parseInt(getComputedStyle(el).maxHeight, 10) || 0;
+    el.style.height = 'auto';
+    const scrollHeight = el.scrollHeight;
+    el.style.height = (maxHeight && scrollHeight > maxHeight) ? maxHeight + 'px' : scrollHeight + 'px';
+    el.style.overflowY = (maxHeight && scrollHeight > maxHeight) ? 'auto' : 'hidden';
+  };
+
+  // Main textarea
+  const mainTextarea = document.querySelector('textarea[name="content"]');
+  if (mainTextarea) {
+    mainTextarea.addEventListener('input', () => autoGrow(mainTextarea));
+    autoGrow(mainTextarea);
   }
-  const csrftoken = getCookie('csrftoken');
 
-  // === VOTE BÀI VIẾT ===
+  // Vote - HOẠT ĐỘNG GIỐNG HỆT (Không cần thay đổi JS)
   document.querySelectorAll('.vote-box').forEach(box => {
     const buttons = box.querySelectorAll('.js-vote');
     const countEl = box.querySelector('.js-count');
@@ -377,8 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener('click', async () => {
         const type = btn.dataset.type;
         const postId = box.dataset.post;
-        const url = `/forum/${postId}/react/${type}/`;
-        const res = await fetch(url, {
+        const res = await fetch(`/forum/${postId}/react/${type}/`, {
           method: 'POST',
           headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }
         });
@@ -393,183 +457,137 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // === ⭐️ LOGIC MỚI CHO LIGHTBOX ⭐️ ===
-  let lightboxImages = [];
-  let currentImageIndex = 0;
+  // Lightbox (Không thay đổi)
+  let lightboxImages = [], currentImageIndex = 0;
   const lightbox = document.getElementById('image-lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
   const lightboxPrev = document.getElementById('lightbox-prev');
   const lightboxNext = document.getElementById('lightbox-next');
   const lightboxClose = document.querySelector('.lightbox-close');
 
-  function openLightbox(postElement, clickedImgSrc) {
-    // 1. Tìm tất cả ảnh trong cùng 1 bài post
-    lightboxImages = [];
-    // Lấy TẤT CẢ ảnh, bao gồm cả cái bị ẩn (trong trường hợp 5+)
-    postElement.querySelectorAll('.js-lightbox-trigger').forEach(img => {
-      lightboxImages.push(img.src);
-    });
-
-    if (lightboxImages.length === 0) return;
-
-    // 2. Tìm index của ảnh được click
-    currentImageIndex = lightboxImages.findIndex(src => src === clickedImgSrc);
-
-    // 3. Cập nhật UI và hiển thị
+  const openLightbox = (postElement, src) => {
+    lightboxImages = Array.from(postElement.querySelectorAll('.js-lightbox-trigger')).map(img => img.src);
+    currentImageIndex = lightboxImages.indexOf(src);
     updateLightboxImage();
     lightbox.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // Chống cuộn trang
-  }
-
-  function updateLightboxImage() {
-    if (lightboxImages.length === 0) return;
+    document.body.style.overflow = 'hidden';
+  };
+  const updateLightboxImage = () => {
     lightboxImg.src = lightboxImages[currentImageIndex];
+    const show = lightboxImages.length > 1;
+    lightboxPrev.style.display = show ? 'block' : 'none';
+    lightboxNext.style.display = show ? 'block' : 'none';
+  };
+  const closeLightbox = () => { lightbox.style.display = 'none'; document.body.style.overflow = 'auto'; };
 
-    // Chỉ hiển thị nút next/prev nếu có nhiều hơn 1 ảnh
-    const hasMultiple = lightboxImages.length > 1;
-    lightboxPrev.style.display = hasMultiple ? 'block' : 'none';
-    lightboxNext.style.display = hasMultiple ? 'block' : 'none';
-  }
+  lightboxNext.onclick = () => { currentImageIndex = (currentImageIndex + 1) % lightboxImages.length; updateLightboxImage(); };
+  lightboxPrev.addEventListener('click', () => { currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length; updateLightboxImage(); });
+  lightboxClose.onclick = closeLightbox;
+  lightbox.onclick = e => { if (e.target === lightbox) closeLightbox(); };
 
-  function showNextImage() {
-    currentImageIndex = (currentImageIndex + 1) % lightboxImages.length;
-    updateLightboxImage();
-  }
-
-  function showPrevImage() {
-    currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length;
-    updateLightboxImage();
-  }
-
-  function closeLightbox() {
-    lightbox.style.display = 'none';
-    lightboxImages = []; // Xóa cache ảnh
-    document.body.style.overflow = 'auto'; // Cho phép cuộn lại
-  }
-
-  // --- Thêm Event Listeners cho Lightbox ---
-  if(lightbox) {
-    lightboxNext.addEventListener('click', showNextImage);
-    lightboxPrev.addEventListener('click', showPrevImage);
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) { // Chỉ đóng khi click vào nền đen
-        closeLightbox();
-      }
-    });
-  }
-  // --- Hết Logic Lightbox ---
-
-
-  // === CLICK TOÀN TRANG ===
-  document.addEventListener('click', async (e) => {
+  // Main click handler (Không thay đổi - JS vẫn hoạt động)
+  document.addEventListener('click', async e => {
     const allMenus = document.querySelectorAll('.comment-menu');
-    const btn = e.target.closest('.comment-menu-btn');
+    const menuBtn = e.target.closest('.comment-menu-btn');
+    const img = e.target.closest('.js-lightbox-trigger');
 
-    // ⭐️ MỚI: Mở Lightbox
-    // Phải đặt listener này *bên trong* click event chính
-    const imgTrigger = e.target.closest('.js-lightbox-trigger');
-    if (imgTrigger) {
-      e.preventDefault();
-      const postContainer = imgTrigger.closest('.post-images');
-      openLightbox(postContainer, imgTrigger.src);
-      return; // Dừng lại, không chạy logic khác
-    }
+    if (img) { e.preventDefault(); openLightbox(img.closest('.post-images'), img.src); return; }
 
-    // 1️⃣ Menu ba chấm
-    if (btn) {
+    if (menuBtn) {
       e.stopPropagation();
-      const menu = btn.parentElement.querySelector('.comment-menu');
-      allMenus.forEach(m => { if (m !== menu) m.style.display = 'none'; });
+      const menu = menuBtn.parentElement.querySelector('.comment-menu');
       const isOpen = menu.style.display === 'block';
-      menu.style.display = isOpen ? 'none' : 'block';
+      allMenus.forEach(m => { if (m !== menu) m.style.display = 'none'; });
+      if (isOpen) { menu.style.display = 'none'; return; }
 
-      if (!isOpen) {
-        menu.style.visibility = 'hidden';
-        menu.style.display = 'block';
-        const rect = menu.getBoundingClientRect();
-        const bottomOverflow = rect.bottom > window.innerHeight;
-        if (bottomOverflow || (window.innerHeight - rect.bottom) < 20) {
-          menu.classList.add('menu-up');
-        } else {
-          menu.classList.remove('menu-up');
-        }
-        menu.style.display = 'none';
-        menu.style.visibility = '';
-        menu.style.display = 'block';
-      }
-      return;
-    }
-    // 2️⃣ Click ngoài menu → đóng
-    if (!e.target.closest('.comment-menu-wrapper')) {
-      allMenus.forEach(m => m.style.display = 'none');
-    }
-
-    // 3️⃣ Mở modal báo cáo
-    const reportBtn = e.target.closest('.js-open-report') || e.target.closest('.js-open-report-comment');
-    if (reportBtn) {
-      const id = reportBtn.getAttribute('data-target');
-      const modal = document.getElementById(id);
-      if (modal) modal.style.display = 'flex';
+      menu.classList.remove('menu-up');
+      menu.style.visibility = 'hidden';
+      menu.style.display = 'block';
+      const spaceBelow = window.innerHeight - menuBtn.getBoundingClientRect().bottom;
+      if (spaceBelow < menu.offsetHeight + 20) menu.classList.add('menu-up');
+      menu.style.visibility = 'visible';
       return;
     }
 
-    // 4️⃣ Đóng modal
+    if (!e.target.closest('.comment-menu-wrapper')) allMenus.forEach(m => m.style.display = 'none');
+
+    const reportBtn = e.target.closest('.js-open-report, .js-open-report-comment');
+    if (reportBtn) { document.getElementById(reportBtn.dataset.target).style.display = 'flex'; return; }
+
     const modal = e.target.closest('.modal');
-    if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) {
-      modal.style.display = 'none';
-      return;
-    }
+    if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) { modal.style.display = 'none'; return; }
 
-    // 5️⃣ Chỉnh sửa bình luận
-    if (e.target.classList.contains('js-edit-comment')) {
-      const id = e.target.dataset.id;
-      const box = document.getElementById(`comment-${id}`);
-      const div = box.querySelector('.comment-content');
-      const oldHtml = div.innerHTML;
-      const text = oldHtml.replace(/<br\s*\/?>/ig, "\n").trim();
-      div.innerHTML = `
+    // === EDIT COMMENT (Không thay đổi) ===
+    const editBtn = e.target.closest('.js-edit-comment');
+    if (editBtn) {
+      e.preventDefault();
+      const id = editBtn.dataset.id;
+      const commentBox = document.getElementById(`comment-${id}`);
+      const contentDiv = commentBox.querySelector('.comment-content');
+
+      if (commentBox.querySelector('.edit-form-container')) return;
+
+      const rawText = contentDiv.textContent || contentDiv.innerText;
+
+      const editContainer = document.createElement('div');
+      editContainer.className = 'edit-form-container';
+      editContainer.innerHTML = `
         <form class="edit-form" data-id="${id}">
-          <textarea rows="3" class="form-control" style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:6px;">${text}</textarea>
-          <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:6px;">
+          <div class="edit-help-text">
+            <span>Nội dung cũ:</span>
+            <span class="old">${rawText.replace(/\n/g, ' [Enter] ')}</span>
+          </div>
+          <textarea placeholder="Nhập nội dung mới...">${rawText}</textarea>
+          <div class="btn-group">
             <button type="button" class="btn-ghost js-cancel-edit">Hủy</button>
             <button type="submit" class="btn-primary">Lưu</button>
           </div>
         </form>`;
-      div.querySelector('.edit-form').dataset.oldHtml = oldHtml;
+      commentBox.appendChild(editContainer);
+
+      const textarea = editContainer.querySelector('textarea');
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+      textarea.addEventListener('input', () => autoGrow(textarea));
+      autoGrow(textarea);
       return;
     }
 
-    // 6️⃣ Hủy chỉnh sửa
-    if (e.target.classList.contains('js-cancel-edit')) {
-      const form = e.target.closest('.edit-form');
-      const old = form.dataset.oldHtml;
-      form.parentElement.innerHTML = old;
-      return;
-    }
-
-    // 7️⃣ Submit chỉnh sửa
-    if (e.target.closest('.edit-form') && e.target.type === 'submit') {
+    const cancelBtn = e.target.closest('.js-cancel-edit');
+    if (cancelBtn) {
       e.preventDefault();
-      const form = e.target.closest('.edit-form');
-      const id = form.dataset.id;
-      const newContent = form.querySelector('textarea').value;
+      cancelBtn.closest('.edit-form-container').remove();
+      return;
+    }
+
+    const saveForm = e.target.closest('.edit-form');
+    if (saveForm && e.target.type === 'submit') {
+      e.preventDefault();
+      const id = saveForm.dataset.id;
+      const newContent = saveForm.querySelector('textarea').value.trim();
+      if (!newContent) { alert('Nội dung không được để trống!'); return; }
+
       const res = await fetch(`/forum/comment/${id}/edit/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
         body: JSON.stringify({ content: newContent })
       });
+
       if (res.ok) {
         const data = await res.json();
-        form.parentElement.innerHTML = data.new_content_html;
-      } else alert('Đã xảy ra lỗi khi cập nhật bình luận.');
+        const commentBox = document.getElementById(`comment-${id}`);
+        commentBox.querySelector('.comment-content').innerHTML = data.new_content_html;
+        saveForm.closest('.edit-form-container').remove();
+      } else {
+        alert('Lỗi khi lưu bình luận.');
+      }
       return;
     }
 
-    // 8️⃣ Xóa bình luận
-    if (e.target.classList.contains('js-delete-comment')) {
-      const id = e.target.dataset.id;
-      if (!confirm('🗑️ Bạn có chắc muốn xóa bình luận này không?')) return;
+    const deleteBtn = e.target.closest('.js-delete-comment');
+    if (deleteBtn) {
+      if (!confirm('Xóa bình luận này?')) return;
+      const id = deleteBtn.dataset.id;
       const res = await fetch(`/forum/comment/${id}/delete/`, {
         method: 'POST',
         headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }
@@ -578,56 +596,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await res.json();
         if (data.status === 'deleted') {
           const el = document.getElementById(`comment-${id}`);
-          el.style.transition = 'opacity .3s';
-          el.style.opacity = '0';
+          el.style.transition = 'opacity .3s'; el.style.opacity = '0';
           setTimeout(() => el.remove(), 300);
-        } else alert('Không thể xóa bình luận.');
-      } else alert('Đã xảy ra lỗi khi xóa bình luận.');
-      return;
+        }
+      }
     }
   });
-
-  // === GỬI FORM BÁO CÁO (AJAX) ===
-  document.querySelectorAll('.js-report-form').forEach(form => {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const postId = form.dataset.post;
-      const formData = new FormData(form);
-      const res = await fetch(`/forum/${postId}/report/`, {
-        method: 'POST',
-        headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
-        body: formData
-      });
-      if (res.ok) {
-        alert('✅ Báo cáo của bạn đã được gửi. Cảm ơn bạn!');
-        form.closest('.modal').style.display = 'none';
-        form.reset();
-      } else alert('⚠️ Lỗi khi gửi báo cáo.');
-    });
-  });
-
-  // === AUTO RESIZE TEXTAREA ===
-  const textarea = document.querySelector('textarea[name="content"]');
-  if (textarea) {
-    textarea.style.resize = 'none';
-    textarea.style.overflowY = 'hidden';
-    const autoGrow = el => {
-      el.style.height = 'auto';
-      el.style.height = el.scrollHeight + 'px';
-    };
-    textarea.addEventListener('input', () => autoGrow(textarea));
-    autoGrow(textarea);
-  }
-
 });
 </script>
-
-<style>
-/* 👇 Fix comment dài bị tràn, tự xuống dòng */
-.comment-content {
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-</style>
 {% endblock %}

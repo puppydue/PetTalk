@@ -12,13 +12,16 @@ from django.utils.html import linebreaks, escape
 from django.views.decorators.http import require_POST
 
 
-
 # ========== 🧭 DANH SÁCH BÀI VIẾT ==========
 @login_required
 def post_list(request):
     q = request.GET.get('q')
     topic = request.GET.get('topic')
-    posts = Post.objects.prefetch_related('images', 'comments', 'reactions')
+
+    # === ⭐️ SỬA DÒNG NÀY ⭐️ ===
+    # Thêm .select_related('username__userprofile') để tải trước avatar
+    posts = Post.objects.select_related('username__userprofile').prefetch_related('images', 'comments', 'reactions')
+    # === HẾT SỬA ===
 
     if q:
         posts = posts.filter(Q(title__icontains=q) | Q(content__icontains=q))
@@ -80,9 +83,6 @@ def post_detail(request, post_id):
         'comment_form': comment_form,
         'report_form': report_form
     })
-
-
-
 
 # ========== 🚨 BÁO CÁO BÀI VIẾT ==========
 @login_required

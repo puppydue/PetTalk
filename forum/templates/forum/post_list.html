@@ -5,39 +5,283 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forum.css' %}">
+
 <style>
-  .create-post-trigger{background:#fff;border-radius:16px;padding:18px;box-shadow:0 4px 10px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:16px}
-  .trigger-avatar{width:40px;height:40px;border-radius:9999px;background:#003459;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
-  .trigger-input{flex:1;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;color:#475569}
-  .post-list{display:flex;flex-direction:column;gap:16px;max-width:780px;margin:0 auto;padding:8px 0}
-  .post-card{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 4px 10px rgba(0,0,0,.08);border-left:6px solid #003459}
-  .avatar{width:40px;height:40px;border-radius:9999px;background:#003459;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
-  .post-title{font-weight:700;color:#0f172a;margin:6px 0}
-  .post-images{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-  .post-images img{width:132px;height:132px;border-radius:12px;object-fit:cover;border:2px solid #eef2f7}
-  .actions{display:flex;align-items:center;gap:12px;margin-top:12px}
-  .vote-btn{width:42px;height:42px;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#003459;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .25s}
-  .vote-btn:hover{background:#f7dba7}
-  .vote-count{font-weight:700;font-size:15px;min-width:28px;text-align:center;color:#003459;text-decoration:none !important}
-  .vote-btn.active-up{background:#ff4500;color:#fff;border-color:#ff4500}
-  .vote-btn.active-down{background:#6a5cff;color:#fff;border-color:#6a5cff}
-  .btn-ghost{border:1px solid #003459;color:#003459;background:#fff;padding:8px 14px;border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none !important;display:flex;align-items:center;gap:6px}
-  .btn-ghost:hover{background:#f7dba7}
-  .btn-primary{border:none;color:#fff;background:#003459;padding:8px 14px;border-radius:10px;font-weight:600;cursor:pointer}
-  .search-wrap{display:flex;gap:8px;margin-bottom:12px}
-  .search-wrap input,.search-wrap select{border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#fff;flex:1}
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
-  .modal__panel{background:#fff;border-radius:16px;max-width:640px;width:100%;padding:18px}
-  .modal__head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid #eef2f7;padding-bottom:10px}
-  .close-x{background:none;border:none;font-size:24px;cursor:pointer;color:#64748b}
+/* === Ô tạo bài viết nhanh === */
+.create-post-trigger {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: all 0.25s ease;
+}
+.create-post-trigger:hover { box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
+
+/* === Avatar user === */
+.trigger-avatar, .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: #003459;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  overflow: hidden;
+}
+.trigger-avatar img, .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* === Ô nhập câu hỏi nhanh === */
+.trigger-input {
+  flex: 1;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  color: #475569;
+  transition: 0.2s;
+}
+.trigger-input:hover { border-color: #003459; }
+
+/* === Danh sách bài viết === */
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 8px 0;
+}
+.post-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  border-left: 6px solid #003459;
+}
+.post-title { font-weight: 700; color: #0f172a; margin: 6px 0; }
+
+/* === Hình ảnh bài viết === */
+.post-images {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.post-images img {
+  width: 132px;
+  height: 132px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid #eef2f7;
+  transition: 0.2s;
+}
+.post-images img:hover { transform: scale(1.03); }
+
+/* === Khu vực vote + actions === */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.vote-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #003459;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.vote-btn:hover { background: #f7dba7; }
+.vote-count {
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 28px;
+  text-align: center;
+  color: #003459;
+}
+.vote-btn.active-up { background: #ff4500; color: #fff; border-color: #ff4500; }
+.vote-btn.active-down { background: #6a5cff; color: #fff; border-color: #6a5cff; }
+
+/* === Nút và button === */
+.btn-ghost {
+  border: 1px solid #003459;
+  color: #003459;
+  background: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+}
+.btn-ghost:hover { background: #f7dba7; border-color: #003459; }
+.btn-primary {
+  border: none;
+  color: #fff;
+  background: #003459;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+.btn-primary:hover { background: #00509e; }
+
+/* === Ô tìm kiếm + lọc === */
+.search-wrap {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.search-wrap input, .search-wrap select {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  flex: 1;
+  color: #0f172a;
+  transition: all 0.2s ease;
+}
+.search-wrap input:focus, .search-wrap select:focus {
+  border-color: #003459;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.1);
+}
+
+/* === Modal overlay === */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 52, 89, 0.25);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto; /* ✅ Cho phép cuộn trong modal */
+}
+
+/* === Panel trong modal === */
+.modal__panel {
+  background: #fff; /* ✅ nền trắng như bạn yêu cầu */
+  border-radius: 16px;
+  max-width: 640px;
+  width: 100%;
+  padding: 20px 22px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  animation: fadeIn 0.25s ease;
+  max-height: 90vh; /* ✅ giới hạn chiều cao modal */
+  overflow-y: auto; /* ✅ cuộn trong modal khi quá nhiều nội dung */
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Header của modal === */
+.modal__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+}
+.modal__head h3 {
+  margin: 0;
+  color: #003459;
+  font-weight: 700;
+}
+.close-x {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #64748b;
+  transition: 0.2s;
+}
+.close-x:hover { color: #003459; }
+
+/* === Các input trong modal === */
+.modal__panel input,
+.modal__panel select {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 12px; /* ✅ làm thấp hơn */
+  background: #fff;
+  color: #0f172a;
+  font-size: 15px;
+  width: 100%;
+  transition: all 0.2s ease;
+  height: 42px; /* ✅ nhỏ gọn hơn */
+}
+.modal__panel textarea {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 15px;
+  width: 100%;
+  transition: all 0.2s ease;
+  min-height: 120px; /* ✅ giữ chiều cao như mong muốn */
+  resize: vertical;
+  line-height: 1.5;
+  font-family: inherit;
+}
+.modal__panel input:focus,
+.modal__panel select:focus,
+.modal__panel textarea:focus {
+  border-color: #003459;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.1);
+}
+
+/* === Chọn file === */
+.modal__panel input[type=file] {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  color: #003459;
+}
 </style>
+
 {% endblock %}
 
 {% block content %}
 <div class="post-list">
   <!-- Ô tạo nhanh mở modal -->
   <div id="btn-open-create" class="create-post-trigger">
-    <div class="trigger-avatar">{{ request.user.username|slice:":1"|upper }}</div>
+    <div class="trigger-avatar">
+      {% if request.user.userprofile.avatar_image %}
+        <img src="{{ request.user.userprofile.avatar_image.url }}" alt="avatar">
+      {% else %}
+        {{ request.user.username|slice:":1"|upper }}
+      {% endif %}
+    </div>
     <div class="trigger-input">Đặt câu hỏi cho cộng đồng…</div>
     <button class="btn-ghost" type="button"><i class="fa-regular fa-image"></i> Ảnh</button>
     <button class="btn-primary" type="button">Đăng</button>
@@ -57,51 +301,57 @@
 
   <!-- Danh sách bài viết -->
   {% for post in posts %}
-  {% reaction_of post request.user as me_react %}
-  <article class="post-card" data-post="{{ post.post_id }}">
-    <div class="user-info" style="display:flex;gap:10px;align-items:center;">
-      <div class="avatar">{{ post.username.username|slice:":1"|upper }}</div>
-      <div>
-        <div style="font-weight:700;color:#003459">{{ post.username.username }}</div>
-        <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
-      </div>
-    </div>
-
-    <h3 class="post-title">{{ post.title }}</h3>
-    <div class="post-content">{{ post.content|linebreaksbr }}</div>
-
-    {% if post.images.all %}
-    <div class="post-images">
-      {% for img in post.images.all %}
-        <img src="{{ img.image.url }}" alt="post image">
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <div class="actions">
-      <div class="vote-box" data-post="{{ post.post_id }}">
-        <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
-          <i class="fa-solid fa-arrow-up"></i>
-        </button>
-        <span class="vote-count js-count">{{ post.total_vote|default:0 }}</span>
-        <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote">
-          <i class="fa-solid fa-arrow-down"></i>
-        </button>
+    {% reaction_of post request.user as me_react %}
+    <article class="post-card" data-post="{{ post.post_id }}">
+      <div class="user-info" style="display:flex;gap:10px;align-items:center;">
+        <div class="avatar">
+          {% if post.username.userprofile.avatar_image %}
+            <img src="{{ post.username.userprofile.avatar_image.url }}" alt="avatar">
+          {% else %}
+            {{ post.username.username|slice:":1"|upper }}
+          {% endif %}
+        </div>
+        <div>
+          <div style="font-weight:700;color:#003459">{{ post.username.username }}</div>
+          <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
+        </div>
       </div>
 
-      <a class="btn-ghost" href="{% url 'forum:post_detail' post.post_id %}">
-        <i class="fa-regular fa-comment"></i> {{ post.comments.count }}
-      </a>
+      <h3 class="post-title">{{ post.title }}</h3>
+      <div class="post-content">{{ post.content|linebreaksbr }}</div>
 
-      <button class="btn-ghost js-open-report" data-target="report-{{ post.post_id }}">
-        <i class="fa-solid fa-flag"></i> Báo cáo
-      </button>
-    </div>
+      {% if post.images.all %}
+        <div class="post-images">
+          {% for img in post.images.all %}
+            <img src="{{ img.image.url }}" alt="post image">
+          {% endfor %}
+        </div>
+      {% endif %}
 
-    {% include "forum/_report_modal.html" with post=post %}
-  </article>
+      <div class="actions">
+        <div class="vote-box" data-post="{{ post.post_id }}">
+          <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
+            <i class="fa-solid fa-arrow-up"></i>
+          </button>
+          <span class="vote-count js-count">{{ post.total_vote|default:0 }}</span>
+          <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote">
+            <i class="fa-solid fa-arrow-down"></i>
+          </button>
+        </div>
+
+        <a class="btn-ghost" href="{% url 'forum:post_detail' post.post_id %}">
+          <i class="fa-regular fa-comment"></i> {{ post.comments.count }}
+        </a>
+
+        <button class="btn-ghost js-open-report" data-target="report-{{ post.post_id }}">
+          <i class="fa-solid fa-flag"></i> Báo cáo
+        </button>
+      </div>
+
+      {% include "forum/_report_modal.html" with post=post %}
+    </article>
   {% empty %}
-  <p>Chưa có bài viết nào.</p>
+    <p style="color:#64748b;text-align:center">Chưa có bài viết nào.</p>
   {% endfor %}
 </div>
 
@@ -173,46 +423,16 @@ document.addEventListener('click',e=>{
   if(modal&&(e.target===modal||e.target.hasAttribute('data-close')))modal.style.display='none';
 });
 </script>
+
+<!-- Giữ nguyên đoạn JS auto resize -->
 <script>
-function getCookie(name){
-  // ... (code getCookie của bạn) ...
-}
-const csrftoken=getCookie('csrftoken');
-
-// =============================================
-// === SỬA LỖI: TỰ ĐỘNG TĂNG CHIỀU CAO Ô COMMENT ===
-// =============================================
-const textarea = document.querySelector('textarea[name="content"]');
-// Hoặc dùng: const textarea = document.getElementById('id_content');
-
-if (textarea) {
-  textarea.style.resize = 'none';     // Tắt thanh kéo resize
-  textarea.style.overflowY = 'hidden'; // Ẩn thanh cuộn dọc
-
-  const autoGrow = (el) => {
-    el.style.height = 'auto'; // Reset chiều cao về auto
-    el.style.height = (el.scrollHeight) + 'px'; // Đặt chiều cao bằng chiều cao nội dung
-  };
-
-  // Lắng nghe sự kiện gõ phím
-  textarea.addEventListener('input', () => autoGrow(textarea));
-
-  // Tự chỉnh chiều cao 1 lần khi tải trang (phòng trường hợp form lỗi)
+const textarea=document.querySelector('textarea[name="content"]');
+if(textarea){
+  textarea.style.resize='none';
+  textarea.style.overflowY='hidden';
+  const autoGrow=el=>{el.style.height='auto';el.style.height=(el.scrollHeight)+'px';};
+  textarea.addEventListener('input',()=>autoGrow(textarea));
   autoGrow(textarea);
 }
-// =============================================
-// === HẾT PHẦN SỬA LỖI ===
-// =============================================
-
-
-// --- Vote (giữ nguyên logic) ---
-document.querySelectorAll('.vote-box').forEach(box=>{
-  // ... (code vote của bạn) ...
-});
-
-// --- Lắng nghe click toàn trang ---
-document.addEventListener('click', async (e)=>{
-  // ... (code xử lý comment menu của bạn) ...
-});
 </script>
 {% endblock %}
