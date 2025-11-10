@@ -51,6 +51,170 @@
   overflow-wrap: anywhere; /* hỗ trợ trình duyệt mới */
 }
 
+  /* === ⭐️ TỐI ƯU LƯỚI ẢNH (Facebook-style) ⭐️ === */
+
+  .post-images {
+      display: grid;
+      gap: 4px; /* Khoảng cách giữa các ảnh */
+      border-radius: 12px; /* Bo góc cho cả khối ảnh */
+      overflow: hidden; /* Bắt buộc để bo góc các ảnh bên trong */
+      margin-top: 15px;
+      height: auto; /* Để chiều cao tự động theo nội dung */
+  }
+  .image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%; /* Height sẽ được set bởi grid row */
+      background: #f8fafc; /* Nền mờ khi tải */
+  }
+  .post-images img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* ⭐️ Đây là chìa khóa: TỰ CROP ẢNH VỪA KHUNG */
+      cursor: pointer;
+      transition: transform 0.2s ease;
+  }
+  .post-images img:hover {
+      transform: scale(1.03); /* Hiệu ứng zoom nhẹ khi di chuột */
+  }
+
+  /* --- Lưới 1 ảnh (Nhỏ hơn) --- */
+  .images-count-1 {
+      display: flex;
+      justify-content: center;
+      max-height: 450px; /* Giới hạn chiều cao "nhỏ hơn nữa" */
+  }
+  .images-count-1 .image-wrapper {
+      height: auto;
+  }
+  .images-count-1 img {
+      position: relative;
+      object-fit: contain; /* 1 ảnh thì không crop, chỉ thu nhỏ */
+      max-height: 450px;
+      width: auto;
+      max-width: 100%;
+      cursor: zoom-in;
+  }
+
+  /* --- Lưới 2 ảnh (1x2) --- */
+  .images-count-2 {
+      grid-template-columns: 1fr 1fr;
+      height: 300px; /* Cố định chiều cao tổng */
+  }
+
+  /* --- Lưới 3 ảnh (1 to, 2 nhỏ) --- */
+  .images-count-3 {
+      grid-template-columns: 2fr 1fr; /* Cột trái 66%, cột phải 33% */
+      grid-template-rows: 1fr 1fr; /* 2 hàng */
+      height: 400px; /* Cố định chiều cao tổng */
+  }
+  .images-count-3 .image-wrapper:first-child {
+      grid-row: span 2; /* Ảnh đầu tiên chiếm 2 hàng */
+  }
+
+  /* --- Lưới 4 ảnh (2x2) --- */
+  .images-count-4 {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      height: 400px; /* Cố định chiều cao tổng */
+  }
+
+  /* --- Lưới 5+ ảnh --- */
+  .images-count-more { /* Dùng class chung cho 5+ */
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      height: 400px;
+  }
+  /* Ẩn ảnh thứ 5 trở đi */
+  .images-count-more .image-wrapper:nth-child(n+5) {
+      display: none;
+  }
+  /* Overlay cho ảnh thứ 4, hiển thị số ảnh còn lại */
+  .images-count-more .image-wrapper:nth-child(4) {
+      position: relative;
+  }
+  .images-count-more .image-wrapper:nth-child(4)::after {
+      content: attr(data-more-count); /* Sẽ là "+3" */
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+  }
+
+  /* === ⭐️ CSS CHO LIGHTBOX (MODAL ẢNH) ⭐️ === */
+  .lightbox {
+    position: fixed;
+    z-index: 9990; /* Nằm trên mọi thứ */
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.9);
+    display: none; /* Ẩn ban đầu */
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .lightbox-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 85vh;
+    animation: zoom 0.3s ease;
+  }
+  @keyframes zoom {
+    from {transform: scale(0.8); opacity: 0;}
+    to {transform: scale(1); opacity: 1;}
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+  .lightbox-close:hover { color: #bbb; }
+  .lightbox-prev, .lightbox-next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+    transition: 0.3s;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    display: none; /* Ẩn khi chỉ có 1 ảnh */
+  }
+  .lightbox-next { right: 0; border-radius: 3px 0 0 3px; }
+  .lightbox-prev { left: 0; }
+  .lightbox-prev:hover, .lightbox-next:hover {
+    background-color: rgba(255,255,255,0.2);
+  }
+  /* === HẾT CSS LIGHTBOX === */
+
 </style>
 {% endblock %}
 {% block title %}Bài viết • {{ post.title }}{% endblock %}
@@ -71,13 +235,41 @@
   <h1 class="post-title" style="font-size:22px">{{ post.title }}</h1>
   <div class="post-content">{{ post.content|linebreaksbr }}</div>
 
+  <!-- === ⭐️ KHỐI CODE ĐÚNG (ĐÃ TỐI ƯU) ⭐️ === -->
   {% if post.images.all %}
-  <div class="post-images" style="margin-top:10px">
-    {% for img in post.images.all %}
-      <img src="{{ img.image.url }}" alt="post image">
-    {% endfor %}
-  </div>
+    {% with image_count=post.images.all|length %}
+      {% if image_count == 1 %}
+        {% with class_name="images-count-1" %}
+          {% include "forum/_post_images.html" %}
+        {% endwith %}
+      {% elif image_count == 2 %}
+        {% with class_name="images-count-2" %}
+          {% include "forum/_post_images.html" %}
+        {% endwith %}
+      {% elif image_count == 3 %}
+        {% with class_name="images-count-3" %}
+          {% include "forum/_post_images.html" %}
+        {% endwith %}
+      {% elif image_count == 4 %}
+        {% with class_name="images-count-4" %}
+          {% include "forum/_post_images.html" %}
+        {% endwith %}
+      {% else %}
+        {% with class_name="images-count-more" %}
+          {% include "forum/_post_images.html" %}
+        {% endwith %}
+      {% endif %}
+    {% endwith %}
   {% endif %}
+
+  <!-- === ⭐️ XÓA KHỐI CODE BỊ LẶP Ở ĐÂY ⭐️ === -->
+  <!--
+      {% if image_count == 1 %}
+        ... (TOÀN BỘ KHỐI CODE CŨ ĐÃ BỊ XÓA) ...
+      {% endif %}
+  -->
+  <!-- === HẾT XÓA === -->
+
 
   <div class="actions" style="display:flex;align-items:center;gap:12px;margin-top:12px">
     <div class="vote-box" data-post="{{ post.post_id }}">
@@ -98,6 +290,7 @@
   {% include "forum/_report_modal.html" with post=post %}
 </article>
 
+<!-- ... (Phần bình luận giữ nguyên) ... -->
 <section class="comment-section" style="max-width:780px; margin:20px auto 0 auto;">
   <hr style="border:none;border-top:1px solid #eef2f7;margin:16px 0">
   <h3 style="color:#003459;margin:0 0 8px 0">Bình luận ({{ comments|length }})</h3>
@@ -143,6 +336,16 @@
     {% endfor %}
   </div>
 </section>
+
+<!-- === ⭐️ THÊM HTML CHO LIGHTBOX (MODAL ẢNH) ⭐️ === -->
+<div id="image-lightbox" class="lightbox">
+  <span class="lightbox-close">&times;</span>
+  <img class="lightbox-content" id="lightbox-img">
+  <a class="lightbox-prev" id="lightbox-prev">&#10094;</a>
+  <a class="lightbox-next" id="lightbox-next">&#10095;</a>
+</div>
+<!-- === HẾT HTML LIGHTBOX === -->
+
 {% endblock %}
 
 {% block extra_js %}
@@ -190,42 +393,113 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // === ⭐️ LOGIC MỚI CHO LIGHTBOX ⭐️ ===
+  let lightboxImages = [];
+  let currentImageIndex = 0;
+  const lightbox = document.getElementById('image-lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
+  const lightboxClose = document.querySelector('.lightbox-close');
+
+  function openLightbox(postElement, clickedImgSrc) {
+    // 1. Tìm tất cả ảnh trong cùng 1 bài post
+    lightboxImages = [];
+    // Lấy TẤT CẢ ảnh, bao gồm cả cái bị ẩn (trong trường hợp 5+)
+    postElement.querySelectorAll('.js-lightbox-trigger').forEach(img => {
+      lightboxImages.push(img.src);
+    });
+
+    if (lightboxImages.length === 0) return;
+
+    // 2. Tìm index của ảnh được click
+    currentImageIndex = lightboxImages.findIndex(src => src === clickedImgSrc);
+
+    // 3. Cập nhật UI và hiển thị
+    updateLightboxImage();
+    lightbox.style.display = 'block';
+    document.body.style.overflow = 'hidden'; // Chống cuộn trang
+  }
+
+  function updateLightboxImage() {
+    if (lightboxImages.length === 0) return;
+    lightboxImg.src = lightboxImages[currentImageIndex];
+
+    // Chỉ hiển thị nút next/prev nếu có nhiều hơn 1 ảnh
+    const hasMultiple = lightboxImages.length > 1;
+    lightboxPrev.style.display = hasMultiple ? 'block' : 'none';
+    lightboxNext.style.display = hasMultiple ? 'block' : 'none';
+  }
+
+  function showNextImage() {
+    currentImageIndex = (currentImageIndex + 1) % lightboxImages.length;
+    updateLightboxImage();
+  }
+
+  function showPrevImage() {
+    currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length;
+    updateLightboxImage();
+  }
+
+  function closeLightbox() {
+    lightbox.style.display = 'none';
+    lightboxImages = []; // Xóa cache ảnh
+    document.body.style.overflow = 'auto'; // Cho phép cuộn lại
+  }
+
+  // --- Thêm Event Listeners cho Lightbox ---
+  if(lightbox) {
+    lightboxNext.addEventListener('click', showNextImage);
+    lightboxPrev.addEventListener('click', showPrevImage);
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) { // Chỉ đóng khi click vào nền đen
+        closeLightbox();
+      }
+    });
+  }
+  // --- Hết Logic Lightbox ---
+
+
   // === CLICK TOÀN TRANG ===
   document.addEventListener('click', async (e) => {
     const allMenus = document.querySelectorAll('.comment-menu');
     const btn = e.target.closest('.comment-menu-btn');
 
-// 1️⃣ Menu ba chấm
-if (btn) {
-  e.stopPropagation();
-  const menu = btn.parentElement.querySelector('.comment-menu');
-  allMenus.forEach(m => { if (m !== menu) m.style.display = 'none'; });
-  const isOpen = menu.style.display === 'block';
-  menu.style.display = isOpen ? 'none' : 'block';
-
-  if (!isOpen) {
-    // 💡 Kiểm tra xem menu có bị tràn khỏi màn hình hay không
-    // Bật tạm để đo chính xác kích thước thực tế
-    menu.style.visibility = 'hidden';
-    menu.style.display = 'block';
-
-    const rect = menu.getBoundingClientRect();
-    const bottomOverflow = rect.bottom > window.innerHeight;
-
-    // Nếu bị tràn xuống hoặc gần mép dưới => mở lên trên
-    if (bottomOverflow || (window.innerHeight - rect.bottom) < 20) {
-      menu.classList.add('menu-up');
-    } else {
-      menu.classList.remove('menu-up');
+    // ⭐️ MỚI: Mở Lightbox
+    // Phải đặt listener này *bên trong* click event chính
+    const imgTrigger = e.target.closest('.js-lightbox-trigger');
+    if (imgTrigger) {
+      e.preventDefault();
+      const postContainer = imgTrigger.closest('.post-images');
+      openLightbox(postContainer, imgTrigger.src);
+      return; // Dừng lại, không chạy logic khác
     }
 
-    // Ẩn lại, sẽ hiển thị đúng khi click xong
-    menu.style.display = 'none';
-    menu.style.visibility = '';
-    menu.style.display = 'block';
-  }
-  return;
-}
+    // 1️⃣ Menu ba chấm
+    if (btn) {
+      e.stopPropagation();
+      const menu = btn.parentElement.querySelector('.comment-menu');
+      allMenus.forEach(m => { if (m !== menu) m.style.display = 'none'; });
+      const isOpen = menu.style.display === 'block';
+      menu.style.display = isOpen ? 'none' : 'block';
+
+      if (!isOpen) {
+        menu.style.visibility = 'hidden';
+        menu.style.display = 'block';
+        const rect = menu.getBoundingClientRect();
+        const bottomOverflow = rect.bottom > window.innerHeight;
+        if (bottomOverflow || (window.innerHeight - rect.bottom) < 20) {
+          menu.classList.add('menu-up');
+        } else {
+          menu.classList.remove('menu-up');
+        }
+        menu.style.display = 'none';
+        menu.style.visibility = '';
+        menu.style.display = 'block';
+      }
+      return;
+    }
     // 2️⃣ Click ngoài menu → đóng
     if (!e.target.closest('.comment-menu-wrapper')) {
       allMenus.forEach(m => m.style.display = 'none');
@@ -357,4 +631,3 @@ if (btn) {
 }
 </style>
 {% endblock %}
-
