@@ -116,13 +116,15 @@
           <h4>📅 Sự kiện sắp diễn ra</h4>
           <div class="event-list">
             {% for e in upcoming_events %}
+              <!-- === THAY ĐỔI CẤU TRÚC HTML Ở ĐÂY === -->
               <a href="{% url 'dang_ky_tham_gia' e.id %}" class="event-item">
-                <div class="event-info">
-                  <i class="fa-solid fa-calendar-day"></i>
-                  <div class="event-text">
-                    <strong>{{ e.title }}</strong>
-                    <small>{{ e.date|date:"d/m/Y" }}</small>
-                  </div>
+                <div class="event-date-badge">
+                  <span class="month">{{ e.date|date:"M" }}</span> <!-- Tháng, vd: Th11 -->
+                  <span class="day">{{ e.date|date:"d" }}</span> <!-- Ngày, vd: 10 -->
+                </div>
+                <div class="event-text">
+                  <strong>{{ e.title }}</strong>
+                  <small>{{ e.location }}</small> <!-- Hiển thị địa điểm -->
                 </div>
               </a>
             {% empty %}
