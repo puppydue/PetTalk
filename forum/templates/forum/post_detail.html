@@ -261,7 +261,8 @@ textarea[name="content"] {
 .images-count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
 .images-count-more { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
 .images-count-more .image-wrapper:nth-child(n+5) { display: none; }
-.images-count-more .image-wrapper:nth-child(4)::after {
+/* ✅ SỬA LỖI 1 (từ post_list): Sửa CSS để đọc attribute từ wrapper */
+.images-count-more .image-wrapper[data-more-count]::after {
   content: attr(data-more-count);
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0,0,0,0.6); color: white; display: flex;
@@ -277,7 +278,6 @@ textarea[name="content"] {
 .lightbox-close { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; }
 .lightbox-close:hover { color: #bbb; }
 
-/* ✅ SỬA LỖI: Đã xóa "display: none;" */
 .lightbox-prev, .lightbox-next {
   cursor: pointer;
   position: absolute;
@@ -289,7 +289,6 @@ textarea[name="content"] {
   font-weight: bold;
   font-size: 30px;
   user-select: none;
-  /* display: none; */ /* <-- Dòng này đã bị xóa */
 }
 .lightbox-next { right: 0; border-radius: 3px 0 0 3px; }
 .lightbox-prev { left: 0; }
@@ -323,15 +322,68 @@ textarea[name="content"] {
   <div class="post-content" style="line-height:1.6;color:#1e293b;">{{ post.content|linebreaksbr }}</div>
 
   {% if post.images.all %}
-    {% with image_count=post.images.all|length %}
-      {% if image_count == 1 %}{% with class_name="images-count-1" %}{% include "forum/_post_images.html" %}{% endwith %}
-      {% elif image_count == 2 %}{% with class_name="images-count-2" %}{% include "forum/_post_images.html" %}{% endwith %}
-      {% elif image_count == 3 %}{% with class_name="images-count-3" %}{% include "forum/_post_images.html" %}{% endwith %}
-      {% elif image_count == 4 %}{% with class_name="images-count-4" %}{% include "forum/_post_images.html" %}{% endwith %}
-      {% else %}{% with class_name="images-count-more" %}{% include "forum/_post_images.html" %}{% endwith %}{% endif %}
+    {% with all_images=post.images.all %}
+      {% with image_count=all_images|length %}
+        {% if image_count == 1 %}
+          {% with class_name="images-count-1" %}
+            <div class="post-images {{ class_name }}">
+              {% for img in all_images %}
+              <div class="image-wrapper">
+                <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+              </div>
+              {% endfor %}
+            </div>
+          {% endwith %}
+        {% elif image_count == 2 %}
+          {% with class_name="images-count-2" %}
+            <div class="post-images {{ class_name }}">
+              {% for img in all_images %}
+              <div class="image-wrapper">
+                <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+              </div>
+              {% endfor %}
+            </div>
+          {% endwith %}
+        {% elif image_count == 3 %}
+          {% with class_name="images-count-3" %}
+            <div class="post-images {{ class_name }}">
+              {% for img in all_images %}
+              <div class="image-wrapper">
+                <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+              </div>
+              {% endfor %}
+            </div>
+          {% endwith %}
+        {% elif image_count == 4 %}
+          {% with class_name="images-count-4" %}
+            <div class="post-images {{ class_name }}">
+              {% for img in all_images %}
+              <div class="image-wrapper">
+                <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+              </div>
+              {% endfor %}
+            </div>
+          {% endwith %}
+        {% else %}
+          {% with class_name="images-count-more" %}
+            <div class="post-images {{ class_name }}">
+              {% for img in all_images|slice:":4" %}
+              <div class="image-wrapper"
+                   {% if forloop.last %}data-more-count="+{{ image_count|add:"-4" }}"{% endif %}>
+                <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+              </div>
+              {% endfor %}
+              <div style="display:none;">
+                {% for img in all_images|slice:"4:" %}
+                  <img src="{{ img.image.url }}" class="js-lightbox-trigger">
+                {% endfor %}
+              </div>
+            </div>
+          {% endwith %}
+        {% endif %}
+      {% endwith %}
     {% endwith %}
   {% endif %}
-
   <div class="actions">
     <div class="vote-box" data-post="{{ post.post_id }}">
       <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
@@ -412,15 +464,15 @@ textarea[name="content"] {
 <div id="image-lightbox" class="lightbox">
   <span class="lightbox-close">×</span>
   <img class="lightbox-content" id="lightbox-img">
-  <a class="lightbox-prev" id="lightbox-prev"></a>
-  <a class="lightbox-next" id="lightbox-next"></a>
+  <a class="lightbox-prev" id="lightbox-prev">&#10094;</a>
+  <a class="lightbox-next" id="lightbox-next">&#10095;</a>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const csrftoken = document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
+  const csrftoken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
 
   // Auto grow
   const autoGrow = el => {
@@ -439,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
     autoGrow(mainTextarea);
   }
 
-  // Vote - HOẠT ĐỘNG GIỐNG HỆT (Không cần thay đổi JS)
+  // Vote
   document.querySelectorAll('.vote-box').forEach(box => {
     const buttons = box.querySelectorAll('.js-vote');
     const countEl = box.querySelector('.js-count');
@@ -462,7 +514,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Lightbox (Không thay đổi)
+  // Lightbox
   let lightboxImages = [], currentImageIndex = 0;
   const lightbox = document.getElementById('image-lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
@@ -470,144 +522,190 @@ document.addEventListener("DOMContentLoaded", () => {
   const lightboxNext = document.getElementById('lightbox-next');
   const lightboxClose = document.querySelector('.lightbox-close');
 
-  const openLightbox = (postElement, src) => {
-    lightboxImages = Array.from(postElement.querySelectorAll('.js-lightbox-trigger')).map(img => img.src);
-    currentImageIndex = lightboxImages.indexOf(src);
-    updateLightboxImage();
-    lightbox.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-  };
-  const updateLightboxImage = () => {
-    lightboxImg.src = lightboxImages[currentImageIndex];
-    // ✅ JS Vẫn giữ logic cũ (đây là logic đúng)
-    const show = lightboxImages.length > 1;
-    lightboxPrev.style.display = show ? 'block' : 'none';
-    lightboxNext.style.display = show ? 'block' : 'none';
-  };
-  const closeLightbox = () => { lightbox.style.display = 'none'; document.body.style.overflow = 'auto'; };
+  if (lightbox && lightboxImg && lightboxPrev && lightboxNext && lightboxClose) {
+    const openLightbox = (postElement, src) => {
+      lightboxImages = Array.from(postElement.querySelectorAll('.js-lightbox-trigger')).map(img => img.src);
+      currentImageIndex = lightboxImages.indexOf(src);
+      updateLightboxImage();
+      lightbox.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    };
 
-  lightboxNext.onclick = () => { currentImageIndex = (currentImageIndex + 1) % lightboxImages.length; updateLightboxImage(); };
-  lightboxPrev.addEventListener('click', () => { currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length; updateLightboxImage(); });
-  lightboxClose.onclick = closeLightbox;
-  lightbox.onclick = e => { if (e.target === lightbox) closeLightbox(); };
+    const updateLightboxImage = () => {
+      lightboxImg.src = lightboxImages[currentImageIndex];
+      const show = lightboxImages.length > 1;
+      lightboxPrev.style.display = show ? 'block' : 'none';
+      lightboxNext.style.display = show ? 'block' : 'none';
+    };
 
-  // Main click handler (Không thay đổi - JS vẫn hoạt động)
-  document.addEventListener('click', async e => {
-    const allMenus = document.querySelectorAll('.comment-menu');
-    const menuBtn = e.target.closest('.comment-menu-btn');
-    const img = e.target.closest('.js-lightbox-trigger');
+    const closeLightbox = () => {
+      lightbox.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    };
 
-    if (img) { e.preventDefault(); openLightbox(img.closest('.post-images'), img.src); return; }
-
-    if (menuBtn) {
-      e.stopPropagation();
-      const menu = menuBtn.parentElement.querySelector('.comment-menu');
-      const isOpen = menu.style.display === 'block';
-      allMenus.forEach(m => { if (m !== menu) m.style.display = 'none'; });
-      if (isOpen) { menu.style.display = 'none'; return; }
-
-      menu.classList.remove('menu-up');
-      menu.style.visibility = 'hidden';
-      menu.style.display = 'block';
-      const spaceBelow = window.innerHeight - menuBtn.getBoundingClientRect().bottom;
-      if (spaceBelow < menu.offsetHeight + 20) menu.classList.add('menu-up');
-      menu.style.visibility = 'visible';
-      return;
-    }
-
-    if (!e.target.closest('.comment-menu-wrapper')) allMenus.forEach(m => m.style.display = 'none');
-
-    const reportBtn = e.target.closest('.js-open-report, .js-open-report-comment');
-    if (reportBtn) { document.getElementById(reportBtn.dataset.target).style.display = 'flex'; return; }
-
-    const modal = e.target.closest('.modal');
-    if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) { modal.style.display = 'none'; return; }
-
-    // === EDIT COMMENT (Không thay đổi) ===
-    const editBtn = e.target.closest('.js-edit-comment');
-    if (editBtn) {
-      e.preventDefault();
-      const id = editBtn.dataset.id;
-      const commentBox = document.getElementById(`comment-${id}`);
-      const contentDiv = commentBox.querySelector('.comment-content');
-
-      if (commentBox.querySelector('.edit-form-container')) return;
-
-      const rawText = contentDiv.textContent || contentDiv.innerText;
-
-      const editContainer = document.createElement('div');
-      editContainer.className = 'edit-form-container';
-      editContainer.innerHTML = `
-        <form class="edit-form" data-id="${id}">
-          <div class="edit-help-text">
-            <span>Nội dung cũ:</span>
-            <span class="old">${rawText.replace(/\n/g, ' [Enter] ')}</span>
-          </div>
-          <textarea placeholder="Nhập nội dung mới...">${rawText}</textarea>
-          <div class="btn-group">
-            <button type="button" class="btn-ghost js-cancel-edit">Hủy</button>
-            <button type="submit" class="btn-primary">Lưu</button>
-          </div>
-        </form>`;
-      commentBox.appendChild(editContainer);
-
-      const textarea = editContainer.querySelector('textarea');
-      textarea.focus();
-      textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
-      textarea.addEventListener('input', () => autoGrow(textarea));
-      autoGrow(textarea);
-      return;
-    }
-
-    const cancelBtn = e.target.closest('.js-cancel-edit');
-    if (cancelBtn) {
-      e.preventDefault();
-      cancelBtn.closest('.edit-form-container').remove();
-      return;
-    }
-
-    const saveForm = e.target.closest('.edit-form');
-    if (saveForm && e.target.type === 'submit') {
-      e.preventDefault();
-      const id = saveForm.dataset.id;
-      const newContent = saveForm.querySelector('textarea').value.trim();
-      if (!newContent) { alert('Nội dung không được để trống!'); return; }
-
-      const res = await fetch(`/forum/comment/${id}/edit/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
-        body: JSON.stringify({ content: newContent })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const commentBox = document.getElementById(`comment-${id}`);
-        commentBox.querySelector('.comment-content').innerHTML = data.new_content_html;
-        saveForm.closest('.edit-form-container').remove();
-      } else {
-        alert('Lỗi khi lưu bình luận.');
+    // ✅ SỬA LỖI 3: Thêm hàm chuyển ảnh
+    const nextImage = () => {
+      if (lightboxImages.length > 1) {
+        currentImageIndex = (currentImageIndex + 1) % lightboxImages.length;
+        updateLightboxImage();
       }
-      return;
-    }
+    };
+    const prevImage = () => {
+      if (lightboxImages.length > 1) {
+        currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length;
+        updateLightboxImage();
+      }
+    };
 
-    const deleteBtn = e.target.closest('.js-delete-comment');
-    if (deleteBtn) {
-      if (!confirm('Xóa bình luận này?')) return;
-      const id = deleteBtn.dataset.id;
-      const res = await fetch(`/forum/comment/${id}/delete/`, {
-        method: 'POST',
-        headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.status === 'deleted') {
-          const el = document.getElementById(`comment-${id}`);
-          el.style.transition = 'opacity .3s'; el.style.opacity = '0';
-          setTimeout(() => el.remove(), 300);
+    lightboxNext.onclick = nextImage;
+    lightboxPrev.onclick = prevImage;
+    lightboxClose.onclick = closeLightbox;
+    lightbox.onclick = e => { if (e.target === lightbox) closeLightbox(); };
+
+    // ✅ SỬA LỖI 3: Thêm Event Listener cho bàn phím
+    document.addEventListener('keydown', (e) => {
+      if (lightbox.style.display === 'block') {
+        if (e.key === 'ArrowRight') nextImage();
+        else if (e.key === 'ArrowLeft') prevImage();
+        else if (e.key === 'Escape') closeLightbox();
+      }
+    });
+
+    // ✅ SỬA LỖI 2: Viết lại hàm click listener chính
+    // Hàm này sẽ xử lý cả ảnh thường, nút +X, và menu
+    document.addEventListener('click', async e => {
+      const allMenus = document.querySelectorAll('.comment-menu');
+      const menuBtn = e.target.closest('.comment-menu-btn');
+
+      // Kiểm tra click vào ảnh (bao gồm cả nút +X)
+      const imgTrigger = e.target.closest('.js-lightbox-trigger, .image-wrapper[data-more-count]');
+      if (imgTrigger) {
+        e.preventDefault();
+        let firstImg = imgTrigger.classList.contains('js-lightbox-trigger')
+                     ? imgTrigger
+                     : imgTrigger.querySelector('.js-lightbox-trigger');
+        if (!firstImg) {
+            firstImg = imgTrigger.closest('.post-images').querySelector('.js-lightbox-trigger');
+        }
+        openLightbox(imgTrigger.closest('.post-images'), firstImg.src);
+        return;
+      }
+
+      // Xử lý menu "..."
+      if (menuBtn) {
+        e.stopPropagation();
+        const menu = menuBtn.parentElement.querySelector('.comment-menu');
+        const isOpen = menu.style.display === 'block';
+        allMenus.forEach(m => { if (m !== menu) m.style.display = 'none'; });
+        if (isOpen) { menu.style.display = 'none'; return; }
+        menu.classList.remove('menu-up');
+        menu.style.visibility = 'hidden';
+        menu.style.display = 'block';
+        const spaceBelow = window.innerHeight - menuBtn.getBoundingClientRect().bottom;
+        if (spaceBelow < menu.offsetHeight + 20) menu.classList.add('menu-up');
+        menu.style.visibility = 'visible';
+        return;
+      }
+
+      // Đóng menu khi click ra ngoài
+      if (!e.target.closest('.comment-menu-wrapper')) allMenus.forEach(m => m.style.display = 'none');
+
+      // Xử lý modal báo cáo
+      const reportBtn = e.target.closest('.js-open-report, .js-open-report-comment');
+      if (reportBtn) {
+        const targetId = reportBtn.dataset.target;
+        if (targetId) document.getElementById(targetId).style.display = 'flex';
+        return;
+      }
+
+      // Xử lý modal chung
+      const modal = e.target.closest('.modal');
+      if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) { modal.style.display = 'none'; return; }
+
+      // Xử lý Edit comment
+      const editBtn = e.target.closest('.js-edit-comment');
+      if (editBtn) {
+        e.preventDefault();
+        const id = editBtn.dataset.id;
+        const commentBox = document.getElementById(`comment-${id}`);
+        const contentDiv = commentBox.querySelector('.comment-content');
+        if (commentBox.querySelector('.edit-form-container')) return;
+        const rawText = contentDiv.textContent || contentDiv.innerText;
+        const editContainer = document.createElement('div');
+        editContainer.className = 'edit-form-container';
+        editContainer.innerHTML = `
+          <form class="edit-form" data-id="${id}">
+            <div class="edit-help-text">
+              <span>Nội dung cũ:</span>
+              <span class="old">${rawText.replace(/\n/g, ' [Enter] ')}</span>
+            </div>
+            <textarea placeholder="Nhập nội dung mới...">${rawText}</textarea>
+            <div class="btn-group">
+              <button type="button" class="btn-ghost js-cancel-edit">Hủy</button>
+              <button type="submit" class="btn-primary">Lưu</button>
+            </div>
+          </form>`;
+        commentBox.appendChild(editContainer);
+        const textarea = editContainer.querySelector('textarea');
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+        textarea.addEventListener('input', () => autoGrow(textarea));
+        autoGrow(textarea);
+        return;
+      }
+
+      // Hủy Edit
+      const cancelBtn = e.target.closest('.js-cancel-edit');
+      if (cancelBtn) {
+        e.preventDefault();
+        cancelBtn.closest('.edit-form-container').remove();
+        return;
+      }
+
+      // Lưu Edit
+      const saveForm = e.target.closest('.edit-form');
+      if (saveForm && e.target.type === 'submit') {
+        e.preventDefault();
+        const id = saveForm.dataset.id;
+        const newContent = saveForm.querySelector('textarea').value.trim();
+        if (!newContent) { alert('Nội dung không được để trống!'); return; }
+        const res = await fetch(`/forum/comment/${id}/edit/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+          body: JSON.stringify({ content: newContent })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const commentBox = document.getElementById(`comment-${id}`);
+          commentBox.querySelector('.comment-content').innerHTML = data.new_content_html;
+          saveForm.closest('.edit-form-container').remove();
+        } else {
+          alert('Lỗi khi lưu bình luận.');
+        }
+        return;
+      }
+
+      // Xóa Comment
+      const deleteBtn = e.target.closest('.js-delete-comment');
+      if (deleteBtn) {
+        if (!confirm('Xóa bình luận này?')) return;
+        const id = deleteBtn.dataset.id;
+        const res = await fetch(`/forum/comment/${id}/delete/`, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === 'deleted') {
+            const el = document.getElementById(`comment-${id}`);
+            el.style.transition = 'opacity .3s'; el.style.opacity = '0';
+            setTimeout(() => el.remove(), 300);
+          }
         }
       }
-    }
-  });
+    }); // Kết thúc Main click handler
+
+  } // Kết thúc If check lightbox elements
 });
 </script>
 {% endblock %}
