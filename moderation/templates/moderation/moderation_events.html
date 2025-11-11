@@ -8,58 +8,58 @@
 {% endblock %}
 
 {% block content %}
-<h2>📅 Duyệt đăng ký sự kiện</h2>
+<div class="content-wrapper">
+  <h2>Duyệt đăng ký sự kiện</h2>
 
-<!-- Tabs -->
-<div class="tab-wrapper">
-  <a href="{% url 'moderation_reports' %}" class="tab-btn">Báo cáo vi phạm</a>
-  <a href="{% url 'moderation_events' %}" class="tab-btn active">Đăng ký sự kiện</a>
+  <!-- Tabs -->
+  <div class="tab-wrapper">
+    <a href="{% url 'moderation_reports' %}" class="tab-btn">Báo cáo vi phạm</a>
+    <a href="{% url 'moderation_events' %}" class="tab-btn active">Đăng ký sự kiện</a>
+  </div>
+
+  <!-- Bảng danh sách sự kiện -->
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Tên sự kiện</th>
+        <th>Người tạo</th>
+        <th>Thời gian</th>
+        <th>Địa điểm</th>
+        <th>Trạng thái</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in pending_events %}
+      <tr data-id="{{ e.id }}">
+        <td>#{{ e.id }}</td>
+        <td>{{ e.title }}</td>
+        <td>{{ e.creator.username }}</td>
+        <td>{{ e.date|date:"d/m/Y H:i" }}</td>
+        <td>{{ e.location }}</td>
+        <td><span class="status-badge status-{{ e.status }}">{{ e.status|capfirst }}</span></td>
+        <td>
+          <button class="btn-check"
+                  onclick="openModal(this)"
+                  data-title="{{ e.title }}"
+                  data-user="{{ e.creator.username }}"
+                  data-date="{{ e.date|date:'d/m/Y H:i' }}"
+                  data-location="{{ e.location }}"
+                  data-desc="{{ e.description }}"
+                  data-status="{{ e.status }}">
+            Kiểm tra
+          </button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" style="text-align:center; color:gray;">Không có sự kiện nào cần duyệt.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
-
-<!-- Bảng danh sách sự kiện -->
-<table class="styled-table">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Tên sự kiện</th>
-      <th>Người tạo</th>
-      <th>Thời gian</th>
-      <th>Địa điểm</th>
-      <th>Trạng thái</th>
-      <th>Hành động</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for e in pending_events %}
-    <tr data-id="{{ e.id }}">
-      <td>#{{ e.id }}</td>
-      <td>{{ e.title }}</td>
-      <td>{{ e.creator.username }}</td>
-      <td>{{ e.date|date:"d/m/Y H:i" }}</td>
-      <td>{{ e.location }}</td>
-      <td>
-        <span class="status-badge status-{{ e.status }}">{{ e.status|capfirst }}</span>
-      </td>
-      <td>
-        <button class="btn-check"
-                onclick="openModal(this)"
-                data-title="{{ e.title }}"
-                data-user="{{ e.creator.username }}"
-                data-date="{{ e.date|date:'d/m/Y H:i' }}"
-                data-location="{{ e.location }}"
-                data-desc="{{ e.description }}"
-                data-status="{{ e.status }}">
-          Kiểm tra
-        </button>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="7" style="text-align:center; color:gray;">Không có sự kiện nào cần duyệt.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
 
 <!-- Modal chi tiết sự kiện -->
 <div class="modal-overlay" id="modal" style="display:none;">
@@ -97,7 +97,7 @@ function openModal(button) {
   const location = button.getAttribute('data-location');
   const desc = button.getAttribute('data-desc');
   const status = button.getAttribute('data-status');
-  const eventId = button.closest('tr').querySelector('td').innerText.replace('#', '').trim();
+  const eventId = button.closest('tr').dataset.id;
 
   document.getElementById("modal-title").textContent = title;
   document.getElementById("modal-user").textContent = user;
@@ -109,7 +109,6 @@ function openModal(button) {
 
   const badge = document.getElementById("modal-status");
   badge.className = "status-badge status-" + status;
-
   document.getElementById("modal").style.display = "flex";
 }
 
@@ -118,7 +117,7 @@ function closeModal() {
   document.getElementById("modal").style.display = "none";
 }
 
-// ========== AJAX CẬP NHẬT SỰ KIỆN ==========
+// ========== AJAX CẬP NHẬT ==========
 function updateEvent(action) {
   const modal = document.getElementById("modal");
   const eventId = modal.dataset.eventId;
@@ -136,8 +135,6 @@ function updateEvent(action) {
     if (data.success) {
       const newStatus = data.new_status;
       const row = document.querySelector(`tr[data-id="${eventId}"]`);
-
-      // cập nhật trạng thái trong bảng
       if (row) {
         const badge = row.querySelector('.status-badge');
         if (badge) {
@@ -146,17 +143,12 @@ function updateEvent(action) {
         }
       }
 
-      // cập nhật modal
       const modalBadge = document.getElementById("modal-status");
       modalBadge.textContent = newStatus;
       modalBadge.className = `status-badge status-${newStatus}`;
 
       closeModal();
-
-      // ✅ Thông báo nhỏ gọn
       showToast(`✅ Đã ${newStatus === 'approved' ? 'phê duyệt' : 'từ chối'} sự kiện #${eventId}`, newStatus);
-
-      // Tùy chọn reload nhẹ
       setTimeout(() => window.location.reload(), 800);
     } else {
       showToast("❌ Lỗi: " + (data.error || 'Không thể cập nhật.'), "error");
@@ -165,7 +157,7 @@ function updateEvent(action) {
   .catch(err => console.error(err));
 }
 
-// ========== HÀM TOAST THÔNG BÁO ==========
+// ========== TOAST ==========
 function showToast(message, type) {
   const toast = document.createElement("div");
   toast.className = `toast-message toast-${type}`;
@@ -174,7 +166,7 @@ function showToast(message, type) {
   setTimeout(() => toast.remove(), 2000);
 }
 
-// ========== LẤY CSRF TOKEN ==========
+// ========== CSRF ==========
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
@@ -190,24 +182,4 @@ function getCookie(name) {
   return cookieValue;
 }
 </script>
-
-<style>
-.toast-message {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  padding: 12px 18px;
-  color: #fff;
-  border-radius: 8px;
-  font-weight: 500;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  animation: fadein 0.3s, fadeout 0.5s 1.8s;
-  z-index: 9999;
-}
-.toast-approved { background: #22c55e; }
-.toast-rejected { background: #ef4444; }
-.toast-error { background: #f97316; }
-@keyframes fadein { from { opacity: 0; bottom: 10px; } to { opacity: 1; bottom: 30px; } }
-@keyframes fadeout { from { opacity: 1; } to { opacity: 0; bottom: 10px; } }
-</style>
 {% endblock %}
