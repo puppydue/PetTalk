@@ -276,7 +276,21 @@ textarea[name="content"] {
 .lightbox-content { margin: auto; display: block; max-width: 90%; max-height: 85vh; animation: zoom 0.3s ease; }
 .lightbox-close { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; }
 .lightbox-close:hover { color: #bbb; }
-.lightbox-prev, .lightbox-next { cursor: pointer; position: absolute; top: 50%; width: auto; padding: 16px; margin-top: -50px; color: white; font-weight: bold; font-size: 30px; user-select: none; display: none; }
+
+/* ✅ SỬA LỖI: Đã xóa "display: none;" */
+.lightbox-prev, .lightbox-next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -50px;
+  color: white;
+  font-weight: bold;
+  font-size: 30px;
+  user-select: none;
+  /* display: none; */ /* <-- Dòng này đã bị xóa */
+}
 .lightbox-next { right: 0; border-radius: 3px 0 0 3px; }
 .lightbox-prev { left: 0; }
 .lightbox-prev:hover, .lightbox-next:hover { background-color: rgba(255,255,255,0.2); }
@@ -291,7 +305,6 @@ textarea[name="content"] {
 {% reaction_of post request.user as me_react %}
 
 <article class="post-card" style="max-width:780px;margin:0 auto;background:#fff;border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
-  <!-- ... (Phần thông tin post giữ nguyên) ... -->
   <div class="user-info" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
     <div class="avatar">
       {% if post.username.userprofile.avatar_image %}
@@ -319,9 +332,7 @@ textarea[name="content"] {
     {% endwith %}
   {% endif %}
 
-  <!-- (BẮT ĐẦU) HTML ĐÃ CẬP NHẬT -->
   <div class="actions">
-    <!-- VOTE BOX (STYLE TỪ POST_LIST) -->
     <div class="vote-box" data-post="{{ post.post_id }}">
       <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
         <i class="fa-solid fa-arrow-up"></i>
@@ -332,13 +343,10 @@ textarea[name="content"] {
       </button>
     </div>
 
-    <!-- NÚT BÁO CÁO (STYLE VÀ HTML TỪ POST_LIST) -->
     <button class="btn-ghost js-open-report" data-target="report-{{ post.post_id }}">
       <i class="fa-solid fa-flag"></i> Báo cáo
     </button>
   </div>
-  <!-- (KẾT THÚC) HTML ĐÃ CẬP NHẬT -->
-
   {% include "forum/_report_modal.html" with post=post %}
 </article>
 
@@ -351,7 +359,6 @@ textarea[name="content"] {
     <input type="hidden" name="comment" value="1">
     {{ comment_form.content }}
     <div style="display:flex;justify-content:flex-end;margin-top:8px">
-      <!-- Nút này giờ cũng sẽ dùng style .btn-primary đã copy qua -->
       <button class="btn-primary" type="submit">Đăng</button>
     </div>
   </form>
@@ -374,7 +381,6 @@ textarea[name="content"] {
           </div>
         </div>
 
-        <!-- (BẮT ĐẦU) HTML NÚT MENU ĐÃ NÂNG CẤP -->
         <div class="comment-menu-wrapper" style="position:relative;">
           <button class="comment-menu-btn" aria-label="Menu">
             <i class="fa-solid fa-ellipsis"></i>
@@ -394,8 +400,7 @@ textarea[name="content"] {
             {% endif %}
           </div>
         </div>
-        <!-- (KẾT THÚC) HTML NÚT MENU ĐÃ NÂNG CẤP -->
-      </div>
+        </div>
 
       <div class="comment-content">{{ c.content|linebreaksbr }}</div>
       {% include "forum/_report_comment_modal.html" with comment=c %}
@@ -474,6 +479,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   const updateLightboxImage = () => {
     lightboxImg.src = lightboxImages[currentImageIndex];
+    // ✅ JS Vẫn giữ logic cũ (đây là logic đúng)
     const show = lightboxImages.length > 1;
     lightboxPrev.style.display = show ? 'block' : 'none';
     lightboxNext.style.display = show ? 'block' : 'none';

@@ -4,23 +4,26 @@
 
 {% block extra_css %}
 <style>
-/* Container chính */
-.edit-post-container {
-  max-width: 800px;
-  margin: 40px auto;
+/* ✅ THÊM MỚI: Style cho .card (copy từ profile_detail.html)
+   để bọc nội dung chính cho đồng bộ */
+.card {
   background: #fff;
-  padding: 28px;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  padding: 28px;
+  margin-bottom: 24px;
 }
-
-.edit-post-container h3 {
-  color: #003459;
+.card h3 {
+  font-size: 20px;
   font-weight: 700;
-  margin-top: 0;
+  color: #003459;
+  margin-top: 0; /* Reset margin */
+  margin-bottom: 20px;
 }
+/* Hết style .card */
 
-/* Style cho Form */
+
+/* Style cho Form (giữ nguyên từ lần trước) */
 .edit-post-form label {
   display: block;
   font-weight: 600;
@@ -29,7 +32,6 @@
   font-size: 14.5px;
 }
 
-/* Áp style cho các ô nhập liệu (giống trang profile) */
 .edit-post-form input[type="text"],
 .edit-post-form select,
 .edit-post-form textarea {
@@ -58,7 +60,7 @@
   outline: none; /* Bỏ viền xanh mặc định */
 }
 
-/* Nút bấm */
+/* Nút bấm (giữ nguyên) */
 .form-actions {
   display: flex;
   gap: 12px;
@@ -103,7 +105,7 @@
 
 
 {% block content %}
-<div class="edit-post-container">
+<div class="card">
 
     <h3>Chỉnh sửa bài viết</h3>
     <p>Bạn đang chỉnh sửa bài: <strong>{{ post.title }}</strong></p>
