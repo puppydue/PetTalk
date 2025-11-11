@@ -10,7 +10,7 @@ import json
 from .models import Comment
 from django.utils.html import linebreaks, escape
 from django.views.decorators.http import require_POST
-
+from django.contrib import messages
 
 
 # ========== 🧭 DANH SÁCH BÀI VIẾT ==========
@@ -18,7 +18,11 @@ from django.views.decorators.http import require_POST
 def post_list(request):
     q = request.GET.get('q')
     topic = request.GET.get('topic')
-    posts = Post.objects.prefetch_related('images', 'comments', 'reactions')
+
+    # === ⭐️ SỬA DÒNG NÀY ⭐️ ===
+    # Thêm .select_related('username__userprofile') để tải trước avatar
+    posts = Post.objects.select_related('username__userprofile').prefetch_related('images', 'comments', 'reactions')
+    # === HẾT SỬA ===
 
     if q:
         posts = posts.filter(Q(title__icontains=q) | Q(content__icontains=q))
@@ -80,9 +84,6 @@ def post_detail(request, post_id):
         'comment_form': comment_form,
         'report_form': report_form
     })
-
-
-
 
 # ========== 🚨 BÁO CÁO BÀI VIẾT ==========
 @login_required
@@ -151,3 +152,40 @@ def delete_comment(request, id):
     comment = get_object_or_404(Comment, pk=id, username=request.user)
     comment.delete()
     return JsonResponse({'status': 'deleted'})
+
+
+# ✅ THÊM HÀM MỚI: post_edit
+@login_required
+def post_edit(request, pk):
+    # Đảm bảo chỉ chủ bài viết mới được sửa
+    post = get_object_or_404(Post, pk=pk, username=request.user)
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cập nhật bài viết thành công!")
+            # Quay về trang profile sau khi sửa
+            return redirect('profiles:my_profile')
+    else:
+        form = PostForm(instance=post)
+
+    # Chúng ta cần một template để hiển thị form này
+    return render(request, 'forum/post_edit.html', {'form': form, 'post': post})
+
+
+# ✅ THÊM HÀM MỚI: post_delete
+@login_required
+def post_delete(request, pk):
+    # Đảm bảo chỉ chủ bài viết mới được xóa
+    post = get_object_or_404(Post, pk=pk, username=request.user)
+
+    # Dùng thẻ <a> (GET) để xóa cho nhanh, giống pet_delete
+    try:
+        post_title = post.title
+        post.delete()
+        messages.success(request, f"Đã xóa bài viết '{post_title}' thành công.")
+    except Exception as e:
+        messages.error(request, f"Có lỗi xảy ra khi xóa: {e}")
+
+    return redirect('profiles:my_profile')

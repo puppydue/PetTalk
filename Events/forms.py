@@ -5,7 +5,7 @@ from .models import Event
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'description', 'date', 'end_date', 'location', 'image']
+        fields = ['title', 'description', 'date', 'end_date', 'location','capacity', 'image']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -27,6 +27,10 @@ class EventForm(forms.ModelForm):
             'location': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Nhập địa điểm tổ chức'
+            }),
+            'capacity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nhập số lượng người tham gia tối đa'
             }),
             'image': forms.ClearableFileInput(attrs={
                 'class': 'form-control'

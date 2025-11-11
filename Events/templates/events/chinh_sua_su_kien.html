@@ -1,163 +1,168 @@
 {% extends "base.html" %}
 {% block title %}Chỉnh sửa sự kiện{% endblock %}
-{% block content %}
 
-<div class="edit-wrapper">
-  <div class="edit-box">
-    <h2>✏️ <span>Chỉnh sửa sự kiện</span></h2>
-
-    <form method="post" enctype="multipart/form-data" class="edit-form">
-      {% csrf_token %}
-
-      <div class="form-group">
-        <label for="id_title">🎯 Tiêu đề:</label>
-        {{ form.title }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_description">📝 Mô tả:</label>
-        {{ form.description }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_date">🗓 Thời gian bắt đầu:</label>
-        {{ form.date }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_end_date">⌛ Thời gian kết thúc:</label>
-        {{ form.end_date }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_location">📍 Địa điểm:</label>
-        {{ form.location }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_image">🖼 Ảnh bìa:</label>
-        {{ form.image }}
-      </div>
-
-      <div class="form-buttons">
-        <button type="submit" class="save-btn">💾 Lưu thay đổi</button>
-        <a href="{% url 'danh_sach_su_kien' %}" class="cancel-btn">↩ Quay lại</a>
-      </div>
-    </form>
-  </div>
-</div>
-
+{% block extra_css %}
 <style>
-.edit-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 85vh;
-  background-color: #fff8e1;
+{{ block.super }}
+
+/* ✅ SỬA LỖI: Dùng style .card đồng bộ
+   (Giống trang profile/post_edit) */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  padding: 28px;
+  margin-bottom: 24px;
+  /* Giữ lại animation của bạn */
   animation: fadeIn 0.6s ease-in-out;
 }
-
-.edit-box {
-  background: #fffef7;
-  border-radius: 20px;
-  padding: 35px 45px;
-  width: 520px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-  border: 2px solid #ffe082;
-  transition: 0.3s;
-}
-
-.edit-box:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-}
-
-.edit-box h2 {
-  text-align: center;
+.card h3 {
+  font-size: 20px;
   font-weight: 700;
   color: #003459;
-  margin-bottom: 25px;
+  margin-top: 0;
+  margin-bottom: 20px;
 }
 
-.edit-box h2 span {
-  color: #003459;
+/* ✅ SỬA LỖI: Đồng bộ style form */
+.synced-form .form-group {
+  margin-bottom: 20px; /* Tăng khoảng cách */
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 18px;
-}
-
-.form-group label {
+.synced-form label {
+  display: block;
   font-weight: 600;
   color: #333;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  font-size: 14.5px;
 }
 
-.form-group input[type="text"],
-.form-group input[type="datetime-local"],
-.form-group textarea,
-.form-group select {
-  border: 2px solid #ffe082;
+/* Áp style cho các ô nhập liệu (giống trang profile) */
+.synced-form input[type="text"],
+.synced-form input[type="datetime-local"],
+.synced-form input[type="file"],
+.synced-form textarea,
+.synced-form select {
+  width: 100%;
+  border: 1.5px solid #e2e2e2;
   border-radius: 10px;
-  padding: 8px 10px;
+  background: #fafafa; /* Đồng bộ nền #fafafa */
+  padding: 15px 10px;
   font-size: 15px;
-  outline: none;
-  background-color: #fff;
-  transition: 0.2s ease;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: 'Be Vietnam Pro', sans-serif;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
+.synced-form textarea {
+  min-height: 150px;
+  line-height: 1.6;
+}
+
+.synced-form input[type="text"]:focus,
+.synced-form input[type="datetime-local"]:focus,
+.synced-form input[type="file"]:focus,
+.synced-form textarea:focus,
+.synced-form select:focus {
   border-color: #003459;
-  box-shadow: 0 0 4px rgba(0,52,89,0.3);
+  background: #fff; /* Nền trắng khi focus */
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.08);
+  outline: none;
 }
 
+/* ✅ SỬA LỖI: Đồng bộ nút bấm */
 .form-buttons {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 12px;
   margin-top: 20px;
 }
 
-.save-btn {
-  background: #4caf50;
-  color: white;
+.btn-primary {
+  background: #003459;
+  color: #fff;
   border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
+  border-radius: 10px;
+  padding: 10px 20px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.save-btn:hover {
-  background: #43a047;
-  transform: translateY(-2px);
-}
-
-.cancel-btn {
+  transition: all 0.2s ease;
+  font-size: 14.5px;
   text-decoration: none;
-  background: #9e9e9e;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: 0.3s;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
-
-.cancel-btn:hover {
-  background: #757575;
+.btn-primary:hover {
+  background: #0056a3;
   transform: translateY(-2px);
 }
 
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: 1.5px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14.5px;
+  text-decoration: none;
+}
+.btn-secondary:hover {
+  background: #e0e0e0;
+  border-color: #aaa;
+}
+
+/* Giữ lại animation của bạn */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 </style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <h3>✏️ Chỉnh sửa sự kiện</h3>
+
+  <form method="post" enctype="multipart/form-data" class="synced-form">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="{{ form.title.id_for_label }}">🎯 Tiêu đề:</label>
+      {{ form.title }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.description.id_for_label }}">📝 Mô tả:</label>
+      {{ form.description }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.date.id_for_label }}">🗓 Thời gian bắt đầu:</label>
+      {{ form.date }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.end_date.id_for_label }}">⌛ Thời gian kết thúc:</label>
+      {{ form.end_date }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.location.id_for_label }}">📍 Địa điểm:</label>
+      {{ form.location }}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.image.id_for_label }}">🖼 Ảnh bìa:</label>
+      {{ form.image }}
+    </div>
+
+    <div class="form-buttons">
+      <button type="submit" class="btn-primary">💾 Lưu thay đổi</button>
+      <a href="{% url 'danh_sach_su_kien' %}" class="btn-secondary">↩ Quay lại</a>
+    </div>
+  </form>
+</div>
 
 {% endblock %}

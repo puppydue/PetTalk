@@ -102,22 +102,36 @@
   <div class="right-panel-content">
     <div class="panel">
       <h4>🔥 Chủ đề nổi bật</h4>
-      <div class="chip">Huấn luyện</div>
-      <div class="chip">Chăm sóc</div>
-      <div class="chip">Dinh dưỡng</div>
-      <div class="chip">Cấp cứu</div>
+      <div class="chip-list">
+        {% for value,label in topic_choices %}
+          <a href="{% url 'forum:post_list' %}?topic={{ value }}" class="chip chip-anim">
+            <i class="fa-solid fa-paw"></i> {{ label }}
+          </a>
+        {% empty %}
+          <p style="color:#64748b; font-size:13px;">Không có chủ đề nào</p>
+        {% endfor %}
+      </div>
     </div>
-
-    <div class="panel">
-      <h4>📅 Sự kiện sắp diễn ra</h4>
-      <div class="event">
-        <strong>Workshop Grooming</strong>
-        <small>11/11/2025</small>
-      </div>
-      <div class="event">
-        <strong>Pet Adoption Day</strong>
-        <small>25/11/2025</small>
-      </div>
+        <div class="panel">
+          <h4>📅 Sự kiện sắp diễn ra</h4>
+          <div class="event-list">
+            {% for e in upcoming_events %}
+              <!-- === THAY ĐỔI CẤU TRÚC HTML Ở ĐÂY === -->
+              <a href="{% url 'dang_ky_tham_gia' e.id %}" class="event-item">
+                <div class="event-date-badge">
+                  <span class="month">{{ e.date|date:"M" }}</span> <!-- Tháng, vd: Th11 -->
+                  <span class="day">{{ e.date|date:"d" }}</span> <!-- Ngày, vd: 10 -->
+                </div>
+                <div class="event-text">
+                  <strong>{{ e.title }}</strong>
+                  <small>{{ e.location }}</small> <!-- Hiển thị địa điểm -->
+                </div>
+              </a>
+            {% empty %}
+              <p style="color:#64748b;font-size:13px;">Không có sự kiện sắp diễn ra.</p>
+            {% endfor %}
+          </div>
+        </div>
     </div>
   </div>
   {% endblock %}

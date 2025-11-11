@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}Hồ sơ cá nhân{% endblock %}
+{% load forum_extras %} {% block title %}Hồ sơ cá nhân{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -12,6 +11,8 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
 .profile-wrapper {
   max-width: 950px;
   margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 /* Header */
@@ -22,7 +23,7 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
   background: #fff;
   border-radius: 16px;
   padding: 28px;
-  margin-top: 30px;
+  margin-top: 3px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 .profile-header img {
@@ -52,12 +53,19 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
   cursor: pointer;
   font-weight: 500;
   color: #555;
-  transition: 0.2s;
+  transition: all 0.2s ease-out;
 }
 .tab.active {
   background: #003459;
   color: #fff;
   border-color: #003459;
+}
+.tab:not(.active):hover {
+  background: #f4f4f4;
+  border-color: #aaa;
+  color: #003459;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
 }
 
 /* Card */
@@ -79,18 +87,29 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
 .info-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px 28px;
+  gap: 20px 24px;
   background: #fff;
   border: 1.8px solid #cfd9e2;
   border-radius: 14px;
-  padding: 24px 28px;
+  padding: 28px;
   margin-top: 16px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.05);
   transition: all 0.2s ease-in-out;
 }
-.info-form:hover {
-  border-color: #003459;
-  box-shadow: 0 6px 12px rgba(0,52,89,0.08);
+/* Dùng .no-box cho cả form user và pet */
+.info-form.no-box {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  background: none;
+  margin-top: 16px; /* Giữ khoảng cách với nội dung bên trên */
+}
+.info-form label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 14.5px;
 }
 .info-form input,
 .info-form select,
@@ -102,6 +121,7 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
   padding: 15px 10px;
   font-size: 15px;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 .info-form input:focus,
 .info-form select:focus,
@@ -121,9 +141,14 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
   padding: 10px 20px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  font-size: 14.5px; /* Đồng bộ font */
 }
-.btn-primary:hover { background: #0056a3; }
+.btn-primary:hover {
+  background: #0056a3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,52,89,0.2);
+}
 
 /* Thẻ thú cưng */
 .pet-item {
@@ -133,14 +158,299 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
   padding-bottom: 24px;
   margin-bottom: 24px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+  transition: all 0.2s ease-out;
+}
+.pet-item:hover {
+  box-shadow: 0 5px 15px rgba(0,0,0,0.07);
 }
 
 /* Form “Thêm thú cưng mới” */
 .card.add-pet {
   border: 2px dashed #003459 !important;
   border-radius: 16px;
+  text-align: center;
 }
-.card.add-pet h3 { color: #003459; }
+.card.add-pet button {
+    animation: pulse 2s infinite ease-in-out;
+}
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,52,89,0.4); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0,52,89,0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,52,89,0); }
+}
+
+/* --- CSS Cải tiến khu vực Upload Avatar --- */
+.avatar-upload-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.avatar-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #fafafa;
+  border: 1.5px solid #e2e2e2;
+  border-radius: 10px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+.avatar-upload-wrapper:hover {
+  border-color: #003459;
+  background: #fff;
+}
+.avatar-preview {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: #f0f0f0;
+}
+.avatar-controls {
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.btn-change-avatar {
+  display: inline-block;
+  background: #fff;
+  color: #003459;
+  border: 1.5px solid #003459;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+.btn-change-avatar:hover {
+  background: #003459;
+  color: #fff;
+}
+.btn-change-avatar span {
+  pointer-events: none;
+}
+.btn-clear-avatar {
+  display: inline-block;
+  background: #fff;
+  color: #d9534f;
+  border: 1.5px solid #d9534f;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+.btn-clear-avatar:hover {
+  background: #d9534f;
+  color: #fff;
+}
+.btn-clear-avatar span {
+  pointer-events: none;
+}
+.django-avatar-field {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* CSS Nút Xóa Thú Cưng */
+.btn-danger {
+  display: inline-block;
+  background: #fff;
+  color: #d9534f;
+  border: 1.5px solid #d9534f;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-size: 14.5px;
+}
+.btn-danger:hover {
+  background: #d9534f;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(217,83,79,0.2);
+}
+
+/* --- CSS Tab Comments (Code cũ) --- */
+.profile-item-list .card {
+    padding: 12px 28px;
+}
+.profile-comment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+.profile-comment-item:last-child {
+    border-bottom: none;
+}
+.profile-item-content {
+    flex-grow: 1;
+}
+.profile-item-content h5 {
+    margin: 0 0 4px 0;
+    font-size: 17px;
+    color: #003459;
+}
+.profile-item-content h5 a {
+    color: inherit;
+    text-decoration: none;
+    transition: 0.2s;
+}
+.profile-item-content h5 a:hover {
+    color: #0056a3;
+}
+.profile-item-content small {
+    color: #6c757d;
+    font-size: 14px;
+}
+.profile-comment-item .profile-item-content p {
+    font-style: italic;
+    color: #333;
+    margin:0 0 8px 0;
+}
+.profile-comment-item .profile-item-content strong a {
+    color: #003459;
+    text-decoration: none;
+}
+.profile-comment-item .profile-item-content strong a:hover {
+    text-decoration: underline;
+}
+
+/* --- ✅ CSS MỚI TỪ FORUM.CSS --- */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: #003459;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  overflow: hidden;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* max-width: 780px; */ /* Bỏ max-width để nó full-width trong card */
+  margin: 0 auto;
+  padding: 8px 0;
+}
+.post-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  border-left: 6px solid #003459;
+}
+.post-title { font-weight: 700; color: #0f172a; margin: 6px 0; }
+.post-images {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.post-images img {
+  width: 132px;
+  height: 132px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid #eef2f7;
+  transition: 0.2s;
+}
+.post-images img:hover { transform: scale(1.03); }
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* ✅ SỬA LỖI: Thêm CSS cho .vote-box */
+.vote-box {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Điều chỉnh khoảng cách nếu muốn */
+}
+
+.vote-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #003459;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.vote-btn:hover { background: #f7dba7; }
+.vote-count {
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 28px;
+  text-align: center;
+  color: #003459;
+}
+.vote-btn.active-up { background: #ff4500; color: #fff; border-color: #ff4500; }
+.vote-btn.active-down { background: #6a5cff; color: #fff; border-color: #6a5cff; }
+.btn-ghost {
+  border: 1px solid #003459;
+  color: #003459;
+  background: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+}
+.btn-ghost:hover { background: #f7dba7; border-color: #003459; }
+
+/* CSS cho nút Sửa/Xóa mới */
+.btn-ghost.btn-edit {
+  color: #0f5132;
+  border-color: #0f5132;
+}
+.btn-ghost.btn-edit:hover {
+  background: #f0f7f2;
+}
+.btn-ghost.btn-delete {
+  color: #d9534f;
+  border-color: #d9534f;
+}
+.btn-ghost.btn-delete:hover {
+  background: #fdf2f2;
+}
+
+/* --- HẾT CSS MỚI --- */
+
 
 /* Popup */
 .popup {
@@ -178,7 +488,6 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
 {% block content %}
 <div class="profile-wrapper">
 
-  <!-- HEADER -->
   <div class="profile-header">
     <img src="{% if user_info.avatar_image %}{{ user_info.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Avatar">
     <div>
@@ -188,41 +497,52 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
     </div>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" onclick="showTab('overview')">Overview</div>
     <div class="tab" onclick="showTab('posts')">Posts</div>
     <div class="tab" onclick="showTab('comments')">Comments</div>
   </div>
 
-  <!-- OVERVIEW -->
   <div id="overview" class="section active">
-    <!-- FORM THÔNG TIN CÁ NHÂN -->
     <div class="card">
       <h3>Thông tin cá nhân</h3>
-      <form method="POST" action="{% url 'profiles:my_profile' %}" enctype="multipart/form-data" class="info-form">
+      <form method="POST" action="{% url 'profiles:my_profile' %}" enctype="multipart/form-data" class="info-form no-box">
         {% csrf_token %}
         <input type="hidden" name="form_name" value="user_form">
-
         <div><label>Họ và tên</label><input type="text" name="first_name" value="{{ request.user.first_name }}"></div>
         <div><label>Ngày sinh</label>{{ form.birthdate }}</div>
         <div><label>Số điện thoại</label>{{ form.phone }}</div>
         <div><label>Email</label><input type="email" name="email" value="{{ request.user.email }}"></div>
         <div><label>Địa chỉ</label>{{ form.location }}</div>
         <div>
-  <label>Vai trò</label>
-  <input type="text" value="{{ user_info.get_role_display }}" readonly style="background:#f5f5f5; font-weight:600;">
-</div>
-
-        <div class="full-width"><label>Ảnh đại diện</label>{{ form.avatar_image }}</div>
-
-        <div class="full-width" style="display:flex;align-items:center;gap:10px;">
+          <label>Vai trò</label>
+          <input type="text" value="{{ user_info.get_role_display }}" readonly style="background:#f5f5f5; font-weight:600;">
+        </div>
+        <div class="full-width avatar-upload-container" data-preview-target="user_avatar_preview">
+          <label>Ảnh đại diện</label>
+          <div class="avatar-upload-wrapper">
+            <img src="{% if user_info.avatar_image %}{{ user_info.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Xem trước" class="avatar-preview" id="user_avatar_preview">
+            <div class="avatar-controls">
+              <button type="button" class="btn-change-avatar" onclick="triggerAvatarInput(this)">
+                <span>🖼️ Đổi ảnh</span>
+              </button>
+              {% if user_info.avatar_image %}
+              <button type="button" class="btn-clear-avatar" onclick="clearAvatarInput(this)">
+                <span>🗑️ Xóa ảnh</span>
+              </button>
+              {% endif %}
+              <div class="django-avatar-field">
+                {{ form.avatar_image }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="full-width" style="display:flex;align-items:center;gap:12px;">
           <button type="submit" class="btn-primary">💾 Lưu thông tin</button>
         </div>
       </form>
     </div>
 
-    <!-- DANH SÁCH THÚ CƯNG -->
     <div class="card">
       <h3>Thông tin thú cưng</h3>
       {% for pet, pform in pet_form_pairs %}
@@ -232,6 +552,8 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
               <div style="width:70px;height:70px;border-radius:14px;overflow:hidden;background:#f0f0f0;">
                 {% if pet.avatar_image %}
                   <img src="{{ pet.avatar_image.url }}" style="width:100%;height:100%;object-fit:cover;">
+                {% else %}
+                  <img src="{% static 'images/default_avatar.png' %}" style="width:100%;height:100%;object-fit:cover;opacity:0.5;">
                 {% endif %}
               </div>
               <div>
@@ -245,7 +567,7 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
             </div>
           </div>
 
-          <form method="POST" action="{% url 'profiles:pet_update' pet.id %}" enctype="multipart/form-data" class="info-form" style="margin-top:0;">
+          <form method="POST" action="{% url 'profiles:pet_update' pet.id %}" enctype="multipart/form-data" class="info-form no-box">
             {% csrf_token %}
             <input type="hidden" name="form_name" value="pet_form_{{ pet.id }}">
             <div><label>Tên thú cưng</label>{{ pform.name }}</div>
@@ -253,9 +575,32 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
             <div><label>Loài</label>{{ pform.species }}</div>
             <div><label>Ngày sinh</label>{{ pform.birthdate }}</div>
             <div><label>Cân nặng (kg)</label>{{ pform.weight_kg }}</div>
-            <div class="full-width"><label>Ảnh đại diện</label>{{ pform.avatar_image }}</div>
-            <div class="full-width" style="display:flex;align-items:center;gap:10px;">
+            <div class="full-width avatar-upload-container" data-preview-target="pet_avatar_preview_{{ pet.id }}">
+              <label>Ảnh đại diện</label>
+              <div class="avatar-upload-wrapper">
+                <img src="{% if pet.avatar_image %}{{ pet.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Xem trước" class="avatar-preview" id="pet_avatar_preview_{{ pet.id }}">
+                <div class="avatar-controls">
+                  <button type="button" class="btn-change-avatar" onclick="triggerAvatarInput(this)">
+                    <span>🖼️ Đổi ảnh</span>
+                  </button>
+                  {% if pet.avatar_image %}
+                  <button type="button" class="btn-clear-avatar" onclick="clearAvatarInput(this)">
+                    <span>🗑️ Xóa ảnh</span>
+                  </button>
+                  {% endif %}
+                  <div class="django-avatar-field">
+                    {{ pform.avatar_image }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="full-width" style="display:flex;align-items:center;gap:12px;">
               <button type="submit" class="btn-primary">💾 Lưu thú cưng</button>
+              <a href="{% url 'profiles:pet_delete' pet.id %}"
+                 class="btn-danger"
+                 onclick="return confirm('Bạn có chắc muốn xóa thú cưng {{ pet.name|escapejs }}? Hành động này không thể hoàn tác.');">
+                🗑️ Xóa thú cưng
+              </a>
             </div>
           </form>
         </div>
@@ -264,26 +609,34 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
       {% endfor %}
     </div>
 
-  <!-- FORM THÊM THÚ CƯNG (dạng pop-up) -->
-<div class="card add-pet" style="text-align:center;">
-  <button id="openAddPet" class="btn-primary" type="button" style="font-size:16px;">➕ Thêm thú cưng mới</button>
-</div>
-
-<!-- POPUP FORM THÊM THÚ CƯNG -->
-<div id="addPetPopup" class="popup">
+  <div class="card add-pet">
+    <button id="openAddPet" class="btn-primary" type="button" style="font-size:16px;">➕ Thêm thú cưng mới</button>
+  </div>
+</div> <div id="addPetPopup" class="popup">
   <div class="popup-content" style="flex-direction:column; align-items:stretch; width:520px; max-width:95%;">
     <h3 style="text-align:center; color:#003459; margin-bottom:16px;">Thêm thú cưng mới</h3>
-    <form method="POST" action="{% url 'profiles:pet_create' %}" enctype="multipart/form-data" class="info-form" style="box-shadow:none; border:none; margin-top:0;">
+    <form method="POST" action="{% url 'profiles:pet_create' %}" enctype="multipart/form-data" class="info-form" style="box-shadow:none; border:none; margin-top:0; padding: 10px 0 0 0;">
       {% csrf_token %}
       <input type="hidden" name="form_name" value="new_pet_form">
-
       <div><label>Tên thú cưng</label>{{ add_pet_form.name }}</div>
       <div><label>Loài</label>{{ add_pet_form.species }}</div>
       <div><label>Giới tính</label>{{ add_pet_form.sex }}</div>
       <div><label>Ngày sinh</label>{{ add_pet_form.birthdate }}</div>
       <div><label>Cân nặng (kg)</label>{{ add_pet_form.weight_kg }}</div>
-      <div class="full-width"><label>Ảnh đại diện</label>{{ add_pet_form.avatar_image }}</div>
-
+      <div class="full-width avatar-upload-container" data-preview-target="new_pet_avatar_preview">
+        <label>Ảnh đại diện</label>
+        <div class="avatar-upload-wrapper">
+          <img src="{% static 'images/default_avatar.png' %}" alt="Xem trước" class="avatar-preview" id="new_pet_avatar_preview">
+          <div class="avatar-controls">
+            <button type="button" class="btn-change-avatar" onclick="triggerAvatarInput(this)">
+              <span>🖼️ Đổi ảnh</span>
+            </button>
+            <div class="django-avatar-field">
+              {{ add_pet_form.avatar_image }}
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="full-width" style="display:flex;justify-content:center;gap:12px;margin-top:10px;">
         <button type="submit" class="btn-primary">💾 Lưu thú cưng</button>
         <button type="button" id="closeAddPet" style="background:#ccc;border:none;border-radius:8px;padding:10px 18px;cursor:pointer;">Hủy</button>
@@ -292,48 +645,155 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
   </div>
 </div>
 
-<script>
-// ✅ Mở & Đóng popup “Thêm thú cưng”
-document.addEventListener("DOMContentLoaded", () => {
-  const openBtn = document.getElementById("openAddPet");
-  const closeBtn = document.getElementById("closeAddPet");
-  const popup = document.getElementById("addPetPopup");
 
-  if (openBtn && popup) {
-    openBtn.addEventListener("click", () => {
-      popup.style.display = "flex";
-      setTimeout(() => popup.style.opacity = 1, 50);
-    });
-  }
-
-  if (closeBtn && popup) {
-    closeBtn.addEventListener("click", () => {
-      popup.style.opacity = 0;
-      setTimeout(() => popup.style.display = "none", 300);
-    });
-  }
-
-  // Đóng khi click ra ngoài
-  popup.addEventListener("click", (e) => {
-    if (e.target === popup) {
-      popup.style.opacity = 0;
-      setTimeout(() => popup.style.display = "none", 300);
-    }
-  });
-});
-</script>
-
-
-  <!-- POSTS / COMMENTS -->
   <div id="posts" class="section" style="display:none;">
-    <div class="card"><p>Chưa có bài viết nào.</p></div>
-  </div>
-  <div id="comments" class="section" style="display:none;">
-    <div class="card"><p>Chưa có bình luận nào.</p></div>
-  </div>
-</div>
+    <div class="post-list">
+      {% for post in posts %}
+        {% reaction_of post request.user as me_react %}
+        <article class="post-card" data-post="{{ post.post_id }}">
+          <div class="user-info" style="display:flex;gap:10px;align-items:center;">
+            <div class="avatar">
+              {% if post.username.userprofile.avatar_image %}
+                <img src="{{ post.username.userprofile.avatar_image.url }}" alt="avatar">
+              {% else %}
+                {{ post.username.username|slice:":1"|upper }}
+              {% endif %}
+            </div>
+            <div>
+              <div style="font-weight:700;color:#003459">{{ post.username.username }}</div>
+              <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
+            </div>
+          </div>
 
-<script>
+          <h3 class="post-title">{{ post.title }}</h3>
+          <div class="post-content">{{ post.content|linebreaksbr }}</div>
+
+          {% if post.images.all %}
+            <div class="post-images">
+              {% for img in post.images.all %}
+                <img src="{{ img.image.url }}" alt="post image">
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="actions">
+            <div class="vote-box" data-post="{{ post.post_id }}">
+              <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+              <span class="vote-count js-count">{{ post.total_votes|default:0 }}</span>
+              <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote">
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
+            </div>
+
+            <a class="btn-ghost" href="{% url 'forum:post_detail' post.post_id %}">
+              <i class="fa-regular fa-comment"></i> {{ post.comments.count }}
+            </a>
+
+            <a href="{% url 'forum:post_edit' post.post_id %}" class="btn-ghost btn-edit" style="margin-left: auto;">
+                ✏️ Sửa
+            </a>
+            <a href="{% url 'forum:post_delete' post.post_id %}" class="btn-ghost btn-delete" onclick="return confirm('Bạn có chắc muốn xóa bài viết này?');">
+                🗑️ Xóa
+            </a>
+
+          </div>
+        </article>
+      {% empty %}
+        <p style="color:#64748b;text-align:center; padding: 20px;">Chưa có bài viết nào.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div id="comments" class="section profile-item-list" style="display:none;">
+    <div class="card">
+      {% for comment in comments %}
+        <div class="profile-comment-item">
+          <div class="profile-item-content">
+            <p>"{{ comment.content|truncatewords:20 }}"</p>
+            <small>
+              Bình luận trong bài:
+              <strong><a href="{% url 'forum:post_detail' comment.post.post_id %}">{{ comment.post.title }}</a></strong>
+            </small>
+          </div>
+        </div>
+      {% empty %}
+        <p style="text-align:center;color:#6c757d;padding: 20px 0;">Chưa có bình luận nào.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+</div> <script>
+// --- JAVASCRIPT ---
+
+// ✅ JS MỚI: getCookie và csrftoken (cho Vote)
+function getCookie(name){let v=null;if(document.cookie&&document.cookie!==''){const c=document.cookie.split(';');for(let i=0;i<c.length;i++){const s=c[i].trim();if(s.substring(0,name.length+1)===(name+'=')){v=decodeURIComponent(s.substring(name.length+1));break}}}return v}
+const csrftoken=getCookie('csrftoken');
+
+// ✅ Hằng số: URL ảnh default
+const DEFAULT_AVATAR_URL = "{% static 'images/default_avatar.png' %}";
+
+// ✅ HÀM: Xử lý nút Xóa ảnh
+function clearAvatarInput(button) {
+  const container = button.closest('.avatar-upload-container');
+  if (!container) return;
+  const clearCheckbox = container.querySelector('input[type="checkbox"]');
+  if (clearCheckbox) {
+    clearCheckbox.checked = true;
+  }
+  const fileInput = container.querySelector('input[type="file"]');
+  if (fileInput) {
+    fileInput.value = null;
+  }
+  const previewTargetId = container.dataset.previewTarget;
+  const previewImage = document.getElementById(previewTargetId);
+  if (previewImage) {
+    previewImage.src = DEFAULT_AVATAR_URL;
+  }
+  button.style.display = 'none';
+}
+
+// ✅ HÀM: Trigger input file ẩn
+function triggerAvatarInput(button) {
+  const container = button.closest('.avatar-upload-container');
+  if (container) {
+    const fileInput = container.querySelector('input[type="file"]');
+    if (fileInput) {
+      fileInput.click();
+    }
+  }
+}
+
+// ✅ HÀM: Xử lý xem trước ảnh
+function setupAvatarPreview(container) {
+  const fileInput = container.querySelector('input[type="file"]');
+  const previewTargetId = container.dataset.previewTarget;
+  if (!previewTargetId) return;
+  const previewImage = document.getElementById(previewTargetId);
+
+  if (fileInput && previewImage) {
+    fileInput.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImage.src = e.target.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+        const clearCheckbox = container.querySelector('input[type="checkbox"]');
+        if (clearCheckbox) {
+          clearCheckbox.checked = false;
+        }
+        const clearButton = container.querySelector('.btn-clear-avatar');
+        if (clearButton) {
+          clearButton.style.display = 'inline-block';
+        }
+      }
+    });
+  }
+}
+
+// ✅ HÀM: Chuyển tab
 function showTab(tabName){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.section').forEach(s=>s.style.display='none');
@@ -341,10 +801,11 @@ function showTab(tabName){
   document.getElementById(tabName).style.display='block';
 }
 
-// ✅ Popup tự động hiển thị theo nội dung Django message
+// ✅ HÀM: Hiển thị popup
 function showPopup(message, icon) {
   const popup = document.getElementById("successPopup");
   const text = document.getElementById("popupMessage");
+  if (!popup || !text) return;
   text.textContent = icon + " " + message;
   popup.style.display = "flex";
   setTimeout(() => popup.style.opacity = 1, 50);
@@ -355,6 +816,38 @@ function showPopup(message, icon) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Áp dụng trình xem trước cho tất cả các container avatar
+  document.querySelectorAll('.avatar-upload-container').forEach(container => {
+    setupAvatarPreview(container);
+  });
+
+  // Mở & Đóng popup “Thêm thú cưng”
+  const openBtn = document.getElementById("openAddPet");
+  const closeBtn = document.getElementById("closeAddPet");
+  const popup = document.getElementById("addPetPopup");
+
+  if (openBtn && popup) {
+    openBtn.addEventListener("click", () => {
+      popup.style.display = "flex";
+      setTimeout(() => popup.style.opacity = 1, 50);
+    });
+  }
+  if (closeBtn && popup) {
+    closeBtn.addEventListener("click", () => {
+      popup.style.opacity = 0;
+      setTimeout(() => popup.style.display = "none", 300);
+    });
+  }
+  if (popup) {
+    popup.addEventListener("click", (e) => {
+      if (e.target === popup) {
+        popup.style.opacity = 0;
+        setTimeout(() => popup.style.display = "none", 300);
+      }
+    });
+  }
+
+  // Hiển thị message
   {% if messages %}
     {% for message in messages %}
       {% if "thú cưng" in message %}
@@ -366,6 +859,29 @@ document.addEventListener("DOMContentLoaded", () => {
       {% endif %}
     {% endfor %}
   {% endif %}
+
+  // ✅ JS MỚI: Vote AJAX
+  document.querySelectorAll('.vote-box').forEach(box=>{
+    const buttons=box.querySelectorAll('.js-vote');
+    const countEl=box.querySelector('.js-count');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click',async()=>{
+        const type=btn.dataset.type;
+        const postId=box.dataset.post;
+        // ⚠️ LƯU Ý: URL này phải tồn tại trong forum/urls.py của bạn
+        const url=`/forum/${postId}/react/${type}/`;
+        const res=await fetch(url,{method:'POST',headers:{'X-CSRFToken':csrftoken,'X-Requested-With':'XMLHttpRequest'}});
+        if(res.ok){
+          const data=await res.json();
+          countEl.textContent=data.total_votes??0;
+          buttons.forEach(b=>b.classList.remove('active-up','active-down'));
+          if(data.reaction==='upvote')box.querySelector('[data-type="upvote"]').classList.add('active-up');
+          if(data.reaction==='downvote')box.querySelector('[data-type="downvote"]').classList.add('active-down');
+        }
+      });
+    });
+  });
+
 });
 </script>
 {% endblock %}
