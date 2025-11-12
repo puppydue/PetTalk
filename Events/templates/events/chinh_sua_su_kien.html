@@ -5,72 +5,74 @@
 <style>
 {{ block.super }}
 
-/* ✅ SỬA LỖI: Dùng style .card đồng bộ
-   (Giống trang profile/post_edit) */
+/* ===== CARD CHUNG ===== */
 .card {
-  background: #fff;
+  background: #fff9e6;
   border-radius: 16px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-  padding: 28px;
-  margin-bottom: 24px;
-  /* Giữ lại animation của bạn */
-  animation: fadeIn 0.6s ease-in-out;
-}
-.card h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #003459;
-  margin-top: 0;
-  margin-bottom: 20px;
+  padding: 30px 40px;
+  margin: 40px auto;
+  max-width: 700px;
+  animation: fadeIn 0.5s ease-in-out;
+  font-family: 'Be Vietnam Pro', sans-serif;
 }
 
-/* ✅ SỬA LỖI: Đồng bộ style form */
-.synced-form .form-group {
-  margin-bottom: 20px; /* Tăng khoảng cách */
+/* ===== TIÊU ĐỀ ===== */
+.card h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #003459;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+/* ===== FORM ===== */
+.synced-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .synced-form label {
-  display: block;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-  font-size: 14.5px;
+  color: #003459;
+  margin-bottom: 5px;
+  font-size: 15px;
 }
 
-/* Áp style cho các ô nhập liệu (giống trang profile) */
 .synced-form input[type="text"],
 .synced-form input[type="datetime-local"],
 .synced-form input[type="file"],
 .synced-form textarea,
+.synced-form input[type="number"],
 .synced-form select {
   width: 100%;
-  border: 1.5px solid #e2e2e2;
+  border: 1.5px solid #ccc;
   border-radius: 10px;
-  background: #fafafa; /* Đồng bộ nền #fafafa */
-  padding: 15px 10px;
+  background: #fff;
+  padding: 10px 12px;
   font-size: 15px;
-  transition: all 0.2s ease;
+  transition: 0.2s ease-in-out;
   box-sizing: border-box;
   font-family: 'Be Vietnam Pro', sans-serif;
 }
 
 .synced-form textarea {
-  min-height: 150px;
-  line-height: 1.6;
+  min-height: 130px;
+  line-height: 1.5;
 }
 
-.synced-form input[type="text"]:focus,
-.synced-form input[type="datetime-local"]:focus,
-.synced-form input[type="file"]:focus,
+.synced-form input:focus,
 .synced-form textarea:focus,
 .synced-form select:focus {
-  border-color: #003459;
-  background: #fff; /* Nền trắng khi focus */
-  box-shadow: 0 0 0 3px rgba(0,52,89,0.08);
   outline: none;
+  border-color: #003459;
+  box-shadow: 0 0 4px rgba(0, 52, 89, 0.3);
 }
 
-/* ✅ SỬA LỖI: Đồng bộ nút bấm */
+/* ===== BUTTONS ===== */
 .form-buttons {
   display: flex;
   gap: 12px;
@@ -82,80 +84,86 @@
   color: #fff;
   border: none;
   border-radius: 10px;
-  padding: 10px 20px;
+  padding: 10px 22px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14.5px;
-  text-decoration: none;
+  font-size: 15px;
+  transition: 0.2s;
 }
 .btn-primary:hover {
-  background: #0056a3;
+  background: #005b8f;
   transform: translateY(-2px);
 }
 
 .btn-secondary {
-  background: #f0f0f0;
-  color: #333;
+  background: #f1f1f1;
+  color: #003459;
   border: 1.5px solid #ccc;
   border-radius: 10px;
-  padding: 10px 20px;
+  padding: 10px 22px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14.5px;
   text-decoration: none;
+  font-size: 15px;
+  transition: 0.2s;
 }
 .btn-secondary:hover {
-  background: #e0e0e0;
-  border-color: #aaa;
+  background: #e5e5e5;
 }
 
-/* Giữ lại animation của bạn */
+/* ===== ẢNH XEM TRƯỚC ===== */
+.preview {
+  margin-top: 10px;
+  text-align: center;
+}
+.preview img {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 10px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Hiệu ứng */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 </style>
-
 {% endblock %}
 
 {% block content %}
-
 <div class="card">
   <h3>✏️ Chỉnh sửa sự kiện</h3>
 
   <form method="post" enctype="multipart/form-data" class="synced-form">
     {% csrf_token %}
 
-    <div class="form-group">
-      <label for="{{ form.title.id_for_label }}">🎯 Tiêu đề:</label>
-      {{ form.title }}
-    </div>
+    <label for="{{ form.title.id_for_label }}">🎯 Tiêu đề:</label>
+    {{ form.title }}
 
-    <div class="form-group">
-      <label for="{{ form.description.id_for_label }}">📝 Mô tả:</label>
-      {{ form.description }}
-    </div>
+    <label for="{{ form.description.id_for_label }}">📝 Mô tả:</label>
+    {{ form.description }}
 
-    <div class="form-group">
-      <label for="{{ form.date.id_for_label }}">🗓 Thời gian bắt đầu:</label>
-      {{ form.date }}
-    </div>
+    <label for="{{ form.date.id_for_label }}">🗓 Thời gian bắt đầu:</label>
+    {{ form.date }}
 
-    <div class="form-group">
-      <label for="{{ form.end_date.id_for_label }}">⌛ Thời gian kết thúc:</label>
-      {{ form.end_date }}
-    </div>
+    <label for="{{ form.end_date.id_for_label }}">⌛ Thời gian kết thúc:</label>
+    {{ form.end_date }}
 
-    <div class="form-group">
-      <label for="{{ form.location.id_for_label }}">📍 Địa điểm:</label>
-      {{ form.location }}
-    </div>
+    <label for="{{ form.location.id_for_label }}">📍 Địa điểm:</label>
+    {{ form.location }}
 
-    <div class="form-group">
-      <label for="{{ form.image.id_for_label }}">🖼 Ảnh bìa:</label>
-      {{ form.image }}
+    <label for="id_capacity">👥 Số lượng người tham gia tối đa:</label>
+    {{ form.capacity }}
+
+    <label for="{{ form.image.id_for_label }}">🖼 Ảnh bìa:</label>
+    {{ form.image }}
+    <div class="preview" id="imagePreview">
+      {% if event.image %}
+        <img src="{{ event.image.url }}" alt="Ảnh hiện tại">
+      {% else %}
+        <p><em>Ảnh sẽ hiển thị tại đây sau khi chọn</em></p>
+      {% endif %}
     </div>
 
     <div class="form-buttons">
@@ -165,4 +173,23 @@
   </form>
 </div>
 
+<script>
+const imageInput = document.getElementById('id_image');
+const preview = document.getElementById('imagePreview');
+
+if (imageInput) {
+  imageInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.innerHTML = `<img src="${e.target.result}" alt="Xem trước ảnh">`;
+      }
+      reader.readAsDataURL(file);
+    } else {
+      preview.innerHTML = '<p><em>Ảnh sẽ hiển thị tại đây sau khi chọn</em></p>';
+    }
+  });
+}
+</script>
 {% endblock %}
