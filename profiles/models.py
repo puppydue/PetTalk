@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
+from badge.models import Badge
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -9,6 +10,9 @@ class UserProfile(models.Model):
     phone = models.CharField(max_length=20, blank=True)
     birthdate = models.DateField(blank=True, null=True)
     location = models.CharField(max_length=120, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s profile"
 
     def get_role_display(self):
         """✅ Trả về vai trò thực tế dựa theo quyền user"""

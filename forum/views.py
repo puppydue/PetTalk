@@ -54,6 +54,7 @@ def create_post(request):
                 PostsImage.objects.create(post=post, image=img)
             return redirect('forum:post_list')
     return redirect('forum:post_list')
+    update_badge_progress(request.user)
 
 
 # ========== 💬 XEM CHI TIẾT + COMMENT ==========
@@ -76,6 +77,8 @@ def post_detail(request, post_id):
             cmt.username = request.user
             cmt.post = post
             cmt.save()
+
+
             return redirect('forum:post_detail', post_id=post_id)
 
     return render(request, 'forum/post_detail.html', {
@@ -84,6 +87,32 @@ def post_detail(request, post_id):
         'comment_form': comment_form,
         'report_form': report_form
     })
+
+
+# ========== ⚡ REACTION (UP/DOWN) ==========
+@login_required
+def toggle_reaction(request, post_id, react_type):
+    post = get_object_or_404(Post, pk=post_id)
+    reaction, created = Reaction.objects.get_or_create(username=request.user, post=post)
+    if not created:
+        if reaction.type == react_type:
+            reaction.delete()  # gỡ vote
+
+
+        else:
+            reaction.type = react_type
+            reaction.save()
+
+
+    else:
+        reaction.type = react_type
+        reaction.save()
+
+
+    total = post.total_votes()
+    return JsonResponse({'total_votes': total})
+    update_badge_progress(request.user)
+
 
 # ========== 🚨 BÁO CÁO BÀI VIẾT ==========
 @login_required
@@ -161,6 +190,13 @@ def post_edit(request, pk):
     post = get_object_or_404(Post, pk=pk, username=request.user)
 
     if request.method == 'POST':
+        comment = Comment.objects.get(pk=id)
+        if comment.username == request.user:
+            comment.delete()
+            return JsonResponse({'status': 'deleted'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
