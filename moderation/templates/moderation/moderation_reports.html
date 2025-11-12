@@ -4,11 +4,255 @@
 {% block title %}Báo cáo vi phạm • Moderator Center{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/basemode.css' %}">
+<style>
+/* ✅ SỬA: Dùng style .card đồng bộ */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.card h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #003459;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* ✅ SỬA: Đồng bộ .tab-wrapper (giống .tabs) */
+.tab-wrapper {
+  display: flex;
+  gap: 16px;
+  margin: 24px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.tab-btn {
+  padding: 8px 10px 12px 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+.tab-btn.active, .tab-btn:hover {
+  color: #003459;
+  border-bottom-color: #003459;
+}
+
+/* ✅ SỬA: Đồng bộ .filters (giống .chip) */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.filters .group { display: flex; align-items: center; gap: 8px; }
+.filter-title { font-weight: 600; color: #333; }
+.pill {
+  display: inline-flex;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid #e2e8f0;
+  color: #003459;
+  background: #f8fafc;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+.pill:hover { border-color: #003459; background: #fff; }
+.pill.active {
+  background: #003459;
+  color: #fff;
+  border-color: #003459;
+}
+
+/* ✅ SỬA: Đồng bộ .styled-table */
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.styled-table th, .styled-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+.styled-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #003459;
+}
+.styled-table tr:hover { background-color: #fcfcfc; }
+.styled-table td:last-child { text-align: center; }
+
+/* ✅ SỬA LỖI 2: Thêm style cho hàng đã xử lý */
+.styled-table tr.status-approved,
+.styled-table tr.status-rejected {
+    opacity: 0.6;
+    background-color: #f8fafc;
+}
+
+/* ✅ SỬA: Đồng bộ .badge (giống event) */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.badge-approved { background: #dcfce7; color: #166534; }
+.badge-pending { background: #fef9c3; color: #713f12; }
+.badge-rejected { background: #fee2e2; color: #991b1b; }
+
+/* ✅ SỬA: Đồng bộ Nút bấm */
+.btn-primary, .btn-danger, .btn-secondary, .btn-success {
+  display: inline-block;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  text-decoration: none;
+}
+.btn-primary { background: #003459; color: #fff; border: 1.5px solid #003459; }
+.btn-primary:hover { background: #0056a3; border-color: #0056a3; transform: translateY(-2px); }
+.btn-secondary { background: #f0f0f0; color: #333; border: 1.5px solid #ccc; }
+.btn-secondary:hover { background: #e0e0e0; border-color: #aaa; transform: translateY(-2px); }
+.btn-danger { background: #fff; color: #d9534f; border: 1.5px solid #d9534f; }
+.btn-danger:hover { background: #d9534f; color: #fff; transform: translateY(-2px); }
+
+/* ✅ THÊM MỚI (Task 3): Nút Success (Phê duyệt) */
+.btn-success {
+    background: #16a34a;
+    color: #fff;
+    border: 1.5px solid #16a34a;
+}
+.btn-success:hover {
+    background: #15803d;
+    border-color: #15803d;
+    transform: translateY(-2px);
+}
+/* Style cho nút bị vô hiệu hóa */
+.btn-primary[disabled] {
+    background-color: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.btn-primary[disabled]:hover {
+    background-color: #ccc;
+    border-color: #ccc;
+    transform: none;
+}
+
+
+/* ✅ SỬA: Đồng bộ Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 52, 89, 0.25);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  padding: 20px 28px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+}
+.modal-header h3 { margin: 0; color: #003459; font-weight: 700; }
+.modal-close {
+  background: none; border: none; font-size: 24px;
+  cursor: pointer; color: #64748b; transition: 0.2s;
+}
+.modal-close:hover { color: #003459; }
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ✅ SỬA LỖI 3: Style cho modal trực quan hơn - TRẢ LẠI NHƯ CŨ (ANH 2) và sửa "Loại" */
+.modal-box p {
+    font-size: 15px; /* Giữ kích thước chữ như ảnh 2 */
+    color: #475569; /* Giữ màu chữ như ảnh 2 */
+    margin-bottom: 8px; /* Khoảng cách giữa các dòng */
+    display: flex; /* Dùng flex để căn lề cho strong */
+    align-items: center;
+}
+.modal-box p strong {
+    color: #000; /* Màu đen như ảnh 2 */
+    font-weight: 700; /* Đậm như ảnh 2 */
+    text-transform: none; /* KHÔNG viết hoa */
+    min-width: 120px; /* Căn lề cho phần nhãn */
+    display: inline-block;
+    padding-right: 10px; /* Khoảng cách giữa nhãn và nội dung */
+}
+
+/* ✅ SỬA LỖI 3: Style riêng cho Loại báo cáo */
+#m-type-wrapper {
+    display: inline-flex; /* Để nó co lại theo nội dung */
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 6px; /* Bo góc nhẹ */
+    border: 1px solid #003459; /* Khung */
+    background-color: #e6f0f5; /* Màu nền nhẹ */
+    color: #003459; /* Màu chữ */
+    font-weight: 600;
+    text-transform: uppercase; /* Viết hoa */
+    font-size: 13px; /* Kích thước chữ */
+}
+
+#m-target {
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    padding:10px; /* Giữ padding như ảnh 2 */
+    border-radius:8px;
+    margin-top: 8px; /* Khoảng cách từ nhãn Nội dung bị báo cáo */
+    margin-bottom: 8px;
+    font-size: 14px; /* Kích thước chữ như ảnh 2 */
+}
+#m-target div:first-child {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #000; /* Màu đen */
+}
+#m-target div:last-child {
+    color: #475569; /* Màu xám */
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="content-wrapper">
+<div class="card">
   <h2>Báo cáo vi phạm</h2>
 
   <div class="tab-wrapper">
@@ -16,7 +260,6 @@
     <a href="{% url 'moderation_events' %}" class="tab-btn">Đăng ký sự kiện</a>
   </div>
 
-  <!-- Filters -->
   <div class="filters">
     <div class="group">
       <span class="filter-title">Loại:</span>
@@ -25,7 +268,7 @@
            href="?type={{ val }}&status={{ status_filter }}">{{ opt }}</a>
       {% endfor %}
     </div>
-    <div class="group" style="margin-left:12px">
+    <div class="group">
       <span class="filter-title">Trạng thái:</span>
       {% for opt,val in status_options %}
         <a class="pill {% if status_filter == val %}active{% endif %}"
@@ -48,18 +291,19 @@
     </thead>
     <tbody>
       {% for r in reports %}
-        <tr data-type="{{ r.rtype }}" data-id="{{ r.rid }}">
+        <tr data-type="{{ r.rtype }}" data-id="{{ r.rid }}" class="status-{{ r.status }}">
           <td>#{{ r.rid }}</td>
           <td>{{ r.rtype|capfirst }}</td>
           <td>{{ r.reporter }}</td>
           <td>
             <div style="font-weight:600">{{ r.target_title }}</div>
-            <div style="color:var(--muted); font-size:.9rem">{{ r.target_preview }}</div>
+            <div style="color:#475569; font-size:.9rem">{{ r.target_preview }}</div>
           </td>
           <td>{{ r.created_at|date:"d/m/Y H:i" }}</td>
           <td><span class="badge badge-{{ r.status }}">{{ r.status|capfirst }}</span></td>
           <td>
-            <button class="btn-check"
+            <button class="btn-primary"
+                    style="padding: 6px 12px; font-size: 13px;"
                     onclick="openModal(this)"
                     data-type="{{ r.rtype }}"
                     data-id="{{ r.rid }}"
@@ -68,19 +312,18 @@
                     data-details="{{ r.details|default_if_none:'' }}"
                     data-status="{{ r.status }}"
                     data-title="{{ r.target_title }}"
-                    data-preview="{{ r.target_preview|default:'' }}">
-              Kiểm tra
+                    data-preview="{{ r.target_preview|default:'' }}"
+                    {% if r.status != 'pending' %}disabled{% endif %}> Kiểm tra
             </button>
           </td>
         </tr>
       {% empty %}
-        <tr><td colspan="7" style="text-align:center;color:gray">Không có báo cáo nào.</td></tr>
+        <tr><td colspan="7" style="text-align:center;color:gray; padding: 20px;">Không có báo cáo nào.</td></tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 
-<!-- Modal -->
 <div class="modal-overlay" id="modal" style="display:none;">
   <div class="modal-box">
     <div class="modal-header">
@@ -88,19 +331,21 @@
       <span class="modal-close" onclick="closeModal()">×</span>
     </div>
 
-    <p><strong>Loại:</strong> <span id="m-type"></span></p>
-    <p><strong>Người báo cáo:</strong> <span id="m-reporter"></span></p>
-    <p><strong>Lý do:</strong> <span id="m-reason"></span></p>
-    <p><strong>Chi tiết:</strong> <span id="m-details"></span></p>
-    <p><strong>Nội dung bị báo cáo:</strong></p>
-    <div id="m-target" style="background:#f8fafc;border:1px solid var(--line);padding:10px;border-radius:8px;margin-bottom:8px"></div>
+    <div style="max-height: 40vh; overflow-y: auto; padding-right: 10px;">
+      <p><strong>Loại:</strong> <span id="m-type-wrapper"><span id="m-type"></span></span></p>
+      <p><strong>Người báo cáo:</strong> <span id="m-reporter"></span></p>
+      <p><strong>Lý do:</strong> <span id="m-reason"></span></p>
+      <p><strong>Chi tiết:</strong> <span id="m-details"></span></p>
+      <p><strong>Nội dung bị báo cáo:</strong></p>
+      <div id="m-target"></div>
 
-    <p><strong>Trạng thái:</strong> <span id="m-status" class="badge badge-pending">Pending</span></p>
+      <p><strong>Trạng thái:</strong> <span id="m-status" class="badge badge-pending">Pending</span></p>
+    </div>
 
     <div class="modal-footer">
-      <button class="btn-approve" onclick="updateReport('approve')">Phê duyệt</button>
-      <button class="btn-reject" onclick="updateReport('reject')">Từ chối</button>
-      <button class="btn-close" onclick="closeModal()">Đóng</button>
+      <button class="btn-primary btn-success" onclick="confirmApprove()">Phê duyệt</button>
+      <button class="btn-danger" onclick="updateReport('reject')">Từ chối</button>
+      <button class="btn-secondary" onclick="closeModal()">Đóng</button>
     </div>
   </div>
 </div>
@@ -123,13 +368,13 @@ function openModal(btn){
   modal.dataset.rtype = rtype;
   modal.dataset.rid   = rid;
 
-  document.getElementById('m-type').textContent     = rtype;
+  document.getElementById('m-type').textContent     = rtype; // Chỉ gán nội dung loại
   document.getElementById('m-reporter').textContent = reporter;
   document.getElementById('m-reason').textContent   = reason;
   document.getElementById('m-details').textContent  = details;
   document.getElementById('m-target').innerHTML     =
-    `<div style="font-weight:600;margin-bottom:6px">${title}</div>
-     <div style="color:var(--muted)">${preview}</div>`;
+    `<div>${title}</div>
+     <div>${preview}</div>`;
 
   const badge = document.getElementById('m-status');
   badge.textContent = status.charAt(0).toUpperCase()+status.slice(1);
@@ -137,6 +382,14 @@ function openModal(btn){
   modal.style.display = 'flex';
 }
 function closeModal(){ document.getElementById('modal').style.display = 'none'; }
+
+// ✅ SỬA LỖI 3: Thêm hàm xác nhận
+function confirmApprove() {
+  const title = document.getElementById('m-target').querySelector('div:first-child').textContent;
+  if (confirm(`Phê duyệt báo cáo này sẽ XÓA nội dung "${title}".\n\nBạn có chắc chắn?`)) {
+    updateReport('approve');
+  }
+}
 
 function updateReport(action){
   const modal = document.getElementById('modal');
@@ -148,9 +401,17 @@ function updateReport(action){
     headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/x-www-form-urlencoded'},
     body: `action=${action}`
   })
-  .then(r => r.json())
+  .then(r => {
+      if (!r.ok) {
+          throw new Error(`HTTP error! status: ${r.status}`);
+      }
+      return r.json();
+  })
   .then(data => {
-    if(!data.success){ showToast("Lỗi: " + (data.error || 'Không cập nhật được'), 'error'); return; }
+    if(!data.success){
+      showToast("Lỗi: " + (data.error || 'Không cập nhật được'), 'error');
+      return;
+    }
 
     const newStatus = data.new_status;
     const row = document.querySelector(`tr[data-type="${rtype}"][data-id="${rid}"]`);
@@ -158,21 +419,49 @@ function updateReport(action){
       const badge = row.querySelector('.badge');
       badge.textContent = newStatus.charAt(0).toUpperCase()+newStatus.slice(1);
       badge.className = `badge badge-${newStatus}`;
+
+      row.className = `status-${newStatus}`; // Thêm class 'status-approved' hoặc 'status-rejected'
+      const button = row.querySelector('button');
+      if (button) {
+          button.disabled = true;
+      }
     }
 
     closeModal();
-    showToast(`Đã ${newStatus === 'approved' ? 'phê duyệt' : 'từ chối'} báo cáo #${rid}`, newStatus);
+    let toastMsg = `Đã ${newStatus === 'approved' ? 'phê duyệt (đã xóa nội dung)' : 'từ chối'} báo cáo #${rid}`;
+    showToast(toastMsg, newStatus);
 
-    setTimeout(() => window.location.reload(), 800);
   })
-  .catch(() => showToast("Lỗi mạng", 'error'));
+  .catch((err) => {
+    console.error('Fetch Error:', err);
+    showToast("Lỗi mạng hoặc máy chủ. Vui lòng F5.", 'error');
+  });
 }
 
 function showToast(msg,type){
   const t = document.createElement('div');
   t.className = `toast-message toast-${type}`;
   t.textContent = msg; document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 2000);
+
+  const style = document.createElement('style');
+  if (!document.querySelector('.toast-style')) {
+    style.className = 'toast-style';
+    style.innerHTML = `
+    .toast-message {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      padding: 10px 20px; border-radius: 8px; color: #fff;
+      background-color: #333; z-index: 10001;
+      font-family: 'Be Vietnam Pro', sans-serif; font-weight: 600;
+    }
+    .toast-approved { background-color: #16a34a; }
+    .toast-rejected { background-color: #d9534f; }
+    .toast-error { background-color: #d9534f; }
+    .toast-pending { background-color: #f59e0b; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  setTimeout(()=>t.remove(), 2500);
 }
 
 function getCookie(name){

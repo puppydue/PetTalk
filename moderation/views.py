@@ -108,10 +108,12 @@ def update_report_status(request, rtype, rid):
             if action == 'approve' and report.status != 'approved':
                 if report.post:
                     report.post.delete()
+                    report.post = None  # <--- ✅ THÊM DÒNG NÀY
                 report.status = 'approved'
             elif action == 'reject':
                 report.status = 'rejected'
             report.save()
+
 
         else:  # comment
             report = ReportsComment.objects.select_related('comment').get(pk=rid)
@@ -119,11 +121,11 @@ def update_report_status(request, rtype, rid):
             if action == 'approve' and report.status != 'approved':
                 if report.comment:
                     report.comment.delete()
+                    report.comment = None  # <--- ✅ THÊM DÒNG NÀY
                 report.status = 'approved'
             elif action == 'reject':
                 report.status = 'rejected'
             report.save()
-
         return JsonResponse({'success': True, 'new_status': report.status})
 
     except (ReportsPost.DoesNotExist, ReportsComment.DoesNotExist):

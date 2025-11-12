@@ -6,22 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}PetTalk{% endblock %}</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="{% static 'css/basemode.css' %}">
+
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
   <header class="main-header">
     <div class="logo" onclick="window.location.href='/'">
-  <img src="{% static 'images/pettalk.png' %}" alt="PetTalk Logo" class="logo-img">
-</div>
+      <img src="{% static 'images/pettalk.png' %}" alt="PetTalk Logo" class="logo-img">
+    </div>
 
-    <!-- ✅ Thanh người dùng động -->
     <div class="user-bar">
       {% if user.is_authenticated %}
-        <!-- Khi đã đăng nhập -->
         <span onclick="window.location.href='/profile/'" style="cursor:pointer; font-weight:600;">
           {{ user.username }}
         </span>
@@ -33,7 +33,6 @@
           </button>
         </form>
       {% else %}
-        <!-- Khi chưa đăng nhập -->
         <a href="{% url 'login' %}" class="auth-link">
           <i class="fa-solid fa-user"></i> Đăng nhập
         </a>
@@ -41,8 +40,7 @@
     </div>
   </header>
 
-  <div class="layout">
-    <!-- Sidebar -->
+  <div class="layout" style="grid-template-columns: 260px 1fr; gap: 24px;">
     <aside class="sidebar">
       <div class="nav-item "
            onclick="window.location.href='/forum/'">
@@ -60,21 +58,18 @@
       </div>
       <hr>
       <div
-          onclick="window.location.href=/moderation/reports/"
-          class="nav-item {% if '/events/' in request.path %}active{% endif %}">
-          <i class="fa-solid fa-shield-halved"></i> Moderator Center</a>
+          onclick="window.location.href='/moderation/reports/'"
+          class="nav-item {% if '/moderation/' in request.path %}active{% endif %}">
+          <i class="fa-solid fa-shield-halved"></i> Moderator Center
       </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
       {% block content %}{% endblock %}
     </main>
 
-    <aside class="right-panel">
-      {% block right %}{% endblock %}
-    </aside>
-  </div>
+    </div>
+
   {% block extra_js %}{% endblock %}
 </body>
 </html>
