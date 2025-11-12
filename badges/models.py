@@ -1,31 +1,25 @@
+# badges/models.py
 from django.db import models
 from django.contrib.auth.models import User
-
-class Badge(models.Model):
-    COLOR_CHOICES = [
-        ("gold", "Vàng"),
-        ("blue", "Xanh dương"),
-        ("green", "Xanh lá"),
-        ("red", "Đỏ"),
-        ("cyan", "Xanh ngọc"),
-        ("lime", "Xanh nhạt"),
-    ]
-
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    icon = models.CharField(max_length=10, default="🏅")
-    target = models.IntegerField(default=1)
-    color = models.CharField(max_length=20, choices=COLOR_CHOICES, default="blue")
-
-    def __str__(self):
-        return self.name
-
+from badge.models import Badge  # Import Badge chính từ app badge
 
 class UserBadgeProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    badge = models.ForeignKey(Badge, on_delete=models.CASCADE)
-    progress = models.IntegerField(default=0)
+    badge = models.ForeignKey(Badge, on_delete=models.CASCADE, null=True, blank=True)  # Đã reference đúng 'badge.Badge', nhưng remove null/blank=True để strict hơn nếu có thể (sau migrate)
+
+    post_count = models.PositiveIntegerField(default=0)
+    comment_count = models.PositiveIntegerField(default=0)
+    reaction_count = models.PositiveIntegerField(default=0)
+    progress = models.PositiveIntegerField(default=0)
     last_updated = models.DateTimeField(auto_now=True)
 
-    def is_completed(self):
-        return self.progress >= self.badge.target
+    def update_progress(self):
+        """Cập nhật tiến trình dựa trên loại badge."""
+        if self.badge.type == "post":
+            self.progress = self.post_count
+        elif self.badge.type == "comment":
+            self.progress = self.comment_count
+        elif self.badge.type == "reaction":
+            self.progress = self.reaction_count
+        # Thêm if cho type mới nếu cần (event/adoption)
+        self.save()

@@ -1,7 +1,8 @@
+# badges/urls.py
 from django.urls import path
-from .views import user_badges
+from . import views
 
-app_name = "badges"
 urlpatterns = [
-    path("", user_badges, name="user_badges"),
+    path('', views.user_badges, name='user_badges'),
+    path('save_badge/', views.save_display_badge, name='save_display_badge'),  # ← THÊM DÒNG NÀY
 ]

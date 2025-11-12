@@ -5,13 +5,9 @@
 
 {% block extra_css %}
 <style>
-    body {
-        background: #fff8ed; /* NỀN VÀNG GIỐNG PROFILE */
-    }
+    body { background: #fff8ed; }
 
-    /* ... (CSS cũ cho :root, card, title, muted, btn, toolbar, brow, etc. giữ nguyên) ... */
     :root{
-      /* ... (biến màu) ... */
       --primary: #003459;
       --secondary: #F7DBA7;
       --bg: #f8fafc;
@@ -25,285 +21,268 @@
       --danger:#ef4444;
       --shadow:0 14px 34px rgba(16,24,40,.10);
     }
+
     *{box-sizing:border-box}
     a{color:inherit;text-decoration:none}
 
-    .card {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 20px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        margin-bottom: 24px;
-    }
-     .header-card {
-       padding: 20px;
-       border-radius: var(--radius);
-       background: var(--card);
-       border: 1px solid var(--line);
-       margin-bottom: 16px;
-       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    .card, .header-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin-bottom: 16px;
     }
     .title{font-weight:900;font-size:18px;margin:0 0 12px}
     .muted{color:var(--muted);font-size:13px}
-    .btn{
-        padding:10px 14px;
-        border:1px solid var(--line);
-        background:#fff;
-        border-radius:12px;
-        cursor:pointer;
-        box-shadow:var(--shadow);
-        font-family: inherit;
-        font-weight: 500;
-    }
-    .btn.primary{
-        background: var(--primary);
-        color:#fff;
-        border-color:transparent
-    }
+    .btn{padding:10px 14px;border:1px solid var(--line);background:#fff;border-radius:12px;cursor:pointer;box-shadow:var(--shadow);font-weight:500;}
+    .btn.primary{background: var(--primary);color:#fff;border-color:transparent}
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .toolbar .btn{padding:8px 12px}
     .brow{display:grid;grid-template-columns:56px 1fr 120px;gap:14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#ffffff,#fafcff);box-shadow:var(--shadow);margin:10px 0}
-    .bicon{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:26px;background:conic-gradient(from 180deg, #e6f0ff, #f8fbff);border:1px solid #e3e8ff}
+    .bicon{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:26px;background:#f8fafc;border:1px solid #e2e8f0}
     .bname{font-weight:900}
     .bmeta{color:#475569;font-size:13px;margin-top:2px}
     .bar{height:12px;background:#eef2ff;border:1px solid #dbe3ff;border-radius:999px;overflow:hidden;margin-top:8px;position:relative}
-    .bar>div{height:100%;background:linear-gradient(90deg,#93c5fd,#2563eb);position:relative}
-    .bar>div:after{content:"";position:absolute;right:0;top:0;height:100%;width:10px;background:radial-gradient(circle at 70% 50%, rgba(255,255,255,.9), rgba(255,255,255,0));mix-blend-mode:overlay}
+    .bar>div{height:100%;background:linear-gradient(90deg,#93c5fd,#2563eb);width:0%;}
     .bstat{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#334155;margin-top:8px}
     .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f0f9ff;border:1px solid #bae6fd;font-size:12px}
-    .ok-chip{display:inline-flex;align-items:center;gap:6px;background:#ecfdf5;border:1px solid #86efac;color:#166534;border-radius:999px;padding:4px 10px;font-weight:800}
+    .ok-chip{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:999px;padding:4px 10px;font-weight:700}
     .chip-warn{background:#fff7ed;border:1px solid #fed7aa;color:#b45309;border-radius:999px;padding:4px 10px;font-size:12px}
 
-    /* CSS CHO PANEL BÊN PHẢI */
-    .display-badge-option {
+    /* === PANEL DANH HIỆU ĐÃ ĐẠT === */
+    .achieved-panel {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: var(--shadow);
+    }
+    .achieved-title {
+        font-weight: 900;
+        font-size: 16px;
+        margin: 0 0 12px;
+    }
+    .achieved-option {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 12px;
-        cursor: pointer;
-        padding: 8px;
-        border-radius: 8px;
-        transition: background-color 0.2s ease;
+        gap: 8px;
+        padding: 6px 0;
+        font-size: 14px;
     }
-    .display-badge-option:hover {
-        background-color: #f1f5f9;
+    .achieved-option input[type="radio"] {
+        accent-color: var(--primary);
     }
-    .display-badge-option input[type="radio"] {
-        appearance: none;
-        -webkit-appearance: none;
-        margin: 0;
-        width: 20px;
-        height: 20px;
-        border: 2px solid var(--line);
-        border-radius: 50%;
-        cursor: pointer;
-        position: relative;
-        transition: border-color 0.2s ease, background-color 0.2s ease;
+    .selected-badge {
+        background: #f0fdf4;
+        border: 1px solid #86efac;
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 12px;
+        display: none;
     }
-    .display-badge-option input[type="radio"]:checked {
-        border-color: var(--primary);
-        background-color: var(--primary);
-    }
-    .display-badge-option input[type="radio"]:checked::after {
-        content: '';
+    .selected-badge.show {
         display: block;
-        width: 5px;
-        height: 10px;
-        border: solid white;
-        border-width: 0 3px 3px 0;
-        transform: rotate(45deg);
-        position: absolute;
-        left: 6px;
-        top: 2px;
     }
-    .display-badge-option label {
-        font-weight: 500;
-        cursor: pointer;
-        flex-grow: 1;
+    .selected-badge .icon {
+        font-size: 28px;
     }
-    .selected-badge-info {
-        font-size: 13px;
-        color: var(--muted);
-        margin-top: 10px;
-        border-top: 1px solid var(--line);
-        padding-top: 10px;
+    .progress-sm {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 8px 0;
     }
-
+    .progress-sm > div {
+        height: 100%;
+        background: #16a34a;
+        border-radius: 3px;
+    }
 </style>
 {% endblock %}
 
-
 {% block content %}
-<main id="center">
-    <div class="header-card">
-        <h2 class="title">Danh hiệu hệ thống</h2>
-        <p class="muted">Chu kỳ: <span id="periodStartLbl">1/1/2025</span> → <span id="periodEndLbl">1/1/2026</span>. Khi hết hạn, tiến trình <b>tự động về 0</b>.</p>
-        <div class="toolbar">
-            <span class="tag">🎯 Mục tiêu năm nay</span>
-            <span class="chip-warn" id="daysLeftLbl">⏳ Còn 71 ngày trong kỳ</span>
+<main id="center" class="container-fluid py-4">
+    <div class="row">
+        <!-- LEFT: TẤT CẢ BADGE -->
+        <div class="col-lg-8">
+            <div class="header-card">
+                <h2 class="title">Danh hiệu hệ thống</h2>
+                <p class="muted">Chu kỳ: 1/1/2025 → 1/1/2026. Khi hết hạn, tiến trình <b>tự động về 0</b>.</p>
+                <div class="toolbar">
+                    <span class="tag">Mục tiêu năm nay</span>
+                    <span class="chip-warn">Còn 71 ngày trong kỳ</span>
+                </div>
+            </div>
+
+            <section id="tab-badges">
+                <div id="badgesList">
+                    {% for b in progress_data %}
+                    <div class="brow" style="border-left:6px solid #f59e0b20">
+                        <div class="bicon">{{ b.icon }}</div>
+                        <div>
+                            <div class="bname">{{ b.name }}</div>
+                            <div class="bmeta">
+                                Mục tiêu: {{ b.target }} {{ b.type }}
+                                {% if b.completed %}
+                                    <span style="color:green;">Đã đạt</span>
+                                {% else %}
+                                    <span style="color:orange;">Đang tiến hành</span>
+                                {% endif %}
+                            </div>
+                            <div class="bar">
+                                <div style="width:{{ b.percent }}%;
+                                    background:linear-gradient(90deg,
+                                        {% if b.color == 'gold' %}#f59e0b, #fbbf24
+                                        {% elif b.color == 'blue' %}#3b82f6, #60a5fa
+                                        {% elif b.color == 'green' %}#16a34a, #4ade80
+                                        {% elif b.color == 'red' %}#ef4444, #fb7185
+                                        {% elif b.color == 'cyan' %}#06b6d4, #67e8f9
+                                        {% elif b.color == 'lime' %}#84cc16, #bef264
+                                        {% else %}#94a3b8, #cbd5e1{% endif %});">
+                                </div>
+                            </div>
+                            <div class="bstat">
+                                <span>Tiến trình của bạn: <b>{{ b.progress }}/{{ b.target }}</b></span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <!-- RIGHT: DANH HIỆU ĐÃ ĐẠT -->
+        <div class="col-lg-4">
+            <div class="achieved-panel">
+                <h3 class="achieved-title">Danh hiệu đã đạt</h3>
+
+                {% if achieved_badges %}
+                <form id="badgeDisplayForm">
+                    <!-- Trong <form id="badgeDisplayForm"> -->
+<script>
+  const achievedBadges = {{ achieved_badges_json|safe }};
+  const currentDisplay = "{{ current_display|escapejs }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('badgeDisplayForm');
+    const selectedBadge = document.getElementById('selectedBadge');
+
+    // Tự động chọn badge đang hiển thị
+    if (currentDisplay) {
+      const radio = document.querySelector(`input[value="${currentDisplay}"]`);
+      if (radio) {
+        radio.checked = true;
+        const badge = achievedBadges.find(b => b.name === currentDisplay);
+        if (badge) showBadge(badge);
+      }
+    }
+
+    form.addEventListener('change', function(e) {
+      const selectedName = e.target.value;
+      const badge = selectedName === 'none' ? null : achievedBadges.find(b => b.name === selectedName);
+
+      // Gửi AJAX lưu
+      fetch("{% url 'save_display_badge' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: new URLSearchParams({
+          "badge_name": selectedName
+        })
+      });
+
+      // Hiển thị preview
+      if (!badge) {
+        selectedBadge.classList.remove('show');
+      } else {
+        showBadge(badge);
+      }
+    });
+
+    function showBadge(badge) {
+      selectedBadge.querySelector('.icon').textContent = badge.icon;
+      selectedBadge.querySelector('.fw-bold').textContent = badge.name;
+      selectedBadge.querySelector('.text-muted').textContent = `${badge.progress}/${badge.target} ${badge.type.toLowerCase()}`;
+      selectedBadge.querySelector('.progress-sm > div').style.width = '100%';
+      selectedBadge.querySelector('.text-success').textContent = 'ĐÃ HOÀN THÀNH!';
+      selectedBadge.classList.add('show');
+    }
+  });
+</script>
+                    <div class="achieved-option">
+                        <input type="radio" name="display_badge" value="none" id="none" checked>
+                        <label for="none">Không hiển thị</label>
+                    </div>
+
+                    {% for b in achieved_badges %}
+                    <div class="achieved-option">
+                        <input type="radio" name="display_badge" value="{{ b.name }}" id="badge_{{ forloop.counter }}">
+                        <label for="badge_{{ forloop.counter }}">
+                            {{ b.icon }} {{ b.name }}
+                            <small class="text-success">({{ b.progress }}/{{ b.target }})</small>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </form>
+
+                <!-- HIỂN THỊ BADGE ĐƯỢC CHỌN -->
+                <div id="selectedBadge" class="selected-badge">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="icon">TROPHY</div>
+                        <div>
+                            <div class="fw-bold">CANHO</div>
+                            <div class="text-muted small">2/1 bình luận</div>
+                        </div>
+                    </div>
+                    <div class="progress-sm mt-2">
+                        <div style="width:100%;"></div>
+                    </div>
+                    <div class="text-success small mt-1">ĐÃ HOÀN THÀNH!</div>
+                </div>
+                {% else %}
+                <p class="muted small">Bạn chưa đạt danh hiệu nào.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
-
-    <section id="tab-badges">
-        <div id="badgesList">
-            <div class="brow" style="border-left:6px solid #f59e0b20"> <div class="bicon" style="background:conic-gradient(from 180deg, #f59e0b22, #fff); border-color:#f59e0b33">🏅</div>
-                <div>
-                  <div class="bname">Vua sẻ chia</div>
-                  <div class="bmeta">Đăng ≥ 50 bài · <b>312</b> người đã đạt</div>
-                  <div class="bar"><div style="width:100%; background:linear-gradient(90deg, #f59e0b, #fbbf24)"></div></div>
-                  <div class="bstat">
-                    <span>Tiến trình của bạn: <b>60/50</b> bài viết</span>
-                    <span><span class="ok-chip">ĐÃ HOÀN THÀNH</span></span>
-                  </div>
-                </div>
-                <div style="display:grid;gap:8px;justify-items:end">
-                  <span class="tag">Mục tiêu: 50 bài viết</span>
-                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Vua sẻ chia')">💡 Mẹo</button>
-                </div>
-            </div>
-            <div class="brow" style="border-left:6px solid #0891b220"> <div class="bicon" style="background:conic-gradient(from 180deg, #0891b222, #fff); border-color:#0891b233">💬</div>
-                <div>
-                  <div class="bname">Bình luận hữu ích</div>
-                  <div class="bmeta">100 like cho bình luận · <b>198</b> người đã đạt</div>
-                  <div class="bar"><div style="width:76%; background:linear-gradient(90deg, #0891b2, #60a5fa)"></div></div>
-                  <div class="bstat">
-                    <span>Tiến trình của bạn: <b>76/100</b> like</span>
-                    <span>Còn 24 để đạt</span>
-                  </div>
-                </div>
-                <div style="display:grid;gap:8px;justify-items:end">
-                  <span class="tag">Mục tiêu: 100 like</span>
-                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Bình luận hữu ích')">💡 Mẹo</button>
-                </div>
-            </div>
-            <div class="brow" style="border-left:6px solid #16a34a20"> <div class="bicon" style="background:conic-gradient(from 180deg, #16a34a22, #fff); border-color:#16a34a33">🧭</div>
-                <div>
-                  <div class="bname">Người dẫn đường</div>
-                  <div class="bmeta">Ghép cặp tìm thú thành công (10 ca) · <b>24</b> người đã đạt</div>
-                  <div class="bar"><div style="width:40%; background:linear-gradient(90deg, #16a34a, #60a5fa)"></div></div>
-                  <div class="bstat">
-                    <span>Tiến trình của bạn: <b>4/10</b> ca</span>
-                    <span>Còn 6 để đạt</span>
-                  </div>
-                </div>
-                <div style="display:grid;gap:8px;justify-items:end">
-                  <span class="tag">Mục tiêu: 10 ca</span>
-                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Người dẫn đường')">💡 Mẹo</button>
-                </div>
-            </div>
-            <div class="brow" style="border-left:6px solid #ef444420"> <div class="bicon" style="background:conic-gradient(from 180deg, #ef444422, #fff); border-color:#ef444433">📈</div>
-                <div>
-                  <div class="bname">Chuyên gia diễn đàn</div>
-                  <div class="bmeta">Upvote câu trả lời ≥ 200 · <b>67</b> người đã đạt</div>
-                  <div class="bar"><div style="width:62%; background:linear-gradient(90deg, #ef4444, #fb7185)"></div></div>
-                  <div class="bstat">
-                    <span>Tiến trình của bạn: <b>123/200</b> upvote</span>
-                    <span>Còn 77 để đạt</span>
-                  </div>
-                </div>
-                <div style="display:grid;gap:8px;justify-items:end">
-                  <span class="tag">Mục tiêu: 200 upvote</span>
-                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Chuyên gia diễn đàn')">💡 Mẹo</button>
-                </div>
-            </div>
-            <div class="brow" style="border-left:6px solid #0ea5e920"> <div class="bicon" style="background:conic-gradient(from 180deg, #0ea5e922, #fff); border-color:#0ea5e933">🎪</div>
-                <div>
-                  <div class="bname">Nhà tổ chức sự kiện</div>
-                  <div class="bmeta">3 sự kiện được duyệt · <b>15</b> người đã đạt</div>
-                  <div class="bar"><div style="width:33%; background:linear-gradient(90deg, #0ea5e9, #60a5fa)"></div></div>
-                  <div class="bstat">
-                    <span>Tiến trình của bạn: <b>1/3</b> sự kiện</span>
-                    <span>Còn 2 để đạt</span>
-                  </div>
-                </div>
-                <div style="display:grid;gap:8px;justify-items:end">
-                  <span class="tag">Mục tiêu: 3 sự kiện</span>
-                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Nhà tổ chức sự kiện')">💡 Mẹo</button>
-                </div>
-            </div>
-            <div class="brow" style="border-left:6px solid #22c55e20"> <div class="bicon" style="background:conic-gradient(from 180deg, #22c55e22, #fff); border-color:#22c55e33">🤝</div>
-                <div>
-                  <div class="bname">Người tốt bụng</div>
-                  <div class="bmeta">5 ca nhận nuôi thành công · <b>9</b> người đã đạt</div>
-                  <div class="bar"><div style="width:60%; background:linear-gradient(90deg, #22c55e, #60a5fa)"></div></div>
-                  <div class="bstat">
-                    <span>Tiến trình của bạn: <b>3/5</b> trường hợp</span>
-                    <span>Còn 2 để đạt</span>
-                  </div>
-                </div>
-                <div style="display:grid;gap:8px;justify-items:end">
-                  <span class="tag">Mục tiêu: 5 trường hợp</span>
-                  <button class="btn" onclick="alert('Mẹo đạt '+ 'Người tốt bụng')">💡 Mẹo</button>
-                </div>
-            </div>
-        </div>
-    </section>
-  </main>
+</main>
 {% endblock %}
-
 
 {% block extra_js %}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const BADGES = [
-    { id: "share-king", icon: "🏅", name: "Vua sẻ chia", target: 50 },
-    { id: "helpful-comment", icon: "💬", name: "Bình luận hữu ích", target: 100 },
-    { id: "match-guide", icon: "🧭", name: "Người dẫn đường", target: 10 },
-    { id: "forum-expert", icon: "📈", name: "Chuyên gia diễn đàn", target: 200 },
-    { id: "event-host", icon: "🎪", name: "Nhà tổ chức sự kiện", target: 3 },
-    { id: "good-samaritan", icon: "🤝", name: "Người tốt bụng", target: 5 },
-  ];
+  const achievedBadges = {{ achieved_badges_json|safe }};
 
-  const USER_PROGRESS = {
-    "share-king": 60, // ✅ đạt
-    "helpful-comment": 76,
-    "match-guide": 4,
-    "forum-expert": 123,
-    "event-host": 1,
-    "good-samaritan": 3,
-  };
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('badgeDisplayForm');
+    const selectedBadge = document.getElementById('selectedBadge');
+    if (!form) return;
 
-  const box = document.getElementById("display-badge-options");
-  const label = document.getElementById("currently-selected-badge");
-  if (!box || !label) {
-    console.error("Không tìm thấy phần hiển thị danh hiệu (#display-badge-options)");
-    return;
-  }
-
-  const achieved = BADGES.filter((b) => (USER_PROGRESS[b.id] || 0) >= b.target);
-
-  box.innerHTML = `
-    <div class="display-badge-option">
-      <input type="radio" id="display-badge-none" name="display-badge" value="none" checked>
-      <label for="display-badge-none">Không hiển thị danh hiệu</label>
-    </div>
-  `;
-
-  if (achieved.length === 0) {
-    box.innerHTML += `<p class="muted">Bạn chưa đạt được danh hiệu nào để hiển thị.</p>`;
-  } else {
-    achieved.forEach((b) => {
-      box.innerHTML += `
-        <div class="display-badge-option">
-          <input type="radio" id="display-badge-${b.id}" name="display-badge" value="${b.id}">
-          <label for="display-badge-${b.id}">${b.icon} ${b.name}</label>
-        </div>`;
-    });
-  }
-
-  box.querySelectorAll('input[name="display-badge"]').forEach((r) => {
-    r.addEventListener("change", (e) => {
-      if (e.target.value === "none") {
-        label.textContent = "Chưa chọn danh hiệu nào.";
-      } else {
-        const picked = BADGES.find((b) => b.id === e.target.value);
-        label.textContent = `Đang hiển thị: ${picked.icon} ${picked.name}`;
+    form.addEventListener('change', function(e) {
+      const selectedName = e.target.value;
+      if (selectedName === 'none') {
+        selectedBadge.classList.remove('show');
+        return;
       }
+
+      const badge = achievedBadges.find(b => b.name === selectedName);
+      if (!badge) return;
+
+      selectedBadge.querySelector('.icon').textContent = badge.icon;
+      selectedBadge.querySelector('.fw-bold').textContent = badge.name;
+      selectedBadge.querySelector('.text-muted').textContent = `${badge.progress}/${badge.target} ${badge.type.toLowerCase()}`;
+
+      const progressBar = selectedBadge.querySelector('.progress-sm > div');
+      progressBar.style.width = '100%';
+
+      const status = selectedBadge.querySelector('.text-success');
+      status.textContent = 'ĐÃ HOÀN THÀNH!';
+
+      selectedBadge.classList.add('show');
     });
   });
-
-  console.log("✅ Danh hiệu đã đạt:", achieved.map((b) => b.name).join(", "));
-});
 </script>
 {% endblock %}

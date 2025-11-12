@@ -4,7 +4,8 @@
 {% block extra_css %}
 <style>
   body {
-    background-color: #fdf7ee; /* nhẹ nhàng hơn #fff2cc */
+    background-color: #fdf7ee;
+    font-family: 'Be Vietnam Pro', sans-serif;
   }
 
   .badge-form-wrapper {
@@ -51,7 +52,7 @@
 
   input[type="text"],
   input[type="number"],
-  input[type="date"],
+  select,
   textarea {
     padding: 12px 14px;
     border-radius: 10px;
@@ -63,6 +64,7 @@
   }
 
   input:focus,
+  select:focus,
   textarea:focus {
     outline: none;
     border-color: #003459;
@@ -71,7 +73,7 @@
 
   textarea {
     resize: vertical;
-    min-height: 120px;
+    min-height: 100px;
   }
 
   .form-actions {
@@ -85,7 +87,7 @@
     background: #003459;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 22px;
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
@@ -111,7 +113,6 @@
     background: #cbd5e1;
   }
 
-  /* Tooltip hiển thị hướng dẫn */
   .hint {
     font-size: 13px;
     color: #64748b;
@@ -139,9 +140,27 @@
     </div>
 
     <div class="form-group">
+      <label for="id_type">Loại danh hiệu</label>
+      {{ form.type }}
+      <div class="hint">Chọn loại hành động được tính: bài viết, bình luận hoặc tương tác.</div>
+    </div>
+
+    <div class="form-group">
+      <label for="id_target">Mục tiêu cần đạt</label>
+      {{ form.target }}
+      <div class="hint">Nhập số lượng cần đạt (ví dụ: 50 bài viết, 100 bình luận...).</div>
+    </div>
+
+    <div class="form-group">
+      <label for="id_color">Màu hiển thị</label>
+      {{ form.color }}
+      <div class="hint">Chọn màu hiển thị cho danh hiệu này.</div>
+    </div>
+
+    <div class="form-group">
       <label for="id_achieved_count">Số người đạt</label>
       {{ form.achieved_count }}
-      <div class="hint">Nếu mới tạo, bạn có thể để 0.</div>
+      <div class="hint">Trường này tự động cập nhật khi người dùng đạt danh hiệu (bạn có thể để 0).</div>
     </div>
 
     <div class="form-actions">
