@@ -740,7 +740,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // === GỬI FORM BÁO CÁO BÀI VIẾT ===
   document.addEventListener('submit', async e => {
     const form = e.target.closest('.js-report-form[data-post]');
-    if (!form) return;
+    if (!form || form.dataset.handled) return;  // 🔹 Ngăn gọi lặp
+    form.dataset.handled = "true";              // 🔹 Đánh dấu đã xử lý
     e.preventDefault();
 
     const postId = form.dataset.post;
@@ -761,32 +762,8 @@ document.addEventListener("DOMContentLoaded", () => {
         form.reset();
       } else alert('❌ Lỗi khi gửi báo cáo.');
     } else alert('❌ Lỗi server khi gửi báo cáo.');
-  });
 
-  // === GỬI FORM BÁO CÁO BÌNH LUẬN ===
-  document.addEventListener('submit', async e => {
-    const form = e.target.closest('.js-report-form[data-comment]');
-    if (!form) return;
-    e.preventDefault();
-
-    const commentId = form.dataset.comment;
-    const url = `/forum/comment/${commentId}/report/`;
-    const formData = new FormData(form);
-
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
-      body: formData
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data.status === 'ok') {
-        alert('✅ Gửi báo cáo bình luận thành công!');
-        form.closest('.modal').style.display = 'none';
-        form.reset();
-      } else alert('❌ Lỗi khi gửi báo cáo.');
-    } else alert('❌ Lỗi server khi gửi báo cáo.');
+    delete form.dataset.handled; // cho phép gửi lại sau nếu cần
   });
 }); // END DOMContentLoaded
 </script>
