@@ -40,8 +40,18 @@ def chinh_sua_su_kien(request, event_id):
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
-            form.save()
-            messages.success(request, f"✅ Sự kiện '{event.title}' đã được cập nhật thành công!")
+            updated = form.save(commit=False)
+
+            # 🔁 Nếu sự kiện đang ở trạng thái "approved" thì chuyển lại thành "pending"
+            if event.status == 'approved':
+                updated.status = 'pending'
+                messages.info(
+                    request,
+                    f"🔄 Sự kiện '{event.title}' đã được cập nhật và sẽ chờ phê duyệt lại."
+                )
+
+            updated.save()
+            messages.success(request, f"✅ Sự kiện '{event.title}' đã được lưu thay đổi thành công!")
             return redirect('danh_sach_su_kien')
         else:
             messages.warning(request, "⚠️ Có lỗi trong biểu mẫu, vui lòng kiểm tra lại.")

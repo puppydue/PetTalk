@@ -94,7 +94,7 @@ class Comment(models.Model):
 # 5️⃣ REPORT (BÁO CÁO)
 # ============================
 class ReportsPost(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True)
     reporter = models.ForeignKey(User, on_delete=models.CASCADE)
     reason = models.CharField(max_length=255)
     details = models.TextField(blank=True)
@@ -112,7 +112,7 @@ class ReportsComment(models.Model):
     )  # Người báo cáo
     comment = models.ForeignKey(
         'Comment',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='reports',
         null=True,  # 👈 tạm cho phép null để migrate
         blank=True

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Chỉnh sửa bài viết{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ✅ THÊM MỚI: Style cho .card (copy từ profile_detail.html)
+   để bọc nội dung chính cho đồng bộ */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #003459;
+  margin-top: 0; /* Reset margin */
+  margin-bottom: 20px;
+}
+/* Hết style .card */
+
+
+/* Style cho Form (giữ nguyên từ lần trước) */
+.edit-post-form label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 14.5px;
+}
+
+.edit-post-form input[type="text"],
+.edit-post-form select,
+.edit-post-form textarea {
+  width: 100%;
+  border: 1.5px solid #e2e2e2;
+  border-radius: 10px;
+  background: #fafafa;
+  padding: 15px 10px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  box-sizing: border-box; /* Quan trọng */
+  font-family: 'Be Vietnam Pro', sans-serif; /* Đảm bảo đồng bộ font */
+}
+
+.edit-post-form textarea {
+  min-height: 200px; /* Cho ô nội dung cao hơn */
+  line-height: 1.6;
+}
+
+.edit-post-form input[type="text"]:focus,
+.edit-post-form select:focus,
+.edit-post-form textarea:focus {
+  border-color: #003459;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.08);
+  outline: none; /* Bỏ viền xanh mặc định */
+}
+
+/* Nút bấm (giữ nguyên) */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-primary {
+  background: #003459;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14.5px;
+  text-decoration: none;
+}
+.btn-primary:hover {
+  background: #0056a3;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: 1.5px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14.5px;
+  text-decoration: none;
+}
+.btn-secondary:hover {
+  background: #e0e0e0;
+  border-color: #aaa;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="card">
+
+    <h3>Chỉnh sửa bài viết</h3>
+    <p>Bạn đang chỉnh sửa bài: <strong>{{ post.title }}</strong></p>
+
+    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <form method="POST" enctype="multipart/form-data" class="edit-post-form">
+        {% csrf_token %}
+
+        <div style="margin-bottom: 20px;">
+            <label for="{{ form.title.id_for_label }}">Tiêu đề</label>
+            {{ form.title }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="{{ form.topic.id_for_label }}">Chủ đề</label>
+            {{ form.topic }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="{{ form.content.id_for_label }}">Nội dung</label>
+            {{ form.content }}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Lưu thay đổi</button>
+            <a href="{% url 'profiles:my_profile' %}" class="btn-secondary">Hủy</a>
+        </div>
+    </form>
+
+</div>
+{% endblock %}

@@ -20,9 +20,12 @@ def auth_slider(request):
                 user = login_form.get_user()
                 login(request, user)
                 messages.success(request, f"Chào mừng {user.username} quay lại!")
-                return redirect('forum:post_list')
-            # Không cần 'else' ở đây, form tự động chứa lỗi
-            # và sẽ được render bên dưới
+
+                # ✅ Ưu tiên redirect đến trang người dùng định vào (nếu có)
+                next_url = request.GET.get('next') or request.POST.get('next')
+                if next_url:
+                    return redirect(next_url)
+                return redirect('forum:post_list')  # fallback mặc định
 
         elif 'register' in request.POST:
             active_panel = 'register'  # Người dùng submit form register

@@ -5,45 +5,344 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forum.css' %}">
+
 <style>
-  .create-post-trigger{background:#fff;border-radius:16px;padding:18px;box-shadow:0 4px 10px rgba(0,0,0,.08);display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:16px}
-  .trigger-avatar{width:40px;height:40px;border-radius:9999px;background:#003459;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
-  .trigger-input{flex:1;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;color:#475569}
-  .post-list{display:flex;flex-direction:column;gap:16px;max-width:780px;margin:0 auto;padding:8px 0}
-  .post-card{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 4px 10px rgba(0,0,0,.08);border-left:6px solid #003459}
-  .avatar{width:40px;height:40px;border-radius:9999px;background:#003459;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
-  .post-title{font-weight:700;color:#0f172a;margin:6px 0}
-  .post-images{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-  .post-images img{width:132px;height:132px;border-radius:12px;object-fit:cover;border:2px solid #eef2f7}
-  .actions{display:flex;align-items:center;gap:12px;margin-top:12px}
-  .vote-btn{width:42px;height:42px;border-radius:10px;border:1px solid #cbd5e1;background:#f8fafc;color:#003459;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .25s}
-  .vote-btn:hover{background:#f7dba7}
-  .vote-count{font-weight:700;font-size:15px;min-width:28px;text-align:center;color:#003459;text-decoration:none !important}
-  .vote-btn.active-up{background:#ff4500;color:#fff;border-color:#ff4500}
-  .vote-btn.active-down{background:#6a5cff;color:#fff;border-color:#6a5cff}
-  .btn-ghost{border:1px solid #003459;color:#003459;background:#fff;padding:8px 14px;border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none !important;display:flex;align-items:center;gap:6px}
-  .btn-ghost:hover{background:#f7dba7}
-  .btn-primary{border:none;color:#fff;background:#003459;padding:8px 14px;border-radius:10px;font-weight:600;cursor:pointer}
-  .search-wrap{display:flex;gap:8px;margin-bottom:12px}
-  .search-wrap input,.search-wrap select{border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#fff;flex:1}
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
-  .modal__panel{background:#fff;border-radius:16px;max-width:640px;width:100%;padding:18px}
-  .modal__head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid #eef2f7;padding-bottom:10px}
-  .close-x{background:none;border:none;font-size:24px;cursor:pointer;color:#64748b}
+/* === Ô tạo bài viết nhanh === */
+.create-post-trigger {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: all 0.25s ease;
+}
+.create-post-trigger:hover { box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
+
+/* === Avatar user === */
+.trigger-avatar, .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: #003459;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  overflow: hidden;
+}
+.trigger-avatar img, .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* === Ô nhập câu hỏi nhanh === */
+.trigger-input {
+  flex: 1;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  color: #475569;
+  transition: 0.2s;
+}
+.trigger-input:hover { border-color: #003459; }
+
+/* === Danh sách bài viết === */
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 8px 0;
+}
+.post-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  border-left: 6px solid #003459;
+}
+.post-title { font-weight: 700; color: #0f172a; margin: 6px 0; }
+
+
+/* === CSS Grid Ảnh & Lightbox === */
+.post-images {
+  display: grid;
+  gap: 4px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 15px;
+}
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #f8fafc;
+}
+.post-images img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.post-images img:hover {
+  transform: scale(1.03);
+}
+/* Các layout grid */
+.images-count-1 { display: flex; justify-content: center; max-height: 450px; }
+.images-count-1 img { position: relative; object-fit: contain; max-height: 450px; width: auto; max-width: 100%; cursor: zoom-in; }
+.images-count-2 { grid-template-columns: 1fr 1fr; height: 300px; }
+.images-count-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
+.images-count-3 .image-wrapper:first-child { grid-row: span 2; }
+.images-count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
+.images-count-more { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
+.images-count-more .image-wrapper:nth-child(n+5) { display: none; }
+
+.images-count-more .image-wrapper[data-more-count]::after {
+  content: attr(data-more-count);
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); color: white; display: flex;
+  align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; cursor: pointer;
+}
+
+/* Lightbox Modal */
+.lightbox {
+  position: fixed; z-index: 9990; padding-top: 50px; left: 0; top: 0;
+  width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9);
+  display: none; animation: fadeIn 0.3s ease;
+}
+.lightbox-content { margin: auto; display: block; max-width: 90%; max-height: 85vh; animation: zoom 0.3s ease; }
+.lightbox-close { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; }
+.lightbox-close:hover { color: #bbb; }
+.lightbox-prev, .lightbox-next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -50px;
+  color: white;
+  font-weight: bold;
+  font-size: 30px;
+  user-select: none;
+}
+.lightbox-next { right: 0; border-radius: 3px 0 0 3px; }
+.lightbox-prev { left: 0; }
+.lightbox-prev:hover, .lightbox-next:hover { background-color: rgba(255,255,255,0.2); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zoom { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+/* === HẾT CSS CẢI TIẾN === */
+
+
+/* === Khu vực vote + actions === */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.vote-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #003459;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.vote-btn:hover { background: #f7dba7; }
+.vote-count {
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 28px;
+  text-align: center;
+  color: #003459;
+}
+.vote-btn.active-up { background: #ff4500; color: #fff; border-color: #ff4500; }
+.vote-btn.active-down { background: #6a5cff; color: #fff; border-color: #6a5cff; }
+
+/* === Nút và button === */
+.btn-ghost {
+  border: 1px solid #003459;
+  color: #003459;
+  background: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+}
+.btn-ghost:hover { background: #f7dba7; border-color: #003459; }
+.btn-primary {
+  border: none;
+  color: #fff;
+  background: #003459;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+.btn-primary:hover { background: #00509e; }
+
+/* === Ô tìm kiếm + lọc === */
+.search-wrap {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.search-wrap input, .search-wrap select {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  flex: 1;
+  color: #0f172a;
+  transition: all 0.2s ease;
+}
+.search-wrap input:focus, .search-wrap select:focus {
+  border-color: #003459;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.1);
+}
+
+/* === Modal overlay === */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 52, 89, 0.25);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* === Panel trong modal === */
+.modal__panel {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 640px;
+  width: 100%;
+  padding: 20px 22px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  animation: fadeIn 0.25s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Header của modal === */
+.modal__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+}
+.modal__head h3 {
+  margin: 0;
+  color: #003459;
+  font-weight: 700;
+}
+.close-x {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #64748b;
+  transition: 0.2s;
+}
+.close-x:hover { color: #003459; }
+
+/* === Các input trong modal === */
+.modal__panel input,
+.modal__panel select {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 15px;
+  width: 100%;
+  transition: all 0.2s ease;
+  height: 42px;
+}
+.modal__panel textarea {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 15px;
+  width: 100%;
+  transition: all 0.2s ease;
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+  font-family: inherit;
+}
+.modal__panel input:focus,
+.modal__panel select:focus,
+.modal__panel textarea:focus {
+  border-color: #003459;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.1);
+}
+
+/* === Chọn file === */
+.modal__panel input[type=file] {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  color: #003459;
+}
 </style>
+
 {% endblock %}
 
 {% block content %}
 <div class="post-list">
-  <!-- Ô tạo nhanh mở modal -->
   <div id="btn-open-create" class="create-post-trigger">
-    <div class="trigger-avatar">{{ request.user.username|slice:":1"|upper }}</div>
+    <div class="trigger-avatar">
+      {% if request.user.userprofile.avatar_image %}
+        <img src="{{ request.user.userprofile.avatar_image.url }}" alt="avatar">
+      {% else %}
+        {{ request.user.username|slice:":1"|upper }}
+      {% endif %}
+    </div>
     <div class="trigger-input">Đặt câu hỏi cho cộng đồng…</div>
     <button class="btn-ghost" type="button"><i class="fa-regular fa-image"></i> Ảnh</button>
     <button class="btn-primary" type="button">Đăng</button>
   </div>
 
-  <!-- Tìm kiếm + Lọc -->
   <form method="get" class="search-wrap">
     <input name="q" value="{{ request.GET.q|default:'' }}" placeholder="Tìm theo tiêu đề/nội dung…">
     <select name="topic">
@@ -55,57 +354,120 @@
     <button class="btn-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
   </form>
 
-  <!-- Danh sách bài viết -->
   {% for post in posts %}
-  {% reaction_of post request.user as me_react %}
-  <article class="post-card" data-post="{{ post.post_id }}">
-    <div class="user-info" style="display:flex;gap:10px;align-items:center;">
-      <div class="avatar">{{ post.username.username|slice:":1"|upper }}</div>
-      <div>
-        <div style="font-weight:700;color:#003459">{{ post.username.username }}</div>
-        <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
-      </div>
-    </div>
-
-    <h3 class="post-title">{{ post.title }}</h3>
-    <div class="post-content">{{ post.content|linebreaksbr }}</div>
-
-    {% if post.images.all %}
-    <div class="post-images">
-      {% for img in post.images.all %}
-        <img src="{{ img.image.url }}" alt="post image">
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <div class="actions">
-      <div class="vote-box" data-post="{{ post.post_id }}">
-        <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
-          <i class="fa-solid fa-arrow-up"></i>
-        </button>
-        <span class="vote-count js-count">{{ post.total_vote|default:0 }}</span>
-        <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote">
-          <i class="fa-solid fa-arrow-down"></i>
-        </button>
+    {% reaction_of post request.user as me_react %}
+    <article class="post-card" data-post="{{ post.post_id }}">
+      <div class="user-info" style="display:flex;gap:10px;align-items:center;">
+        <div class="avatar">
+          {% if post.username.userprofile.avatar_image %}
+            <img src="{{ post.username.userprofile.avatar_image.url }}" alt="avatar">
+          {% else %}
+            {{ post.username.username|slice:":1"|upper }}
+          {% endif %}
+        </div>
+        <div>
+          <div style="font-weight:700;color:#003459">{{ post.username.username }}</div>
+          <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
+        </div>
       </div>
 
-      <a class="btn-ghost" href="{% url 'forum:post_detail' post.post_id %}">
-        <i class="fa-regular fa-comment"></i> {{ post.comments.count }}
-      </a>
+      <h3 class="post-title">{{ post.title }}</h3>
+      <div class="post-content">{{ post.content|linebreaksbr }}</div>
 
-      <button class="btn-ghost js-open-report" data-target="report-{{ post.post_id }}">
-        <i class="fa-solid fa-flag"></i> Báo cáo
-      </button>
-    </div>
+      {% if post.images.all %}
+        {% with all_images=post.images.all %}
+          {% with image_count=all_images|length %}
+            {% if image_count == 1 %}
+              {% with class_name="images-count-1" %}
+                <div class="post-images {{ class_name }}">
+                  {% for img in all_images %}
+                  <div class="image-wrapper">
+                    <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+                  </div>
+                  {% endfor %}
+                </div>
+              {% endwith %}
+            {% elif image_count == 2 %}
+              {% with class_name="images-count-2" %}
+                <div class="post-images {{ class_name }}">
+                  {% for img in all_images %}
+                  <div class="image-wrapper">
+                    <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+                  </div>
+                  {% endfor %}
+                </div>
+              {% endwith %}
+            {% elif image_count == 3 %}
+              {% with class_name="images-count-3" %}
+                <div class="post-images {{ class_name }}">
+                  {% for img in all_images %}
+                  <div class="image-wrapper">
+                    <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+                  </div>
+                  {% endfor %}
+                </div>
+              {% endwith %}
+            {% elif image_count == 4 %}
+              {% with class_name="images-count-4" %}
+                <div class="post-images {{ class_name }}">
+                  {% for img in all_images %}
+                  <div class="image-wrapper">
+                    <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+                  </div>
+                  {% endfor %}
+                </div>
+              {% endwith %}
+            {% else %}
+              {% with class_name="images-count-more" %}
+                <div class="post-images {{ class_name }}">
 
-    {% include "forum/_report_modal.html" with post=post %}
-  </article>
+                  {% for img in all_images|slice:":4" %}
+                  <div class="image-wrapper"
+                       {% if forloop.last %}data-more-count="+{{ image_count|add:"-4" }}"{% endif %}>
+                    <img src="{{ img.image.url }}" alt="Post image {{ forloop.counter }}" class="js-lightbox-trigger">
+                  </div>
+                  {% endfor %}
+
+                  <div style="display:none;">
+                    {% for img in all_images|slice:"4:" %}
+                      <img src="{{ img.image.url }}" class="js-lightbox-trigger">
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endwith %}
+            {% endif %}
+          {% endwith %}
+        {% endwith %}
+      {% endif %}
+
+
+      <div class="actions">
+        <div class="vote-box" data-post="{{ post.post_id }}">
+          <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
+            <i class="fa-solid fa-arrow-up"></i>
+          </button>
+          <span class="vote-count js-count">{{ post.total_vote|default:0 }}</span>
+          <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote">
+            <i class="fa-solid fa-arrow-down"></i>
+          </button>
+        </div>
+
+        <a class="btn-ghost" href="{% url 'forum:post_detail' post.post_id %}">
+          <i class="fa-regular fa-comment"></i> {{ post.comments.count }}
+        </a>
+
+        <button class="btn-ghost js-open-report" data-target="report-{{ post.post_id }}">
+          <i class="fa-solid fa-flag"></i> Báo cáo
+        </button>
+      </div>
+
+      {% include "forum/_report_modal.html" with post=post %}
+    </article>
   {% empty %}
-  <p>Chưa có bài viết nào.</p>
+    <p style="color:#64748b;text-align:center">Chưa có bài viết nào.</p>
   {% endfor %}
 </div>
 
-<!-- Modal tạo bài viết -->
 <div id="create-modal" class="modal">
   <div class="modal__panel">
     <div class="modal__head">
@@ -132,6 +494,15 @@
     </form>
   </div>
 </div>
+
+<div id="image-lightbox" class="lightbox">
+  <span class="lightbox-close">×</span>
+  <img class="lightbox-content" id="lightbox-img">
+
+  <a class="lightbox-prev" id="lightbox-prev">&#10094;</a>
+  <a class="lightbox-next" id="lightbox-next">&#10095;</a>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -168,9 +539,127 @@ document.querySelectorAll('.vote-box').forEach(box=>{
 // === Modal báo cáo ===
 document.addEventListener('click',e=>{
   const btn=e.target.closest('.js-open-report');
-  if(btn){const id=btn.getAttribute('data-target');const m=document.getElementById(id);if(m)m.style.display='flex';}
+  // ✅ SỬA LỖI 2 (TYPO): Sửa .target() thành .dataset.target
+  if(btn){const id=btn.dataset.target;const m=document.getElementById(id);if(m)m.style.display='flex';}
   const modal=e.target.closest('.modal');
   if(modal&&(e.target===modal||e.target.hasAttribute('data-close')))modal.style.display='none';
 });
+    // === Xử lý gửi form báo cáo bài viết ===
+document.addEventListener('submit', async (e) => {
+  const form = e.target.closest('.js-report-form[data-post]');
+  if (!form) return;
+  e.preventDefault();
+
+  const postId = form.dataset.post;
+  const url = `/forum/${postId}/report/`;
+  const formData = new FormData(form);
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+    body: formData
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    if (data.status === 'ok') {
+      alert('✅ Gửi báo cáo thành công!');
+      form.closest('.modal').style.display = 'none';
+      form.reset();
+    } else alert('❌ Lỗi khi gửi báo cáo.');
+  } else alert('❌ Lỗi server khi gửi báo cáo.');
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // === Lightbox ===
+  let lightboxImages = [], currentImageIndex = 0;
+  const lightbox = document.getElementById('image-lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
+  const lightboxClose = document.querySelector('.lightbox-close');
+
+  // Đảm bảo các phần tử tồn tại trước khi thêm event
+  if (!lightbox || !lightboxImg || !lightboxPrev || !lightboxNext || !lightboxClose) {
+    console.error("Lỗi: Không tìm thấy các phần tử Lightbox!");
+    return;
+  }
+
+  const openLightbox = (postElement, src) => {
+    // Tìm tất cả ảnh (bao gồm cả ảnh ẩn trong layout 'more')
+    lightboxImages = Array.from(postElement.querySelectorAll('.js-lightbox-trigger')).map(img => img.src);
+    currentImageIndex = lightboxImages.indexOf(src);
+    updateLightboxImage();
+    lightbox.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  };
+  const updateLightboxImage = () => {
+    lightboxImg.src = lightboxImages[currentImageIndex];
+    const show = lightboxImages.length > 1;
+    lightboxPrev.style.display = show ? 'block' : 'none';
+    lightboxNext.style.display = show ? 'block' : 'none';
+  };
+  const closeLightbox = () => {
+    lightbox.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  };
+
+  // ✅ SỬA LỖI 3: Thêm hàm chuyển ảnh
+  const nextImage = () => { currentImageIndex = (currentImageIndex + 1) % lightboxImages.length; updateLightboxImage(); };
+  const prevImage = () => { currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length; updateLightboxImage(); };
+
+  lightboxNext.onclick = nextImage;
+  lightboxPrev.onclick = prevImage;
+  lightboxClose.onclick = closeLightbox;
+  lightbox.onclick = e => { if (e.target === lightbox) closeLightbox(); };
+
+  // Thêm listener cho tất cả ảnh
+  document.querySelectorAll('.js-lightbox-trigger').forEach(img => {
+    img.addEventListener('click', (e) => {
+      e.preventDefault();
+      openLightbox(img.closest('.post-images'), img.src);
+    });
+  });
+
+  // Thêm listener cho nút "+X"
+  document.querySelectorAll('.images-count-more .image-wrapper[data-more-count]').forEach(wrapper => {
+      wrapper.addEventListener('click', (e) => {
+          e.preventDefault();
+          // Mở ảnh đầu tiên
+          const firstImg = wrapper.parentElement.querySelector('.js-lightbox-trigger');
+          if(firstImg) {
+            openLightbox(wrapper.closest('.post-images'), firstImg.src);
+          }
+      });
+  });
+
+  // ✅ SỬA LỖI 3: Thêm Event Listener cho bàn phím
+  document.addEventListener('keydown', (e) => {
+    if (lightbox.style.display === 'block' && lightboxImages.length > 1) { // Thêm điều kiện > 1
+      if (e.key === 'ArrowRight') {
+        nextImage();
+      } else if (e.key === 'ArrowLeft') {
+        prevImage();
+      } else if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    } else if (e.key === 'Escape') {
+        closeLightbox();
+    }
+  });
+});
+</script>
+
+<script>
+const textarea=document.querySelector('textarea[name="content"]');
+if(textarea){
+  textarea.style.resize='none';
+  textarea.style.overflowY='hidden';
+  const autoGrow=el=>{el.style.height='auto';el.style.height=(el.scrollHeight)+'px';};
+  textarea.addEventListener('input',()=>autoGrow(textarea));
+  autoGrow(textarea);
+}
 </script>
 {% endblock %}

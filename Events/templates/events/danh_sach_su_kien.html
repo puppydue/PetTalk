@@ -26,6 +26,8 @@
             <h4>{{ e.title }}</h4>
             <p>{{ e.description|truncatechars:80 }}</p>
             <p><strong>Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
+            <p><strong>👥 Số lượng:</strong> {{ e.participants.count }} / {{ e.capacity|default:"∞" }}</p>
+
 
             <div class="status-wrapper"> {# Đã thêm margin-top qua CSS #}
               <strong>Trạng thái:</strong>
@@ -89,6 +91,11 @@
           <p>{{ e.description|truncatechars:80 }}</p>
           <p><strong>📍 Địa điểm:</strong> {{ e.location }}</p>
           <p><strong>🕓 Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
+          <p>
+              <strong>👥 Số lượng:</strong>
+              {{ e.participants.count }} / {{ e.capacity|default:"∞" }} người tham gia
+          </p>
+
 
           {% if e.is_past %}
             <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
@@ -96,7 +103,7 @@
             {% if e.creator == user %}
               <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn"> Xem danh sách người tham gia</a>
             {% elif user in e.participants.all %}
-              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn"> Hủy ĐK</a>
+              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn"> Hủy đăng ký</a>
             {% else %}
               <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn"> Tham gia</a>
             {% endif %}
@@ -111,9 +118,8 @@
 </div>
 
 <!-- ✅ CSS --><style>
-/* Các CSS cũ giữ nguyên, chỉ chỉnh sửa/thêm những phần dưới đây */
-
-.event-list {
+/* CHỈ ÁP DỤNG CHO TRANG DANH SÁCH SỰ KIỆN */
+.main-content .event-list {
   width: 100%;
   max-width: 100%;
   margin: 0;
@@ -123,222 +129,47 @@
   box-sizing: border-box;
 }
 
-/* ====== CAROUSEL (ĐÃ CẬP NHẬT) ====== */
-.carousel-wrapper {
-  position: relative;
-  margin-bottom: 40px;
-  /* Bỏ display flex & justify-content */
-  overflow: hidden; /* Quan trọng để ẩn phần nút bị tràn ra */
-  padding: 0 50px; /* Thêm padding để nút bên trong có chỗ đứng */
-}
-
-/* THAY THẾ HIỆU ỨNG MỜ CŨ */
-.carousel-fade {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 50px; /* Bằng với padding của carousel-wrapper */
-    pointer-events: none; /* Cho phép click xuyên qua */
-    z-index: 10;
-}
-.left-fade {
-    left: 0;
-    background: linear-gradient(to right, #fff8ed, rgba(255, 248, 237, 0)); /* Màu nền của body */
-}
-.right-fade {
-    right: 0;
-    background: linear-gradient(to left, #fff8ed, rgba(255, 248, 237, 0)); /* Màu nền của body */
-}
-
-.carousel-container {
-  display: flex;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  gap: 25px;
-  padding: 10px 0; /* Padding 2 bên vẫn là 0 để carousel-fade hoạt động */
-  scrollbar-width: none;
-}
+/* Các style khác giữ nguyên */
+.carousel-wrapper { position: relative; margin-bottom: 40px; overflow: hidden; padding: 0 50px; }
+.carousel-fade { position: absolute; top: 0; bottom: 0; width: 50px; pointer-events: none; z-index: 10; }
+.left-fade { left: 0; background: linear-gradient(to right, #fff8ed, rgba(255,248,237,0)); }
+.right-fade { right: 0; background: linear-gradient(to left, #fff8ed, rgba(255,248,237,0)); }
+.carousel-container { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 25px; padding: 10px 0; scrollbar-width: none; }
 .carousel-container::-webkit-scrollbar { display: none; }
-
-.carousel-btn {
-  background: #ffb84d;
-  border: none;
-  color: white;
-  font-size: 20px;
-  padding: 8px 12px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 11; /* Nút phải cao hơn lớp fade */
-}
-.carousel-btn:hover {
-  background: #ff9800;
-  transform: translateY(-50%) scale(1.1);
-}
-
-.left { left: 5px; } /* Vị trí so với carousel-wrapper (đã có padding) */
+.carousel-btn { background: #ffb84d; border: none; color: white; font-size: 20px; padding: 8px 12px; border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); position: absolute; top: 50%; transform: translateY(-50%); z-index: 11; }
+.carousel-btn:hover { background: #ff9800; transform: translateY(-50%) scale(1.1); }
+.left { left: 5px; }
 .right { right: 5px; }
 
+.status-wrapper { margin-top: 15px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 13px; white-space: nowrap; }
+.status-badge.status-approved { background: #dcfce7; color: #166534; }
+.status-badge.status-pending { background: #fef9c3; color: #713f12; }
+.status-badge.status-rejected { background: #fee2e2; color: #991b1b; }
 
-/* ====== KHUNG TRẠNG THÁI ====== */
-.status-wrapper {
-  margin-top: 15px; /* THAY ĐỔI: Tăng khoảng cách từ nội dung trên */
-  font-size: 14px;
-  display: flex; /* Dùng flex để căn chỉnh */
-  align-items: center;
-  gap: 8px; /* Khoảng cách giữa "Trạng thái:" và badge */
-}
-.status-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 13px;
-  white-space: nowrap; /* Đảm bảo không xuống dòng */
-}
-.status-badge.status-approved {
-  background: #dcfce7;
-  color: #166534;
-}
-.status-badge.status-pending {
-  background: #fef9c3;
-  color: #713f12;
-}
-.status-badge.status-rejected {
-  background: #fee2e2;
-  color: #991b1b;
-}
+.creator-highlight { font-size: 14px; color: #475569; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.creator-highlight .highlight-username { background: #e0f2fe; color: #003459; padding: 4px 10px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 13px; display: inline-block; }
 
-/* ====== KHUNG TÊN USER (ĐÃ CẬP NHẬT THEO YÊU CẦU) ====== */
-.creator-highlight {
-  font-size: 14px;
-  color: #475569; /* Màu chữ xám cho "Tạo bởi:" */
-  margin-bottom: 6px;
-  display: flex; /* Dùng flex để căn chỉnh */
-  align-items: center; /* Căn giữa "Tạo bởi" và badge */
-  gap: 6px; /* Khoảng cách giữa text và badge */
-}
-.creator-highlight .highlight-username {
-  /* Bỏ display: inline-flex và các thuộc tính liên quan đến icon */
-  background: #e0f2fe; /* Nền xanh nhạt, nổi bật hơn */
-  color: #003459; /* Chữ xanh đậm */
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-weight: 600;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Bóng nhẹ */
-  font-size: 13px; /* Cho tên user nhỏ hơn 1 chút cho đẹp */
-  display: inline-block;
-}
+.event-card { flex: 0 0 280px; background: #ffffff; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 18px; text-align: left; border: 1.5px solid #003459; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 350px; }
+.event-card:hover { transform: translateY(-4px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
+.event-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
 
-
-/* ====== CARD ====== */
-.event-card {
-  flex: 0 0 280px;
-  background: #fffef7;
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  padding: 18px;
-  text-align: left;
-  border: 1.5px solid #ffe082;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 350px;
-}
-.event-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-}
-.event-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 10px;
-}
-
-/* ====== BUTTONS ====== */
-.event-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 15px; /* THAY ĐỔI: Tăng khoảng cách từ nội dung trên */
-}
-.edit-btn, .join-btn, .view-btn, .cancel-btn, .delete-btn {
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: 0.25s;
-  padding: 8px 14px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-  width: fit-content;
-  text-align: center; /* Căn giữa chữ trong nút */
-}
-.edit-btn {
-  background: linear-gradient(135deg, #ffb84d, #ff9800);
-  color: white;
-}
-.delete-btn {
-  background: linear-gradient(135deg, #b71c1c, #f44336);
-  color: white;
-}
+.event-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+.edit-btn, .join-btn, .view-btn, .cancel-btn, .delete-btn { display: inline-block; font-size: 14px; font-weight: 600; border-radius: 8px; text-decoration: none; transition: 0.25s; padding: 8px 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.15); width: fit-content; text-align: center; }
+.edit-btn { background: linear-gradient(135deg, #ffb84d, #ff9800); color: white; }
+.delete-btn { background: linear-gradient(135deg, #b71c1c, #f44336); color: white; }
 .join-btn, .view-btn { background: #003459; color: white; }
 .view-btn { background: linear-gradient(135deg, #6ba6ff, #1e88e5); }
-.cancel-btn {
-  background: linear-gradient(135deg, #ff6b6b, #ff4757);
-  color: white;
-}
-.edit-btn:hover, .join-btn:hover, .view-btn:hover, .cancel-btn:hover, .delete-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-}
+.cancel-btn { background: linear-gradient(135deg, #ff6b6b, #ff4757); color: white; }
+.edit-btn:hover, .join-btn:hover, .view-btn:hover, .cancel-btn:hover, .delete-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
 
-/* ====== GRID ====== */
-.event-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin-top: 10px;
-}
+.event-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 10px; }
 
-/* ====== CREATE BUTTON ====== */
-.create-event-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 10px;
-}
-.create-event-btn {
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
-  color: white;
-  font-weight: 600;
-  padding: 10px 18px;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: 0.3s;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-.create-event-btn:hover {
-  background: linear-gradient(135deg, #43A047, #1B5E20);
-  transform: translateY(-2px);
-}
-.event-ended {
-  text-align: center;
-  font-weight: 600;
-  color: #666;
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 10px;
-  border: 1px dashed #bbb;
-}
+.create-event-wrapper { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+.create-event-btn { background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; font-weight: 600; padding: 10px 18px; border-radius: 10px; text-decoration: none; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+.create-event-btn:hover { background: linear-gradient(135deg, #43A047, #1B5E20); transform: translateY(-2px); }
+
+.event-ended { text-align: center; font-weight: 600; color: #666; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #bbb; }
 </style>
 
 <script>

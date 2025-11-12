@@ -22,7 +22,12 @@ class Event(models.Model):
     cover_image = models.ImageField(upload_to='event_covers/', blank=True, null=True)
     image = models.ImageField(upload_to='event_images/', null=True, blank=True)
 
-    capacity = models.PositiveIntegerField(default=50)
+    capacity = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name="Số lượng người tham gia tối đa"
+    )
+
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_events')
     participants = models.ManyToManyField(User, blank=True, related_name='joined_events')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')

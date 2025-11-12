@@ -1,20 +1,19 @@
 /* ----------- Color Variables ----------- */
 :root {
-  --primary: #003459;         /* Xanh dương đậm */
-  --secondary: #F7DBA7;       /* Vàng nhạt */
-  --bg: #FFF8ED;              /* Nền chung */
-  --card: #ffffff;            /* Nền khối content */
-  --line: #e2e8f0;            /* Đường viền */
-  --text: #0f172a;            /* Màu chữ chính */
-  --muted: #475569;           /* Màu chữ phụ */
-  --radius: 14px;             /* Bo góc */
+  --primary: #003459;
+  --secondary: #F7DBA7;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --line: #e2e8f0;
+  --text: #0f172a;
+  --muted: #475569;
+  --radius: 14px;
 }
-
 /* ----------- Global Style ----------- */
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: var(--bg);
+  font-family: 'Be Vietnam Pro', sans-serif;
+  background: #fff8ed; /* 🌟 nền vàng nhạt */
   color: var(--text);
 }
 
@@ -28,28 +27,40 @@ body {
   padding: 12px 24px;
 }
 .logo {
-  font-weight: 700;
-  font-size: 18px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  cursor: pointer;
+}
+
+.logo-img {
+  height: 150px;       /* hoặc 40px nếu bạn muốn to hơn */
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}
+.main-header {
+  height: 50px; /* hoặc giá trị bạn đang dùng */
 }
 .user-bar {
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
 }
 
 /* -------- Layout (Sidebar - Content) -------- */
 .layout {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 260px 1fr 320px;
   gap: 24px;
+  align-items: start;
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 20px 32px;
   box-sizing: border-box;
   background: #fFF8ED;
 }
@@ -67,14 +78,15 @@ body {
   align-items: center;
   gap: 10px;
   padding: 10px;
-  color: var(--text);
+  color: var(--primary);
   font-weight: 500;
   border-radius: 10px;
   cursor: pointer;
+  margin-bottom: 8px; /* 🌟 thêm khoảng cách giữa các ô */
+  transition: background 0.25s ease, color 0.25s ease;
   text-decoration: none;
 }
-.nav-item:hover,
-.nav-item.active {
+.nav-item:hover, .nav-item.active {
   background: var(--secondary);
   color: var(--primary);
 }
@@ -480,14 +492,106 @@ function closeModal() {
     color: #991b1b;
 }
 
-/* Căn giữa ô trạng thái của bảng */
-table.styled-table td {
-    vertical-align: middle;
+/* === Layout khung chính === */
+  .content-wrapper {
+    width: 1000px;
+    max-width: 1100px;         /* giới hạn khi màn hình lớn */
+    background: #fff;
+    padding: 28px 32px;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  /* === Bộ lọc và tab === */
+  .filters { display:flex; gap:12px; align-items:center; margin-bottom:16px; }
+  .filters .group { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .pill {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border:1px solid var(--line);
+    text-decoration:none;
+    color:var(--text);
+    background:#fff;
+    font-weight:500;
+  }
+  .pill.active { background: var(--primary); color:#fff; border-color:var(--primary); }
+
+  /* === Bảng báo cáo === */
+  .styled-table {
+  width: 1000px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow);
+  margin: 0 auto;
 }
 
+/* Header (TH) — cho phép xuống dòng, không bị cắt */
+.styled-table th {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  background: #f8fafc;
+  font-weight: 600;
+  text-align: left;
+  white-space: normal;   /* ✅ cho phép xuống dòng */
+  overflow: visible;     /* ✅ không cắt nội dung */
+  text-overflow: unset;  /* ✅ không dùng "..." */
+}
 
+/* Body (TD) — vẫn giữ hiệu ứng cắt ngắn */
+.styled-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;         /* Không xuống dòng */
+  overflow: hidden;            /* Ẩn phần thừa */
+  text-overflow: ellipsis;     /* Hiển thị "..." */
+}
 
+/* Cột nội dung bị báo cáo — cho phép xuống dòng 2 dòng nhỏ */
+.styled-table td:nth-child(4) {
+  white-space: normal;         /* ✅ Cho phép nhiều dòng */
+  text-overflow: clip;         /* Không hiện "..." */
+  line-height: 1.3;
+}
+.styled-table th:nth-child(1),
+.styled-table td:nth-child(1) { width: 4%; }   /* ID */
+.styled-table th:nth-child(2),
+.styled-table td:nth-child(2) { width: 10%; }  /* Loại */
+.styled-table th:nth-child(3),
+.styled-table td:nth-child(3) { width: 15%; }  /* Người báo cáo */
+.styled-table th:nth-child(4),
+.styled-table td:nth-child(4) { width: 30%; white-space: normal; } /* Nội dung bị báo cáo */
+.styled-table th:nth-child(5),
+.styled-table td:nth-child(5) { width: 15%; }  /* Thời gian */
+.styled-table th:nth-child(6),
+.styled-table td:nth-child(6) { width: 16%; text-align:center; } /* Trạng thái */
+.styled-table th:nth-child(7),
+.styled-table td:nth-child(7) { width: 12%; text-align:center; }  /* Hành động */
 
+  /* === Badge trạng thái === */
+  .badge {
+    display: inline-block;
+    min-width: 85px;              /* ✅ giữ đủ chiều ngang cho chữ dài như “Rejected” */
+    text-align: center;
+    padding:4px 12px; border-radius:10px; font-weight:600;
+  }
+  .badge-pending { background:#fef3c7; color:#92400e; }
+  .badge-approved { background:#dcfce7; color:#166534; }
+  .badge-rejected { background:#fee2e2; color:#991b1b; }
 
-
-
+  /* === Toast === */
+  .toast-message {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 12px 18px; color:#fff; border-radius: 8px; font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    animation: fadein .3s, fadeout .5s 1.8s;
+    z-index: 9999;
+  }
+  .toast-approved{background:#22c55e;}
+  .toast-rejected{background:#ef4444;}
+  .toast-error{background:#f97316;}
+  @keyframes fadein {from{opacity:0;bottom:10px} to{opacity:1;bottom:30px}}
+  @keyframes fadeout{from{opacity:1}to{opacity:0;bottom:10px}}

@@ -1,0 +1,17 @@
+<!--
+  File này được gọi từ post_detail.html.
+  Nó nhận các biến từ context cha, bao gồm:
+  1. class_name: (ví dụ "images-count-3")
+  2. image_count: (ví dụ 3)
+  3. post: (đối tượng Post)
+-->
+<div class="post-images {{ class_name }}">
+  {% for img in post.images.all %}
+    <div class="image-wrapper"
+         {% if class_name == "images-count-more" and forloop.counter == 4 and image_count > 4 %}
+           data-more-count="+{{ image_count|add:"-4" }}"
+         {% endif %}>
+      <img src="{{ img.image.url }}" alt="post image" class="js-lightbox-trigger">
+    </div>
+  {% endfor %}
+</div>

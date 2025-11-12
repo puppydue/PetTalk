@@ -43,3 +43,4 @@ PetTalk/__pycache__/
 .DS_Store
 Thumbs.db
 *.pyc
+/create_data.py

@@ -46,6 +46,12 @@ def my_profile(request):
         f = PetProfileForm(instance=p, prefix=f"pet{p.id}")
         pet_form_pairs.append((p, f))
 
+    # ✅ CẬP NHẬT MỚI: Lấy data cho các tab
+    posts = Post.objects.filter(username=request.user).order_by('-created_at')
+    comments = Comment.objects.filter(username=request.user).select_related('post').order_by('-created_at')
+    posts_count = posts.count()
+    comments_count = comments.count()
+
     ctx = {
         "user_info": profile,
         "form": form,
@@ -56,7 +62,6 @@ def my_profile(request):
         "added_pet": added_pet,
     }
     return render(request, "profiles/profile_detail.html", ctx)
-
 
 @login_required
 def pet_create(request):
@@ -82,3 +87,27 @@ def pet_update(request, pk):
             messages.success(request, "💾 Lưu thông tin thú cưng thành công!")
             return redirect("profiles:my_profile")
     return redirect("profiles:my_profile")
+
+
+@login_required
+def pet_delete(request, pk):
+    # ✅ SỬA Ở ĐÂY: Dùng PetProfile thay vì Pet
+    pet = get_object_or_404(PetProfile, pk=pk)
+
+    # ✅ SỬA Ở ĐÂY: Model của bạn dùng 'user', không phải 'owner'
+    if pet.user != request.user:
+        messages.error(request, "Bạn không có quyền xóa thú cưng này.")
+        return redirect('profiles:my_profile')
+
+    # (Code bên dưới giữ nguyên logic)
+    # Vì nút bấm của chúng ta là thẻ <a> (GET), nên sẽ xóa trực tiếp.
+    # Đây không phải cách an toàn nhất (chuẩn là dùng POST),
+    # nhưng nó sẽ chạy đúng với template hiện tại.
+    try:
+        pet_name = pet.name
+        pet.delete()
+        messages.success(request, f"Đã xóa thú cưng '{pet_name}' thành công. 🐾")
+    except Exception as e:
+        messages.error(request, f"Có lỗi xảy ra khi xóa: {e}")
+
+    return redirect('profiles:my_profile')

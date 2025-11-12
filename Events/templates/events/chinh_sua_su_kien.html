@@ -1,163 +1,195 @@
 {% extends "base.html" %}
 {% block title %}Chỉnh sửa sự kiện{% endblock %}
-{% block content %}
 
-<div class="edit-wrapper">
-  <div class="edit-box">
-    <h2>✏️ <span>Chỉnh sửa sự kiện</span></h2>
-
-    <form method="post" enctype="multipart/form-data" class="edit-form">
-      {% csrf_token %}
-
-      <div class="form-group">
-        <label for="id_title">🎯 Tiêu đề:</label>
-        {{ form.title }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_description">📝 Mô tả:</label>
-        {{ form.description }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_date">🗓 Thời gian bắt đầu:</label>
-        {{ form.date }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_end_date">⌛ Thời gian kết thúc:</label>
-        {{ form.end_date }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_location">📍 Địa điểm:</label>
-        {{ form.location }}
-      </div>
-
-      <div class="form-group">
-        <label for="id_image">🖼 Ảnh bìa:</label>
-        {{ form.image }}
-      </div>
-
-      <div class="form-buttons">
-        <button type="submit" class="save-btn">💾 Lưu thay đổi</button>
-        <a href="{% url 'danh_sach_su_kien' %}" class="cancel-btn">↩ Quay lại</a>
-      </div>
-    </form>
-  </div>
-</div>
-
+{% block extra_css %}
 <style>
-.edit-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 85vh;
-  background-color: #fff8e1;
-  animation: fadeIn 0.6s ease-in-out;
+{{ block.super }}
+
+/* ===== CARD CHUNG ===== */
+.card {
+  background: #fff9e6;
+  border-radius: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  padding: 30px 40px;
+  margin: 40px auto;
+  max-width: 700px;
+  animation: fadeIn 0.5s ease-in-out;
+  font-family: 'Be Vietnam Pro', sans-serif;
 }
 
-.edit-box {
-  background: #fffef7;
-  border-radius: 20px;
-  padding: 35px 45px;
-  width: 520px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-  border: 2px solid #ffe082;
-  transition: 0.3s;
-}
-
-.edit-box:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-}
-
-.edit-box h2 {
-  text-align: center;
+/* ===== TIÊU ĐỀ ===== */
+.card h3 {
+  font-size: 22px;
   font-weight: 700;
   color: #003459;
-  margin-bottom: 25px;
-}
-
-.edit-box h2 span {
-  color: #003459;
-}
-
-.form-group {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 18px;
 }
 
-.form-group label {
+/* ===== FORM ===== */
+.synced-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.synced-form label {
   font-weight: 600;
-  color: #333;
-  margin-bottom: 6px;
-}
-
-.form-group input[type="text"],
-.form-group input[type="datetime-local"],
-.form-group textarea,
-.form-group select {
-  border: 2px solid #ffe082;
-  border-radius: 10px;
-  padding: 8px 10px;
+  color: #003459;
+  margin-bottom: 5px;
   font-size: 15px;
+}
+
+.synced-form input[type="text"],
+.synced-form input[type="datetime-local"],
+.synced-form input[type="file"],
+.synced-form textarea,
+.synced-form input[type="number"],
+.synced-form select {
+  width: 100%;
+  border: 1.5px solid #ccc;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px 12px;
+  font-size: 15px;
+  transition: 0.2s ease-in-out;
+  box-sizing: border-box;
+  font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.synced-form textarea {
+  min-height: 130px;
+  line-height: 1.5;
+}
+
+.synced-form input:focus,
+.synced-form textarea:focus,
+.synced-form select:focus {
   outline: none;
-  background-color: #fff;
-  transition: 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
   border-color: #003459;
-  box-shadow: 0 0 4px rgba(0,52,89,0.3);
+  box-shadow: 0 0 4px rgba(0, 52, 89, 0.3);
 }
 
+/* ===== BUTTONS ===== */
 .form-buttons {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 12px;
   margin-top: 20px;
 }
 
-.save-btn {
-  background: #4caf50;
-  color: white;
+.btn-primary {
+  background: #003459;
+  color: #fff;
   border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
+  border-radius: 10px;
+  padding: 10px 22px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  font-size: 15px;
+  transition: 0.2s;
 }
-
-.save-btn:hover {
-  background: #43a047;
+.btn-primary:hover {
+  background: #005b8f;
   transform: translateY(-2px);
 }
 
-.cancel-btn {
-  text-decoration: none;
-  background: #9e9e9e;
-  color: white;
-  padding: 10px 18px;
-  border-radius: 8px;
+.btn-secondary {
+  background: #f1f1f1;
+  color: #003459;
+  border: 1.5px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 22px;
   font-weight: 600;
-  transition: 0.3s;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  text-decoration: none;
+  font-size: 15px;
+  transition: 0.2s;
+}
+.btn-secondary:hover {
+  background: #e5e5e5;
 }
 
-.cancel-btn:hover {
-  background: #757575;
-  transform: translateY(-2px);
+/* ===== ẢNH XEM TRƯỚC ===== */
+.preview {
+  margin-top: 10px;
+  text-align: center;
+}
+.preview img {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 10px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
 }
 
+/* Hiệu ứng */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 </style>
+{% endblock %}
 
+{% block content %}
+<div class="card">
+  <h3>✏️ Chỉnh sửa sự kiện</h3>
+
+  <form method="post" enctype="multipart/form-data" class="synced-form">
+    {% csrf_token %}
+
+    <label for="{{ form.title.id_for_label }}">🎯 Tiêu đề:</label>
+    {{ form.title }}
+
+    <label for="{{ form.description.id_for_label }}">📝 Mô tả:</label>
+    {{ form.description }}
+
+    <label for="{{ form.date.id_for_label }}">🗓 Thời gian bắt đầu:</label>
+    {{ form.date }}
+
+    <label for="{{ form.end_date.id_for_label }}">⌛ Thời gian kết thúc:</label>
+    {{ form.end_date }}
+
+    <label for="{{ form.location.id_for_label }}">📍 Địa điểm:</label>
+    {{ form.location }}
+
+    <label for="id_capacity">👥 Số lượng người tham gia tối đa:</label>
+    {{ form.capacity }}
+
+    <label for="{{ form.image.id_for_label }}">🖼 Ảnh bìa:</label>
+    {{ form.image }}
+    <div class="preview" id="imagePreview">
+      {% if event.image %}
+        <img src="{{ event.image.url }}" alt="Ảnh hiện tại">
+      {% else %}
+        <p><em>Ảnh sẽ hiển thị tại đây sau khi chọn</em></p>
+      {% endif %}
+    </div>
+
+    <div class="form-buttons">
+      <button type="submit" class="btn-primary">💾 Lưu thay đổi</button>
+      <a href="{% url 'danh_sach_su_kien' %}" class="btn-secondary">↩ Quay lại</a>
+    </div>
+  </form>
+</div>
+
+<script>
+const imageInput = document.getElementById('id_image');
+const preview = document.getElementById('imagePreview');
+
+if (imageInput) {
+  imageInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.innerHTML = `<img src="${e.target.result}" alt="Xem trước ảnh">`;
+      }
+      reader.readAsDataURL(file);
+    } else {
+      preview.innerHTML = '<p><em>Ảnh sẽ hiển thị tại đây sau khi chọn</em></p>';
+    }
+  });
+}
+</script>
 {% endblock %}

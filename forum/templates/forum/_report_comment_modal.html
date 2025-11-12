@@ -1,4 +1,4 @@
-{# Modal báo cáo bình luận, id theo comment để không đụng nhau #}
+{% load static %}
 <div id="report-comment-{{ comment.id }}" class="modal" style="display:none">
   <div class="modal__panel">
     <div class="modal__head">
@@ -6,7 +6,7 @@
       <button class="close-x" data-close>&times;</button>
     </div>
 
-    <form class="js-report-comment-form" data-comment="{{ comment.id }}">
+    <form class="js-report-form" data-comment="{{ comment.id }}">
       {% csrf_token %}
       <div style="display:grid;gap:10px">
         <input class="form-control" name="reason" placeholder="Lý do (bắt buộc)" required>

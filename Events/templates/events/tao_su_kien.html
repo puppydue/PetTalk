@@ -2,91 +2,111 @@
 {% load static %}
 {% block title %}Tạo sự kiện mới • PetTalk{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <style>
-.form-wrapper {
-    background: #fff9e6;
-    padding: 30px 40px;
-    border-radius: 20px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-    max-width: 700px;
-    margin: 40px auto;
-    font-family: "Be Vietnam Pro", sans-serif;
-    color: #222;
-}
+{{ block.super }}
 
-.form-wrapper h2 {
-    display: flex;
-    align-items: center;
-    font-weight: 700;
-    color: #003459;
-    font-size: 24px;
-    margin-bottom: 10px;
+/* ✅ ĐỒNG BỘ: Style cho .card (copy từ trang "Chỉnh sửa") */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  padding: 28px;
+  margin-bottom: 24px;
+  animation: fadeIn 0.6s ease-in-out;
 }
-
-.form-wrapper h2::before {
-    content: "📅";
-    margin-right: 10px;
-    font-size: 26px;
+.card h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #003459;
+  margin-top: 0;
+  margin-bottom: 10px;
 }
-
-.form-wrapper p.note {
+.card p.note {
     color: #333;
     font-size: 15px;
     margin-bottom: 25px;
 }
 
-.form-wrapper form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+/* ✅ ĐỒNG BỘ: Style cho form (copy từ trang "Chỉnh sửa") */
+.synced-form .form-group {
+  margin-bottom: 20px; /* Thêm class này */
 }
 
-.form-wrapper label {
-    font-weight: 600;
-    color: #003459;
+.synced-form label {
+  display: block;
+  font-weight: 600;
+  color: #003459; /* Giữ màu xanh */
+  margin-bottom: 8px;
+  font-size: 14.5px;
 }
 
-.form-wrapper input,
-.form-wrapper textarea {
-    width: 100%;
-    border: 1.5px solid #ccc;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 15px;
-    transition: all 0.2s ease-in-out;
-    background: white;
+.synced-form input[type="text"],
+.synced-form input[type="datetime-local"],
+.synced-form input[type="file"],
+.synced-form input[type="number"],
+.synced-form textarea,
+.synced-form select {
+  width: 100%;
+  border: 1.5px solid #e2e2e2;
+  border-radius: 10px;
+  background: #fafafa;
+  padding: 15px 10px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: 'Be Vietnam Pro', sans-serif;
 }
 
-.form-wrapper input:focus,
-.form-wrapper textarea:focus {
-    outline: none;
-    border-color: #003459;
-    box-shadow: 0 0 4px rgba(0, 52, 89, 0.3);
+.synced-form textarea {
+  min-height: 150px;
+  line-height: 1.6;
 }
 
-.form-wrapper button {
-    align-self: flex-start;
-    background: #003459;
-    color: white;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 22px;
-    font-size: 15px;
-    transition: 0.2s;
+.synced-form input[type="text"]:focus,
+.synced-form input[type="datetime-local"]:focus,
+.synced-form input[type="file"]:focus,
+.synced-form input[type="number"]:focus,
+.synced-form textarea:focus,
+.synced-form select:focus {
+  border-color: #003459;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.08);
+  outline: none;
 }
 
-.form-wrapper button:hover {
-    background: #005b8f;
-    transform: translateY(-1px);
+/* ✅ ĐỒNG BỘ: Style cho nút bấm (copy từ trang "Chỉnh sửa") */
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
 }
 
+.btn-primary {
+  background: #003459;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14.5px;
+  text-decoration: none;
+}
+.btn-primary:hover {
+  background: #0056a3;
+  transform: translateY(-2px);
+}
+
+/* Style xem trước ảnh */
 .preview {
     margin-top: 15px;
     text-align: center;
 }
-
 .preview img {
     max-width: 100%;
     max-height: 250px;
@@ -95,15 +115,13 @@
     border: 1px solid #ddd;
 }
 
-/* ⚠️ Thông báo lỗi */
+/* Style lỗi */
 .error-text {
     color: #d32f2f;
     font-size: 14px;
     margin-top: 3px;
     margin-left: 3px;
 }
-
-/* Lỗi chung toàn form */
 .errorlist.nonfield {
     background: #ffeaea;
     color: #b71c1c;
@@ -113,19 +131,27 @@
     font-weight: 500;
     list-style: none;
 }
-</style>
 
-<div class="form-wrapper">
-  <h2>Tạo sự kiện mới</h2>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="card">
+  <h3>📅 Tạo sự kiện mới</h3>
   <p class="note">
     Vui lòng nhập thông tin để đăng sự kiện. Sau khi gửi, sự kiện sẽ được chuyển sang trạng thái
     <strong>chờ phê duyệt</strong>.
   </p>
 
-  <form method="POST" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data" class="synced-form">
     {% csrf_token %}
 
-    {# ⚠️ Lỗi chung (như ngày kết thúc < ngày bắt đầu) #}
     {% if form.non_field_errors %}
       <ul class="errorlist nonfield">
         {% for error in form.non_field_errors %}
@@ -134,47 +160,69 @@
       </ul>
     {% endif %}
 
-    <label for="id_title">Tiêu đề:</label>
-    {{ form.title }}
-    {% if form.title.errors %}
-      <div class="error-text">{{ form.title.errors.0 }}</div>
-    {% endif %}
+    <div class="form-group">
+      <label for="id_title">Tiêu đề:</label>
+      {{ form.title }}
+      {% if form.title.errors %}
+        <div class="error-text">{{ form.title.errors.0 }}</div>
+      {% endif %}
+    </div>
 
-    <label for="id_description">Mô tả:</label>
-    {{ form.description }}
-    {% if form.description.errors %}
-      <div class="error-text">{{ form.description.errors.0 }}</div>
-    {% endif %}
+    <div class="form-group">
+      <label for="id_description">Mô tả:</label>
+      {{ form.description }}
+      {% if form.description.errors %}
+        <div class="error-text">{{ form.description.errors.0 }}</div>
+      {% endif %}
+    </div>
 
-    <label for="id_date">Thời gian bắt đầu:</label>
-    {{ form.date }}
-    {% if form.date.errors %}
-      <div class="error-text">{{ form.date.errors.0 }}</div>
-    {% endif %}
+    <div class="form-group">
+      <label for="id_date">Thời gian bắt đầu:</label>
+      {{ form.date }}
+      {% if form.date.errors %}
+        <div class="error-text">{{ form.date.errors.0 }}</div>
+      {% endif %}
+    </div>
 
-    <label for="id_end_date">Thời gian kết thúc:</label>
-    {{ form.end_date }}
-    {% if form.end_date.errors %}
-      <div class="error-text">{{ form.end_date.errors.0 }}</div>
-    {% endif %}
+    <div class="form-group">
+      <label for="id_end_date">Thời gian kết thúc:</label>
+      {{ form.end_date }}
+      {% if form.end_date.errors %}
+        <div class="error-text">{{ form.end_date.errors.0 }}</div>
+      {% endif %}
+    </div>
 
-    <label for="id_location">Địa điểm:</label>
-    {{ form.location }}
-    {% if form.location.errors %}
-      <div class="error-text">{{ form.location.errors.0 }}</div>
-    {% endif %}
+    <div class="form-group">
+      <label for="id_location">Địa điểm:</label>
+      {{ form.location }}
+      {% if form.location.errors %}
+        <div class="error-text">{{ form.location.errors.0 }}</div>
+      {% endif %}
+    </div>
 
-    <label for="id_image">Ảnh bìa:</label>
-    {{ form.image }}
-    {% if form.image.errors %}
-      <div class="error-text">{{ form.image.errors.0 }}</div>
-    {% endif %}
+    <div class="form-group">
+      <label for="id_capacity">Số lượng người tham gia tối đa:</label>
+      {{ form.capacity }}
+      {% if form.capacity.errors %}
+        <div class="error-text">{{ form.capacity.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="id_image">Ảnh bìa:</label>
+      {{ form.image }}
+      {% if form.image.errors %}
+        <div class="error-text">{{ form.image.errors.0 }}</div>
+      {% endif %}
+    </div>
 
     <div class="preview" id="imagePreview">
       <p><em>Ảnh sẽ hiển thị tại đây sau khi chọn</em></p>
     </div>
 
-    <button type="submit">Gửi phê duyệt</button>
+    <div class="form-buttons">
+      <button type="submit" class="btn-primary">Gửi phê duyệt</button>
+    </div>
   </form>
 </div>
 

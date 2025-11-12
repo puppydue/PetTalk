@@ -41,7 +41,7 @@ INSTALLED_APPS = [
 
     # Custom apps
     'forum',
-    'Events',       # app sự kiện (E viết hoa theo tên thư mục của bạn)
+    'Events',  # app sự kiện (E viết hoa theo tên thư mục của bạn)
     'accounts',
     'badge',    # app admin
     'badges',
@@ -73,6 +73,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'forum.context_processors.topic_choices',
+                'Events.context_processors.upcoming_events',
             ],
         },
     },
