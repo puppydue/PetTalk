@@ -189,3 +189,24 @@ def post_delete(request, pk):
         messages.error(request, f"Có lỗi xảy ra khi xóa: {e}")
 
     return redirect('profiles:my_profile')
+
+from .models import ReportsComment
+
+@login_required
+def report_comment(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    if request.method == 'POST':
+        reason = request.POST.get('reason')
+        details = request.POST.get('details', '')
+        # Tránh báo cáo trùng
+        if ReportsComment.objects.filter(username=request.user, comment=comment).exists():
+            return JsonResponse({'status': 'duplicate'})
+        ReportsComment.objects.create(
+            username=request.user,
+            comment=comment,
+            reason=reason,
+            details=details,
+            status='pending'
+        )
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'error'})

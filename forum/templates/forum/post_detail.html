@@ -472,26 +472,29 @@ textarea[name="content"] {
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const csrftoken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+  const csrftoken = document.cookie.split('; ')
+    .find(row => row.startsWith('csrftoken='))?.split('=')[1];
 
-  // Auto grow
+  // === Auto grow ===
   const autoGrow = el => {
     if (!el) return;
     const maxHeight = parseInt(getComputedStyle(el).maxHeight, 10) || 0;
     el.style.height = 'auto';
     const scrollHeight = el.scrollHeight;
-    el.style.height = (maxHeight && scrollHeight > maxHeight) ? maxHeight + 'px' : scrollHeight + 'px';
-    el.style.overflowY = (maxHeight && scrollHeight > maxHeight) ? 'auto' : 'hidden';
+    el.style.height = (maxHeight && scrollHeight > maxHeight)
+      ? maxHeight + 'px' : scrollHeight + 'px';
+    el.style.overflowY = (maxHeight && scrollHeight > maxHeight)
+      ? 'auto' : 'hidden';
   };
 
-  // Main textarea
+  // === Main textarea auto grow ===
   const mainTextarea = document.querySelector('textarea[name="content"]');
   if (mainTextarea) {
     mainTextarea.addEventListener('input', () => autoGrow(mainTextarea));
     autoGrow(mainTextarea);
   }
 
-  // Vote
+  // === Vote ===
   document.querySelectorAll('.vote-box').forEach(box => {
     const buttons = box.querySelectorAll('.js-vote');
     const countEl = box.querySelector('.js-count');
@@ -507,14 +510,16 @@ document.addEventListener("DOMContentLoaded", () => {
           const data = await res.json();
           countEl.textContent = data.total_votes ?? 0;
           buttons.forEach(b => b.classList.remove('active-up', 'active-down'));
-          if (data.reaction === 'upvote') box.querySelector('[data-type="upvote"]').classList.add('active-up');
-          if (data.reaction === 'downvote') box.querySelector('[data-type="downvote"]').classList.add('active-down');
+          if (data.reaction === 'upvote')
+            box.querySelector('[data-type="upvote"]').classList.add('active-up');
+          if (data.reaction === 'downvote')
+            box.querySelector('[data-type="downvote"]').classList.add('active-down');
         }
       });
     });
   });
 
-  // Lightbox
+  // === Lightbox ===
   let lightboxImages = [], currentImageIndex = 0;
   const lightbox = document.getElementById('image-lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
@@ -543,13 +548,13 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = 'auto';
     };
 
-    // ✅ SỬA LỖI 3: Thêm hàm chuyển ảnh
     const nextImage = () => {
       if (lightboxImages.length > 1) {
         currentImageIndex = (currentImageIndex + 1) % lightboxImages.length;
         updateLightboxImage();
       }
     };
+
     const prevImage = () => {
       if (lightboxImages.length > 1) {
         currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length;
@@ -562,8 +567,7 @@ document.addEventListener("DOMContentLoaded", () => {
     lightboxClose.onclick = closeLightbox;
     lightbox.onclick = e => { if (e.target === lightbox) closeLightbox(); };
 
-    // ✅ SỬA LỖI 3: Thêm Event Listener cho bàn phím
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
       if (lightbox.style.display === 'block') {
         if (e.key === 'ArrowRight') nextImage();
         else if (e.key === 'ArrowLeft') prevImage();
@@ -571,27 +575,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // ✅ SỬA LỖI 2: Viết lại hàm click listener chính
-    // Hàm này sẽ xử lý cả ảnh thường, nút +X, và menu
+    // === Main Click Handler (menus, modals, edit, delete, lightbox trigger) ===
     document.addEventListener('click', async e => {
       const allMenus = document.querySelectorAll('.comment-menu');
       const menuBtn = e.target.closest('.comment-menu-btn');
 
-      // Kiểm tra click vào ảnh (bao gồm cả nút +X)
+      // Ảnh (bao gồm +X)
       const imgTrigger = e.target.closest('.js-lightbox-trigger, .image-wrapper[data-more-count]');
       if (imgTrigger) {
         e.preventDefault();
         let firstImg = imgTrigger.classList.contains('js-lightbox-trigger')
-                     ? imgTrigger
-                     : imgTrigger.querySelector('.js-lightbox-trigger');
-        if (!firstImg) {
-            firstImg = imgTrigger.closest('.post-images').querySelector('.js-lightbox-trigger');
-        }
+          ? imgTrigger
+          : imgTrigger.querySelector('.js-lightbox-trigger');
+        if (!firstImg)
+          firstImg = imgTrigger.closest('.post-images').querySelector('.js-lightbox-trigger');
         openLightbox(imgTrigger.closest('.post-images'), firstImg.src);
         return;
       }
 
-      // Xử lý menu "..."
+      // Menu "..."
       if (menuBtn) {
         e.stopPropagation();
         const menu = menuBtn.parentElement.querySelector('.comment-menu');
@@ -610,7 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Đóng menu khi click ra ngoài
       if (!e.target.closest('.comment-menu-wrapper')) allMenus.forEach(m => m.style.display = 'none');
 
-      // Xử lý modal báo cáo
+      // Mở modal báo cáo
       const reportBtn = e.target.closest('.js-open-report, .js-open-report-comment');
       if (reportBtn) {
         const targetId = reportBtn.dataset.target;
@@ -618,11 +620,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Xử lý modal chung
+      // Đóng modal khi click ngoài / nút hủy
       const modal = e.target.closest('.modal');
-      if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) { modal.style.display = 'none'; return; }
+      if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) {
+        modal.style.display = 'none';
+        return;
+      }
 
-      // Xử lý Edit comment
+      // === Edit comment ===
       const editBtn = e.target.closest('.js-edit-comment');
       if (editBtn) {
         e.preventDefault();
@@ -698,14 +703,92 @@ document.addEventListener("DOMContentLoaded", () => {
           const data = await res.json();
           if (data.status === 'deleted') {
             const el = document.getElementById(`comment-${id}`);
-            el.style.transition = 'opacity .3s'; el.style.opacity = '0';
+            el.style.transition = 'opacity .3s';
+            el.style.opacity = '0';
             setTimeout(() => el.remove(), 300);
           }
         }
       }
-    }); // Kết thúc Main click handler
+    }); // end main click handler
+  } // end lightbox check
 
-  } // Kết thúc If check lightbox elements
-});
+  // === GỬI FORM BÁO CÁO BÌNH LUẬN ===
+  document.addEventListener('submit', async e => {
+    const form = e.target.closest('.js-report-form[data-comment]');
+    if (!form) return;
+    e.preventDefault();
+
+    const commentId = form.dataset.comment;
+    const url = `/forum/comment/${commentId}/report/`;
+    const formData = new FormData(form);
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+      body: formData
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'ok') {
+        alert('✅ Gửi báo cáo bình luận thành công!');
+        form.closest('.modal').style.display = 'none';
+        form.reset();
+      } else alert('❌ Lỗi khi gửi báo cáo.');
+    } else alert('❌ Lỗi server khi gửi báo cáo.');
+  });
+  // === GỬI FORM BÁO CÁO BÀI VIẾT ===
+  document.addEventListener('submit', async e => {
+    const form = e.target.closest('.js-report-form[data-post]');
+    if (!form) return;
+    e.preventDefault();
+
+    const postId = form.dataset.post;
+    const url = `/forum/${postId}/report/`;
+    const formData = new FormData(form);
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+      body: formData
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'ok') {
+        alert('✅ Gửi báo cáo bài viết thành công!');
+        form.closest('.modal').style.display = 'none';
+        form.reset();
+      } else alert('❌ Lỗi khi gửi báo cáo.');
+    } else alert('❌ Lỗi server khi gửi báo cáo.');
+  });
+
+  // === GỬI FORM BÁO CÁO BÌNH LUẬN ===
+  document.addEventListener('submit', async e => {
+    const form = e.target.closest('.js-report-form[data-comment]');
+    if (!form) return;
+    e.preventDefault();
+
+    const commentId = form.dataset.comment;
+    const url = `/forum/comment/${commentId}/report/`;
+    const formData = new FormData(form);
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+      body: formData
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'ok') {
+        alert('✅ Gửi báo cáo bình luận thành công!');
+        form.closest('.modal').style.display = 'none';
+        form.reset();
+      } else alert('❌ Lỗi khi gửi báo cáo.');
+    } else alert('❌ Lỗi server khi gửi báo cáo.');
+  });
+}); // END DOMContentLoaded
 </script>
+
 {% endblock %}

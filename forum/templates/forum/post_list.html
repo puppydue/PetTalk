@@ -544,6 +544,31 @@ document.addEventListener('click',e=>{
   const modal=e.target.closest('.modal');
   if(modal&&(e.target===modal||e.target.hasAttribute('data-close')))modal.style.display='none';
 });
+    // === Xử lý gửi form báo cáo bài viết ===
+document.addEventListener('submit', async (e) => {
+  const form = e.target.closest('.js-report-form[data-post]');
+  if (!form) return;
+  e.preventDefault();
+
+  const postId = form.dataset.post;
+  const url = `/forum/${postId}/report/`;
+  const formData = new FormData(form);
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+    body: formData
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    if (data.status === 'ok') {
+      alert('✅ Gửi báo cáo thành công!');
+      form.closest('.modal').style.display = 'none';
+      form.reset();
+    } else alert('❌ Lỗi khi gửi báo cáo.');
+  } else alert('❌ Lỗi server khi gửi báo cáo.');
+});
 </script>
 
 <script>
