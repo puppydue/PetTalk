@@ -60,6 +60,10 @@ def my_profile(request):
         "saved_user": saved_user,
         "saved_pet_id": saved_pet_id,
         "added_pet": added_pet,
+        "posts": posts,
+        "comments": comments,
+        "posts_count": posts_count,
+        "comments_count": comments_count,
     }
     return render(request, "profiles/profile_detail.html", ctx)
 
