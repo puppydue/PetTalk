@@ -183,20 +183,14 @@ def delete_comment(request, id):
     return JsonResponse({'status': 'deleted'})
 
 
-# ✅ THÊM HÀM MỚI: post_edit
+# ✅ THAY THẾ HÀM CŨ BẰNG HÀM NÀY:
 @login_required
 def post_edit(request, pk):
     # Đảm bảo chỉ chủ bài viết mới được sửa
     post = get_object_or_404(Post, pk=pk, username=request.user)
 
     if request.method == 'POST':
-        comment = Comment.objects.get(pk=id)
-        if comment.username == request.user:
-            comment.delete()
-            return JsonResponse({'status': 'deleted'})
-    return JsonResponse({'status': 'error'}, status=400)
-
-
+        # Đây là code ĐÚNG của hàm post_edit
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
@@ -208,7 +202,6 @@ def post_edit(request, pk):
 
     # Chúng ta cần một template để hiển thị form này
     return render(request, 'forum/post_edit.html', {'form': form, 'post': post})
-
 
 # ✅ THÊM HÀM MỚI: post_delete
 @login_required
