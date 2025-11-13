@@ -25,7 +25,7 @@ urlpatterns = [
 
     path('profile/', include('profiles.urls', namespace='profiles')),
 
-    path('badges/', include('badges.urls')),
+    # path('badges/', include('badges.urls')),
 
 
 ]

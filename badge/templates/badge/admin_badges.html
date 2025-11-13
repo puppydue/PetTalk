@@ -5,352 +5,178 @@
 
 {% block extra_css %}
 <style>
-  /* Vùng nội dung chính */
-  .admin-badge {
-    width: 85%;
-    max-width: 1200px;
-    margin: 50px auto; /* căn giữa, cách header 1 đoạn */
-    background: #fff;
-    padding: 32px 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  }
+    body { background: #fff8ed; }
 
-  /* Tiêu đề + nút thêm */
-  .header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-  }
-  .header-row h2 {
-    font-weight: 800;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+    /* ===== WRAPPER CHÍNH ===== */
+    .admin-badge-wrapper {
+        max-width: 1100px;
+        margin: 40px auto;
+    }
 
-  .btn-add {
-    background: var(--primary);
-    color: #fff;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-    transition: all 0.2s ease;
-  }
-  .btn-add:hover { opacity: 0.9; transform: translateY(-1px); }
+    .admin-badge {
+        background: #fff;
+        padding: 32px 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
 
-  /* Bảng danh hiệu */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-  }
-  thead { background: #f7dba7; }
-  th, td {
-    padding: 14px 20px;
-    text-align: left;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  th {
-    font-weight: 700;
-    color: var(--primary);
-    font-size: 15px;
-  }
-  td {
-    font-size: 14px;
-    color: var(--text);
-  }
-  tr:last-child td { border-bottom: none; }
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
 
-  /* Nút thao tác */
-  .actions {
-    display: flex;
-    gap: 10px;
-  }
-  .btn-edit, .btn-delete {
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  .btn-edit {
-    background: #e0f2fe;
-    color: #0369a1;
-    border: 1px solid #7dd3fc;
-  }
-  .btn-delete {
-    background: #fee2e2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
-  }
-  .btn-edit:hover { background: #bae6fd; transform: translateY(-1px); }
-  .btn-delete:hover { background: #fecaca; transform: translateY(-1px); }
+    .btn-add {
+        background: var(--primary);
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+    }
 
-  /* === MODAL FORM & MODAL DELETE === */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-  }
+    /* ===== SCROLL WRAPPER ===== */
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 4px;
+    }
 
-  .modal {
-    background: #fff;
-    border-radius: 16px;
-    padding: 24px 28px;
-    width: 460px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    animation: fadeIn 0.25s ease;
-  }
+    /* ===== TABLE ===== */
+    table {
+        width: max-content;   /* 👈 Không bị bóp, auto fit */
+        min-width: 100%;      /* 👈 Không nhỏ hơn khung */
+        border-collapse: collapse;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+    }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    thead {
+        background: #f7dba7;
+    }
 
-  .modal h3 {
-    color: var(--primary);
-    font-weight: 700;
-    margin-bottom: 20px;
-  }
+    th, td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 14px;
+        white-space: nowrap;     /* 👈 NGĂN XUỐNG DÒNG */
+    }
 
-  .form-group {
-    margin-bottom: 14px;
-    display: flex;
-    flex-direction: column;
-  }
+    th {
+        font-weight: 700;
+        color: var(--primary);
+        text-align: left;
+    }
 
-  label { font-weight: 600; margin-bottom: 6px; }
+    .icon-cell {
+        font-size: 22px;
+        text-align: center;
+        width: 70px;
+    }
 
-  input, textarea {
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid var(--line);
-    font-family: inherit;
-    background: #f9fafb;
-  }
+    /* ===== ACTION BUTTONS ===== */
+    .actions {
+        display: flex;
+        gap: 8px;
+        white-space: nowrap;
+    }
 
-  textarea { resize: vertical; min-height: 70px; }
+    .btn-edit, .btn-delete {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        text-decoration: none;
+        border: none;
+    }
 
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 18px;
-  }
+    .btn-edit {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
 
-  .btn-cancel, .btn-save {
-    padding: 8px 16px;
-    border-radius: 10px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-  }
+    .btn-delete {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
 
-  .btn-cancel { background: #e2e8f0; color: #1e293b; }
-  .btn-save { background: var(--primary); color: white; }
+    .btn-edit:hover { background: #bae6fd; }
+    .btn-delete:hover { background: #fecaca; }
+
 </style>
-
 {% endblock %}
 
 {% block content %}
-<div class="admin-badge">
-  <div class="header-row">
-    <h2>🏅 Quản lý danh hiệu</h2>
-    <a href="{% url 'badge:add_badge' %}" class="btn-add">+ Thêm danh hiệu mới</a>
-  </div>
-      <table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Tên danh hiệu</th>
-      <th>Mô tả</th>
-      <th>Ngày tạo</th>
-      <th>Cập nhật</th>
-      <th>Người đạt</th> <!-- 🆕 Cột mới -->
-      <th>Hành động</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for badge in badges %}
-  <tr>
-    <td>{{ badge.id }}</td>
-    <td>{{ badge.name }}</td>
-    <td>{{ badge.description }}</td>
-    <td>{{ badge.created_at|date:"Y-m-d" }}</td>
-    <td>{{ badge.updated_at|date:"Y-m-d" }}</td>
-    <td>{{ badge.achieved_count }}</td>
-    <td class="actions">
-        <a href="{% url 'badge:edit_badge' badge.id %}" class="btn-edit">Sửa</a>
-        <a href="{% url 'badge:delete_badge' badge.id %}" class="btn-delete"
-            onclick="return confirm('Bạn có chắc chắn muốn xóa danh hiệu này?');">Xóa</a>
-    </td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="7">Chưa có danh hiệu nào</td></tr>
-  {% endfor %}
-</tbody>
-</table>
 
-  </table>
-</div>
+<div class="admin-badge-wrapper">
+    <div class="admin-badge">
 
-<!-- === FORM THÊM / SỬA DANH HIỆU === -->
-<div class="modal-overlay" id="modalAdd">
-  <div class="modal">
-    <h3 id="modalTitle">➕ Thêm danh hiệu mới</h3>
-    <form id="fakeForm">
-      <div class="form-group">
-        <label for="badge_name">Tên danh hiệu</label>
-        <input type="text" id="badge_name" required>
-      </div>
-      <div class="form-group">
-        <label for="description">Mô tả</label>
-        <textarea id="description" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="created_at">Ngày tạo</label>
-        <input type="date" id="created_at" required>
-      </div>
-      <div class="form-group">
-        <label for="updated_at">Cập nhật</label>
-        <input type="date" id="updated_at" required>
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn-cancel" onclick="closeModal()">Hủy</button>
-        <button type="submit" class="btn-save">Lưu</button>
-      </div>
-    </form>
-  </div>
-</div>
+        <div class="header-row">
+            <h2>🏅 Quản lý danh hiệu</h2>
+            <a href="{% url 'badge:add_badge' %}" class="btn-add">+ Thêm danh hiệu mới</a>
+        </div>
 
-<!-- === MODAL XÁC NHẬN XÓA === -->
-<div class="modal-overlay" id="modalDelete">
-  <div class="modal">
-    <h3>⚠️ Xác nhận xóa</h3>
-    <p>Bạn có chắc chắn muốn xóa danh hiệu "<b id="delName"></b>" không?</p>
-    <div class="form-actions">
-      <button type="button" class="btn-cancel" onclick="closeDelete()">Hủy</button>
-      <button type="button" class="btn-save" style="background:#dc2626;" onclick="deleteBadge()">Xóa</button>
+        <!-- WRAPPER SCROLL -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Biểu tượng</th>
+                        <th>Tên danh hiệu</th>
+                        <th>Mô tả</th>
+                        <th>Loại</th>
+                        <th>Mục tiêu</th>
+                        <th>Đã đạt</th>
+                        <th>Ngày tạo</th>
+                        <th>Cập nhật</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for badge in badges %}
+                    <tr>
+                        <td>{{ badge.id }}</td>
+
+                        <!-- ICON -->
+                        <td class="icon-cell">
+                            {{ badge.icon|default:"🏆" }}
+                        </td>
+
+                        <td>{{ badge.name }}</td>
+                        <td>{{ badge.description }}</td>
+                        <td>{{ badge.get_type_display }}</td>
+
+                        <td style="text-align:center;">{{ badge.target }}</td>
+                        <td style="text-align:center;">{{ badge.achieved_count }}</td>
+
+                        <td>{{ badge.created_at|date:"Y-m-d" }}</td>
+                        <td>{{ badge.updated_at|date:"Y-m-d" }}</td>
+
+                        <td class="actions">
+                            <a href="{% url 'badge:edit_badge' badge.id %}" class="btn-edit">Sửa</a>
+                            <a href="{% url 'badge:delete_badge' badge.id %}"
+                               onclick="return confirm('Bạn có chắc muốn xóa danh hiệu này?');"
+                               class="btn-delete">Xóa</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" style="text-align:center; padding:20px;">
+                            Chưa có danh hiệu nào.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
-  </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-let currentId = 3;
-
-// === MỞ FORM THÊM / SỬA ===
-function openModal(editData = null) {
-  const modal = document.getElementById("modalAdd");
-  const title = document.getElementById("modalTitle");
-  const form = document.getElementById("fakeForm");
-  form.reset();
-
-  if (editData) {
-    title.innerText = "✏️ Chỉnh sửa danh hiệu";
-    form.dataset.mode = "edit";
-    form.dataset.editId = editData.id;
-    document.getElementById("badge_name").value = editData.name;
-    document.getElementById("description").value = editData.desc;
-    document.getElementById("created_at").value = editData.created;
-    document.getElementById("updated_at").value = editData.updated;
-  } else {
-    title.innerText = "➕ Thêm danh hiệu mới";
-    form.dataset.mode = "add";
-  }
-  modal.style.display = "flex";
-}
-function closeModal() {
-  document.getElementById("modalAdd").style.display = "none";
-}
-
-// === SUBMIT FORM ===
-document.getElementById("fakeForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  const mode = this.dataset.mode;
-  const id = this.dataset.editId;
-  const name = document.getElementById("badge_name").value.trim();
-  const desc = document.getElementById("description").value.trim();
-  const created = document.getElementById("created_at").value;
-  const updated = document.getElementById("updated_at").value;
-
-  if (!name || !desc || !created || !updated) {
-    alert("⚠️ Vui lòng nhập đầy đủ thông tin!");
-    return;
-  }
-
-  if (mode === "add") {
-    currentId++;
-   const newRow = `
-  <tr id="badge-${currentId}">
-    <td>${currentId}</td>
-    <td>${name}</td>
-    <td>${desc}</td>
-    <td>${created}</td>
-    <td>${updated}</td>
-    <td>0</td>
-    <td class="actions">
-      <button class="btn-edit" onclick="editBadge(${currentId})">Sửa</button>
-      <button class="btn-delete" onclick="confirmDelete(${currentId}, '${name}')">Xóa</button>
-    </td>
-  </tr>`;
-
-    document.getElementById("badgeTableBody").insertAdjacentHTML("beforeend", newRow);
-  } else if (mode === "edit") {
-    const row = document.getElementById(`badge-${id}`);
-    row.children[1].innerText = name;
-    row.children[2].innerText = desc;
-    row.children[3].innerText = created;
-    row.children[4].innerText = updated;
-  }
-  closeModal();
-});
-
-// === NÚT "SỬA" ===
-function editBadge(id) {
-  const row = document.getElementById(`badge-${id}`);
-  const data = {
-    id: id,
-    name: row.children[1].innerText,
-    desc: row.children[2].innerText,
-    created: row.children[3].innerText,
-    updated: row.children[4].innerText
-  };
-  openModal(data);
-}
-
-// === XÓA DANH HIỆU ===
-function confirmDelete(id, name) {
-  const modal = document.getElementById("modalDelete");
-  document.getElementById("delName").innerText = name;
-  modal.dataset.deleteId = id;
-  modal.style.display = "flex";
-}
-function closeDelete() {
-  document.getElementById("modalDelete").style.display = "none";
-}
-function deleteBadge() {
-  const modal = document.getElementById("modalDelete");
-  const id = modal.dataset.deleteId;
-  const row = document.getElementById(`badge-${id}`);
-  if (row) row.remove();
-  modal.style.display = "none";
-}
-</script>
 {% endblock %}

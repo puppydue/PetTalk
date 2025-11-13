@@ -109,7 +109,9 @@
         <div class="col-lg-8">
             <div class="header-card">
                 <h2 class="title">Danh hiệu hệ thống</h2>
-                <p class="muted">Chu kỳ: 1/1/2025 → 1/1/2026. Khi hết hạn, tiến trình <b>tự động về 0</b>.</p>
+                <p class="muted">
+                    Chu kỳ: 1/1/2025 → 1/1/2026. Khi hết hạn, tiến trình <b>tự động về 0</b>.
+                </p>
                 <div class="toolbar">
                     <span class="tag">Mục tiêu năm nay</span>
                     <span class="chip-warn">Còn 71 ngày trong kỳ</span>
@@ -120,7 +122,7 @@
                 <div id="badgesList">
                     {% for b in progress_data %}
                     <div class="brow" style="border-left:6px solid #f59e0b20">
-                        <div class="bicon">{{ b.icon }}</div>
+                        <div class="bicon" style="font-size:26px;">{{ b.icon }}</div>
                         <div>
                             <div class="bname">{{ b.name }}</div>
                             <div class="bmeta">
@@ -148,6 +150,8 @@
                             </div>
                         </div>
                     </div>
+                    {% empty %}
+                    <p class="muted">Chưa có danh hiệu nào được cấu hình.</p>
                     {% endfor %}
                 </div>
             </section>
@@ -160,67 +164,18 @@
 
                 {% if achieved_badges %}
                 <form id="badgeDisplayForm">
-                    <!-- Trong <form id="badgeDisplayForm"> -->
-<script>
-  const achievedBadges = {{ achieved_badges_json|safe }};
-  const currentDisplay = "{{ current_display|escapejs }}";
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('badgeDisplayForm');
-    const selectedBadge = document.getElementById('selectedBadge');
-
-    // Tự động chọn badge đang hiển thị
-    if (currentDisplay) {
-      const radio = document.querySelector(`input[value="${currentDisplay}"]`);
-      if (radio) {
-        radio.checked = true;
-        const badge = achievedBadges.find(b => b.name === currentDisplay);
-        if (badge) showBadge(badge);
-      }
-    }
-
-    form.addEventListener('change', function(e) {
-      const selectedName = e.target.value;
-      const badge = selectedName === 'none' ? null : achievedBadges.find(b => b.name === selectedName);
-
-      // Gửi AJAX lưu
-      fetch("{% url 'save_display_badge' %}", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "X-CSRFToken": "{{ csrf_token }}"
-        },
-        body: new URLSearchParams({
-          "badge_name": selectedName
-        })
-      });
-
-      // Hiển thị preview
-      if (!badge) {
-        selectedBadge.classList.remove('show');
-      } else {
-        showBadge(badge);
-      }
-    });
-
-    function showBadge(badge) {
-      selectedBadge.querySelector('.icon').textContent = badge.icon;
-      selectedBadge.querySelector('.fw-bold').textContent = badge.name;
-      selectedBadge.querySelector('.text-muted').textContent = `${badge.progress}/${badge.target} ${badge.type.toLowerCase()}`;
-      selectedBadge.querySelector('.progress-sm > div').style.width = '100%';
-      selectedBadge.querySelector('.text-success').textContent = 'ĐÃ HOÀN THÀNH!';
-      selectedBadge.classList.add('show');
-    }
-  });
-</script>
                     <div class="achieved-option">
-                        <input type="radio" name="display_badge" value="none" id="none" checked>
+                        <input type="radio" name="display_badge" value="none" id="none"
+                               {% if not current_display %}checked{% endif %}>
                         <label for="none">Không hiển thị</label>
                     </div>
 
                     {% for b in achieved_badges %}
                     <div class="achieved-option">
-                        <input type="radio" name="display_badge" value="{{ b.name }}" id="badge_{{ forloop.counter }}">
+                        <input type="radio" name="display_badge"
+                               value="{{ b.name }}"
+                               id="badge_{{ forloop.counter }}"
+                               {% if current_display == b.name %}checked{% endif %}>
                         <label for="badge_{{ forloop.counter }}">
                             {{ b.icon }} {{ b.name }}
                             <small class="text-success">({{ b.progress }}/{{ b.target }})</small>
@@ -232,10 +187,10 @@
                 <!-- HIỂN THỊ BADGE ĐƯỢC CHỌN -->
                 <div id="selectedBadge" class="selected-badge">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="icon">TROPHY</div>
+                        <div class="icon">{{ current_display_icon }}</div>
                         <div>
-                            <div class="fw-bold">CANHO</div>
-                            <div class="text-muted small">2/1 bình luận</div>
+                            {% if current_display %}{{ current_display }}{% endif %}
+                            <div class="text-muted small">0/0 hoạt động</div>
                         </div>
                     </div>
                     <div class="progress-sm mt-2">
@@ -255,33 +210,78 @@
 {% block extra_js %}
 <script>
   const achievedBadges = {{ achieved_badges_json|safe }};
+  const currentDisplay = "{{ current_display|escapejs }}";
+  const saveUrl = "{% url 'badge:save_display_badge' %}";
+
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  const csrftoken = getCookie('csrftoken');
 
   document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('badgeDisplayForm');
     const selectedBadge = document.getElementById('selectedBadge');
+
     if (!form) return;
+
+    function showBadge(badge) {
+      selectedBadge.querySelector('.icon').textContent = badge.icon;
+      selectedBadge.querySelector('.fw-bold').textContent = badge.name;
+      selectedBadge.querySelector('.text-muted').textContent =
+        `${badge.progress}/${badge.target} ${badge.type.toLowerCase()}`;
+      selectedBadge.querySelector('.progress-sm > div').style.width = '100%';
+      selectedBadge.querySelector('.text-success').textContent = 'ĐÃ HOÀN THÀNH!';
+      selectedBadge.classList.add('show');
+    }
+
+    // Hiển thị badge hiện tại nếu có
+    if (currentDisplay) {
+      const badge = achievedBadges.find(b => b.name === currentDisplay);
+      if (badge) {
+        showBadge(badge);
+      }
+    }
 
     form.addEventListener('change', function(e) {
       const selectedName = e.target.value;
-      if (selectedName === 'none') {
+      const badge = selectedName === 'none'
+        ? null
+        : achievedBadges.find(b => b.name === selectedName);
+
+      // Gửi AJAX lưu lựa chọn
+      fetch(saveUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": csrftoken
+        },
+        body: new URLSearchParams({
+          "badge_name": selectedName
+        })
+      }).then(r => r.json()).then(data => {
+        // Không cần thông báo to, chỉ xử lý UI
+        if (data.status !== "success") {
+          console.warn("Save badge error:", data);
+        }
+      });
+
+      // Cập nhật preview
+      if (!badge) {
         selectedBadge.classList.remove('show');
-        return;
+      } else {
+        showBadge(badge);
       }
-
-      const badge = achievedBadges.find(b => b.name === selectedName);
-      if (!badge) return;
-
-      selectedBadge.querySelector('.icon').textContent = badge.icon;
-      selectedBadge.querySelector('.fw-bold').textContent = badge.name;
-      selectedBadge.querySelector('.text-muted').textContent = `${badge.progress}/${badge.target} ${badge.type.toLowerCase()}`;
-
-      const progressBar = selectedBadge.querySelector('.progress-sm > div');
-      progressBar.style.width = '100%';
-
-      const status = selectedBadge.querySelector('.text-success');
-      status.textContent = 'ĐÃ HOÀN THÀNH!';
-
-      selectedBadge.classList.add('show');
     });
   });
 </script>

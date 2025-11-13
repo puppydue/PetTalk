@@ -1,7 +1,9 @@
+# profiles/models.py
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
 from badge.models import Badge
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -11,11 +13,18 @@ class UserProfile(models.Model):
     birthdate = models.DateField(blank=True, null=True)
     location = models.CharField(max_length=120, blank=True)
 
-    def __str__(self):
-        return f"{self.user.username}'s profile"
+    # ⭐ NEW: Danh hiệu đang hiển thị
+    display_badge = models.ForeignKey(
+        Badge,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="profiles_displaying",
+        verbose_name="Danh hiệu hiển thị",
+    )
 
     def get_role_display(self):
-        """✅ Trả về vai trò thực tế dựa theo quyền user"""
+        """Trả về vai trò thực tế dựa theo quyền user"""
         if self.user.is_superuser:
             return "Admin"
         elif self.user.is_staff:
@@ -23,10 +32,8 @@ class UserProfile(models.Model):
         return "Thành viên"
 
     def __str__(self):
-        return f"{self.user.username} ({self.get_role_display()})"
-
-    def __str__(self):
         return f"UserProfile: {self.user.username}"
+
 
 class PetProfile(models.Model):
     SEX_CHOICES = (('M', 'Đực'), ('F', 'Cái'))
@@ -48,7 +55,6 @@ class PetProfile(models.Model):
             return None
         today = date.today()
         delta = (today.year - self.birthdate.year) * 12 + (today.month - self.birthdate.month)
-        # Chuyển số tháng sang năm (mỗi 6 tháng = 0.5 tuổi)
         return round(delta / 12, 1)
 
     def __str__(self):

@@ -1,43 +1,41 @@
+# badge/forms.py
 from django import forms
 from .models import Badge
 
+ICON_CHOICES = [
+    ("🏆", "🏆 Trophy"),
+    ("⭐", "⭐ Star"),
+    ("🔥", "🔥 Fire"),
+    ("⚡", "⚡ Lightning"),
+    ("❤️", "❤️ Heart"),
+    ("💬", "💬 Chat"),
+    ("🚀", "🚀 Rocket"),
+    ("👑", "👑 Crown"),
+    ("🎁", "🎁 Gift"),
+    ("🚩", "🚩 Flag"),
+    ("🐱", "🐱 Meow"),
+    ("🐾", "🐾 Paw"),
+]
+
 class BadgeForm(forms.ModelForm):
+    icon = forms.ChoiceField(
+        choices=ICON_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Biểu tượng"
+    )
+
     class Meta:
         model = Badge
-        fields = ['name', 'description', 'type', 'target', 'color', 'achieved_count']
+        fields = ['name', 'description', 'type', 'target', 'color', 'icon', 'achieved_count']
+
         widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Nhập tên danh hiệu...'
-            }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Mô tả ngắn về danh hiệu...'
             }),
-            'type': forms.Select(attrs={
-                'class': 'form-select'
-            }),
-            'target': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1,
-                'placeholder': 'Nhập mục tiêu cần đạt...'
-            }),
-            'color': forms.Select(attrs={
-                'class': 'form-select'
-            }),
+            'target': forms.NumberInput(attrs={'class': 'form-control'}),
             'achieved_count': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'readonly': True,
-                'style': 'background-color: #f8f9fa;'
+                'readonly': True
             }),
-        }
-
-        labels = {
-            'name': 'Tên danh hiệu',
-            'description': 'Mô tả',
-            'type': 'Loại danh hiệu',
-            'target': 'Mục tiêu cần đạt',
-            'color': 'Màu hiển thị',
-            'achieved_count': 'Số người đã đạt',
         }
