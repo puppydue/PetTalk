@@ -7,7 +7,7 @@
 <style>
     body { background: #fff8ed; }
 
-    :root{
+    :root {
       --primary: #003459;
       --secondary: #F7DBA7;
       --bg: #f8fafc;
@@ -16,273 +16,354 @@
       --text: #0f172a;
       --muted: #475569;
       --radius: 14px;
-      --success:#16a34a;
-      --warn:#f59e0b;
-      --danger:#ef4444;
-      --shadow:0 14px 34px rgba(16,24,40,.10);
     }
 
-    *{box-sizing:border-box}
-    a{color:inherit;text-decoration:none}
-
-    .card, .header-card {
+    /* ✅ THÊM LẠI: Style .card (đồng bộ) */
+    .card {
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      padding: 20px;
+      padding: 24px; /* Đồng bộ padding */
       margin-bottom: 16px;
     }
-    .title{font-weight:900;font-size:18px;margin:0 0 12px}
-    .muted{color:var(--muted);font-size:13px}
-    .btn{padding:10px 14px;border:1px solid var(--line);background:#fff;border-radius:12px;cursor:pointer;box-shadow:var(--shadow);font-weight:500;}
-    .btn.primary{background: var(--primary);color:#fff;border-color:transparent}
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .brow{display:grid;grid-template-columns:56px 1fr 120px;gap:14px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#ffffff,#fafcff);box-shadow:var(--shadow);margin:10px 0}
-    .bicon{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:26px;background:#f8fafc;border:1px solid #e2e8f0}
-    .bname{font-weight:900}
-    .bmeta{color:#475569;font-size:13px;margin-top:2px}
-    .bar{height:12px;background:#eef2ff;border:1px solid #dbe3ff;border-radius:999px;overflow:hidden;margin-top:8px;position:relative}
-    .bar>div{height:100%;background:linear-gradient(90deg,#93c5fd,#2563eb);width:0%;}
-    .bstat{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#334155;margin-top:8px}
-    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f0f9ff;border:1px solid #bae6fd;font-size:12px}
-    .ok-chip{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:999px;padding:4px 10px;font-weight:700}
-    .chip-warn{background:#fff7ed;border:1px solid #fed7aa;color:#b45309;border-radius:999px;padding:4px 10px;font-size:12px}
+    .card h3 {
+        font-weight: 700;
+        font-size: 20px;
+        margin: 0 0 16px 0;
+        color: var(--primary);
+    }
+    .text-muted {
+        color: var(--muted);
+        font-size: 14px;
+    }
 
-    /* === PANEL DANH HIỆU ĐÃ ĐẠT === */
-    .achieved-panel {
-        background: var(--card);
+    /* === ✅ SỬA: Style Badge Row (từ code cũ) === */
+    .badge-row {
+        display: grid;
+        grid-template-columns: 50px 1fr auto;
+        gap: 16px;
+        align-items: center;
+        padding: 14px;
         border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 16px;
-        margin-bottom: 16px;
-        box-shadow: var(--shadow);
+        border-radius: 12px;
+        background: #fff;
+        margin-bottom: 12px;
     }
-    .achieved-title {
-        font-weight: 900;
+    .b-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+        background: var(--bg);
+        border: 1px solid var(--line);
+    }
+    .b-name {
+        font-weight: 700;
         font-size: 16px;
-        margin: 0 0 12px;
+        color: var(--text);
     }
+    .b-meta {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 2px;
+    }
+    .b-bar {
+        height: 8px;
+        background: #eef2ff;
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+    .b-bar > div {
+        height: 100%;
+        width: 0%;
+        transition: width 0.5s ease;
+    }
+
+    /* ✅ SỬA (Task 1): Thêm màu cho thanh tiến trình */
+    .b-bar-gold { background: #f59e0b; }
+    .b-bar-blue { background: #3b82f6; }
+    .b-bar-green { background: #16a34a; }
+    .b-bar-red { background: #ef4444; }
+    .b-bar-cyan { background: #06b6d4; }
+    .b-bar-lime { background: #84cc16; }
+
+    /* Style cho cột trạng thái */
+    .b-status {
+        text-align: right;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .b-status .percent {
+        color: var(--primary);
+    }
+    /* ✅ SỬA (Task 2): Icon hoàn thành (thay cho check) */
+    .b-status .completed-icon {
+        font-size: 22px;
+        color: #16a34a;
+    }
+
+    /* === ✅ SỬA (Task 3): Style Form Chọn Badge === */
     .achieved-option {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 6px 0;
+        gap: 10px;
+        padding: 8px 0;
         font-size: 14px;
+        cursor: pointer;
     }
     .achieved-option input[type="radio"] {
         accent-color: var(--primary);
+        transform: scale(1.2);
     }
-    .selected-badge {
-        background: #f0fdf4;
-        border: 1px solid #86efac;
+
+    /* ✅ SỬA LỖI (Task 1): Xóa style .badge-chip (màu vàng) CŨ */
+    /* .badge-chip { ... } */
+    /* .achieved-option:hover .badge-chip { ... } */
+
+
+    /* === ✅ THÊM MỚI (Task 4): Khung xem trước === */
+    .badge-preview-box {
+        margin-top: 24px;
+        padding: 16px;
+        border: 2px dashed var(--line);
+        border-radius: var(--radius);
+        text-align: center;
+        background: var(--bg);
+    }
+    .badge-preview-box p {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 12px;
+        font-weight: 500;
+        margin-top: 0;
+    }
+    .preview-username {
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--primary);
+        margin-right: 8px;
+    }
+    /* Style cho chip XEM TRƯỚC (DÙNG CHUNG CHO CẢ 2 BÊN) */
+    .preview-badge-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        font-size: 13px;
+        font-weight: 700;
         border-radius: 12px;
-        padding: 12px;
-        margin-top: 12px;
-        display: none;
+        border: 1px solid;
+        cursor: pointer;
+        transition: 0.2s;
     }
-    .selected-badge.show {
-        display: block;
+    /* Các màu cho chip XEM TRƯỚC (dựa trên model.py) */
+    .badge-color-gold { background: #fff4c2; border-color: #f7d98b; color: #8a5a00; }
+    .badge-color-blue { background: #e0f2fe; border-color: #7dd3fc; color: #0369a1; }
+    .badge-color-green { background: #dcfce7; border-color: #86efac; color: #15803d; }
+    .badge-color-red { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+    .badge-color-cyan { background: #cffafe; border-color: #67e8f9; color: #0e7490; }
+    .badge-color-lime { background: #f7fee7; border-color: #bef264; color: #4d7c0f; }
+
+    /* Thêm hover cho các chip chọn */
+    .achieved-option:hover .preview-badge-chip {
+        transform: scale(1.05);
     }
-    .selected-badge .icon {
-        font-size: 28px;
-    }
-    .progress-sm {
-        height: 6px;
-        background: #e2e8f0;
-        border-radius: 3px;
-        overflow: hidden;
-        margin: 8px 0;
-    }
-    .progress-sm > div {
-        height: 100%;
-        background: #16a34a;
-        border-radius: 3px;
-    }
+
 </style>
 {% endblock %}
 
 {% block content %}
-<main id="center" class="container-fluid py-4">
+<div class="container py-4">
     <div class="row">
-        <!-- LEFT: TẤT CẢ BADGE -->
-        <div class="col-lg-8">
-            <div class="header-card">
-                <h2 class="title">Danh hiệu hệ thống</h2>
-                <p class="muted">
-                    Chu kỳ: 1/1/2025 → 1/1/2026. Khi hết hạn, tiến trình <b>tự động về 0</b>.
-                </p>
-                <div class="toolbar">
-                    <span class="tag">Mục tiêu năm nay</span>
-                    <span class="chip-warn">Còn 71 ngày trong kỳ</span>
-                </div>
-            </div>
 
-            <section id="tab-badges">
-                <div id="badgesList">
-                    {% for b in progress_data %}
-                    <div class="brow" style="border-left:6px solid #f59e0b20">
-                        <div class="bicon" style="font-size:26px;">{{ b.icon }}</div>
-                        <div>
-                            <div class="bname">{{ b.name }}</div>
-                            <div class="bmeta">
-                                Mục tiêu: {{ b.target }} {{ b.type }}
-                                {% if b.completed %}
-                                    <span style="color:green;">Đã đạt</span>
-                                {% else %}
-                                    <span style="color:orange;">Đang tiến hành</span>
-                                {% endif %}
-                            </div>
-                            <div class="bar">
-                                <div style="width:{{ b.percent }}%;
-                                    background:linear-gradient(90deg,
-                                        {% if b.color == 'gold' %}#f59e0b, #fbbf24
-                                        {% elif b.color == 'blue' %}#3b82f6, #60a5fa
-                                        {% elif b.color == 'green' %}#16a34a, #4ade80
-                                        {% elif b.color == 'red' %}#ef4444, #fb7185
-                                        {% elif b.color == 'cyan' %}#06b6d4, #67e8f9
-                                        {% elif b.color == 'lime' %}#84cc16, #bef264
-                                        {% else %}#94a3b8, #cbd5e1{% endif %});">
-                                </div>
-                            </div>
-                            <div class="bstat">
-                                <span>Tiến trình của bạn: <b>{{ b.progress }}/{{ b.target }}</b></span>
-                            </div>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <p class="muted">Chưa có danh hiệu nào được cấu hình.</p>
-                    {% endfor %}
-                </div>
-            </section>
-        </div>
-
-        <!-- RIGHT: DANH HIỆU ĐÃ ĐẠT -->
         <div class="col-lg-4">
-            <div class="achieved-panel">
-                <h3 class="achieved-title">Danh hiệu đã đạt</h3>
+            <div class="card">
+                <h3>Danh hiệu của bạn</h3>
 
                 {% if achieved_badges %}
                 <form id="badgeDisplayForm">
-                    <div class="achieved-option">
-                        <input type="radio" name="display_badge" value="none" id="none"
-                               {% if not current_display %}checked{% endif %}>
-                        <label for="none">Không hiển thị</label>
-                    </div>
+                    <label class="achieved-option">
+                        <input type="radio" name="display_badge" value="none"
+                               {% if not current_display_id %}checked{% endif %}>
+                        Không hiển thị
+                    </label>
 
                     {% for b in achieved_badges %}
-                    <div class="achieved-option">
-                        <input type="radio" name="display_badge"
-                               value="{{ b.name }}"
-                               id="badge_{{ forloop.counter }}"
-                               {% if current_display == b.name %}checked{% endif %}>
-                        <label for="badge_{{ forloop.counter }}">
-                            {{ b.icon }} {{ b.name }}
-                            <small class="text-success">({{ b.progress }}/{{ b.target }})</small>
-                        </label>
-                    </div>
+                    <label class="achieved-option">
+                        <input type="radio"
+                               name="display_badge"
+                               value="{{ b.id }}"
+                               {% if current_display_id == b.id %}checked{% endif %}>
+                        <span class="preview-badge-chip badge-color-{{ b.color }}">{{ b.icon }} {{ b.name }}</span>
+                    </label>
                     {% endfor %}
                 </form>
 
-                <!-- HIỂN THỊ BADGE ĐƯỢC CHỌN -->
-                <div id="selectedBadge" class="selected-badge">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="icon">{{ current_display_icon }}</div>
-                        <div>
-                            {% if current_display %}{{ current_display }}{% endif %}
-                            <div class="text-muted small">0/0 hoạt động</div>
-                        </div>
+                <div class="badge-preview-box">
+                    <p>Xem trước (hiển thị cạnh tên bạn):</p>
+                    <div>
+                        <span class="preview-username">{{ request.user.username }}</span>
+                        <span id="preview-badge" class="preview-badge-chip" style="display:none;">
+                            <span id="preview-icon"></span>
+                            <span id="preview-name"></span>
+                        </span>
+                        <span id="preview-none" class="text-muted" style="font-style:italic; display:none;">(Không hiển thị)</span>
                     </div>
-                    <div class="progress-sm mt-2">
-                        <div style="width:100%;"></div>
-                    </div>
-                    <div class="text-success small mt-1">ĐÃ HOÀN THÀNH!</div>
                 </div>
+
                 {% else %}
-                <p class="muted small">Bạn chưa đạt danh hiệu nào.</p>
+                <p class="text-muted">Bạn chưa đạt danh hiệu nào. Hãy cố gắng hơn nhé!</p>
                 {% endif %}
             </div>
         </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <h3>Danh hiệu hệ thống</h3>
+                <p class="text-muted" style="margin-top: -10px; margin-bottom: 20px;">
+                    Đây là toàn bộ danh hiệu bạn có thể đạt được trong PetTalk.
+                </p>
+
+                {% for b in progress_data %}
+                <div class="badge-row">
+                    <div class="b-icon">{{ b.icon }}</div>
+                    <div>
+                        <div class="b-name">{{ b.name }}</div>
+                        <div class="b-meta">
+                            Mục tiêu: {{ b.target }} {{ b.type }}
+                        </div>
+                        <div class="b-bar">
+                            <div class="b-bar-{{ b.color }}" style="width:{{ b.percent }}%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="b-status">
+                        {% if b.completed %}
+                            <span class="completed-icon" title="Đã hoàn thành">
+                                <i class="fa-solid fa-trophy"></i>
+                            </span>
+                        {% else %}
+                            <span class="percent">{{ b.percent }}%</span>
+                            <div class="text-muted" style="font-size: 12px; font-weight: 500;">
+                                {{ b.progress }}/{{ b.target }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
-</main>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  const achievedBadges = {{ achieved_badges_json|safe }};
-  const currentDisplay = "{{ current_display|escapejs }}";
-  const saveUrl = "{% url 'badge:save_display_badge' %}";
+// Lấy CSRF token
+function getCookie(name){let v=null;if(document.cookie&&document.cookie!==''){const c=document.cookie.split(';');for(let i=0;i<c.length;i++){const s=c[i].trim();if(s.substring(0,name.length+1)===(name+'=')){v=decodeURIComponent(s.substring(name.length+1));break}}}return v}
+const csrftoken=getCookie('csrftoken');
 
-  function getCookie(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-          const cookies = document.cookie.split(';');
-          for (let i = 0; i < cookies.length; i++) {
-              const cookie = cookies[i].trim();
-              if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                  break;
-              }
-          }
-      }
-      return cookieValue;
-  }
-  const csrftoken = getCookie('csrftoken');
+// Lấy dữ liệu badge từ Django
+const achievedBadges = {{ achieved_badges_json|safe }};
 
-  document.addEventListener('DOMContentLoaded', function() {
+// Map màu từ model (Python) sang CSS class (cho preview)
+const colorMap = {
+    "gold": "badge-color-gold",
+    "blue": "badge-color-blue",
+    "green": "badge-color-green",
+    "red": "badge-color-red",
+    "cyan": "badge-color-cyan",
+    "lime": "badge-color-lime",
+};
+
+// Lấy các phần tử DOM của preview
+const previewBadge = document.getElementById('preview-badge');
+const previewIcon = document.getElementById('preview-icon');
+const previewName = document.getElementById('preview-name');
+const previewNone = document.getElementById('preview-none');
+
+/**
+ * ✅ THÊM MỚI (Task 4): Hàm cập nhật preview
+ * @param {string} selectedId ID của badge được chọn, hoặc "none"
+ */
+function updatePreview(selectedId) {
+    if (!previewBadge || !previewNone) return; // Thoát nếu không ở đúng trang
+
+    if (selectedId === 'none' || !selectedId) {
+        // Ẩn chip, hiện text "Không hiển thị"
+        previewBadge.style.display = 'none';
+        previewNone.style.display = 'inline';
+    } else {
+        // Tìm badge trong data
+        // ✅ SỬA LỖI: So sánh b.id (số) với selectedId (string)
+        const badge = achievedBadges.find(b => b.id == selectedId);
+        if (badge) {
+            // Cập nhật nội dung
+            previewIcon.textContent = badge.icon;
+            previewName.textContent = badge.name;
+
+            // Xóa class màu cũ
+            previewBadge.className = 'preview-badge-chip';
+            // Thêm class màu mới
+            // ✅ SỬA LỖI: Giờ "badge.color" đã tồn tại, nó sẽ lấy đúng màu
+            const colorClass = colorMap[badge.color] || 'badge-color-blue';
+            previewBadge.classList.add(colorClass);
+
+            // Hiển thị chip, ẩn text
+            previewBadge.style.display = 'inline-flex';
+            previewNone.style.display = 'none';
+        }
+    }
+}
+
+// Chạy khi trang tải xong
+document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('badgeDisplayForm');
-    const selectedBadge = document.getElementById('selectedBadge');
-
     if (!form) return;
 
-    function showBadge(badge) {
-      selectedBadge.querySelector('.icon').textContent = badge.icon;
-      selectedBadge.querySelector('.fw-bold').textContent = badge.name;
-      selectedBadge.querySelector('.text-muted').textContent =
-        `${badge.progress}/${badge.target} ${badge.type.toLowerCase()}`;
-      selectedBadge.querySelector('.progress-sm > div').style.width = '100%';
-      selectedBadge.querySelector('.text-success').textContent = 'ĐÃ HOÀN THÀNH!';
-      selectedBadge.classList.add('show');
+    // 1. Cập nhật preview lần đầu khi tải trang
+    const currentSelectedRadio = form.querySelector('input[name="display_badge"]:checked');
+    if (currentSelectedRadio) {
+        updatePreview(currentSelectedRadio.value);
+    } else {
+        updatePreview('none'); // Mặc định là 'none' nếu không có gì được check
     }
 
-    // Hiển thị badge hiện tại nếu có
-    if (currentDisplay) {
-      const badge = achievedBadges.find(b => b.name === currentDisplay);
-      if (badge) {
-        showBadge(badge);
-      }
-    }
+    // 2. Thêm listener cho form (AJAX + Preview)
+    form.addEventListener("change", function (e) {
+        if (e.target.name !== 'display_badge') return;
 
-    form.addEventListener('change', function(e) {
-      const selectedName = e.target.value;
-      const badge = selectedName === 'none'
-        ? null
-        : achievedBadges.find(b => b.name === selectedName);
+        const selectedId = e.target.value;
 
-      // Gửi AJAX lưu lựa chọn
-      fetch(saveUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "X-CSRFToken": csrftoken
-        },
-        body: new URLSearchParams({
-          "badge_name": selectedName
+        // Cập nhật preview ngay lập tức
+        updatePreview(selectedId);
+
+        // Gửi AJAX (code cũ của bạn)
+        fetch("{% url 'badge:save_display_badge' %}", {
+            method:"POST",
+            headers:{
+                "X-CSRFToken":csrftoken,
+                "Content-Type":"application/x-www-form-urlencoded"
+            },
+            body:new URLSearchParams({
+                badge_id: selectedId
+            })
         })
-      }).then(r => r.json()).then(data => {
-        // Không cần thông báo to, chỉ xử lý UI
-        if (data.status !== "success") {
-          console.warn("Save badge error:", data);
-        }
-      });
-
-      // Cập nhật preview
-      if (!badge) {
-        selectedBadge.classList.remove('show');
-      } else {
-        showBadge(badge);
-      }
+        .then(r => r.json())
+        .then(data => {
+            if (data.status !== 'success') {
+                console.error('Lỗi khi lưu danh hiệu:', data.message);
+            } else {
+                console.log('Đã lưu danh hiệu!');
+            }
+        })
+        .catch(err => console.error('Lỗi fetch:', err));
     });
-  });
+});
 </script>
 {% endblock %}

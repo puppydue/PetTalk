@@ -1,6 +1,5 @@
 # badge/views.py
 import json
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
@@ -15,9 +14,9 @@ def staff_required(view_func):
     return user_passes_test(lambda u: u.is_staff or u.is_superuser)(view_func)
 
 
-# ==========================
-# ADMIN: QUẢN LÝ DANH HIỆU
-# ==========================
+# =======================
+# ADMIN QUẢN LÝ DANH HIỆU
+# =======================
 
 @staff_required
 def admin_badges(request):
@@ -63,53 +62,51 @@ def delete_badge(request, badge_id):
     return redirect('badge:admin_badges')
 
 
-# ==========================
-# USER: XEM ĐIỂM & DANH HIỆU
-# ==========================
+# =======================
+# USER XEM & CHỌN DANH HIỆU
+# =======================
 
 @login_required
 def user_badges(request):
     user = request.user
     badges = Badge.objects.all()
     progress_data = []
-    achieved_badges = []
+    achieved = []
 
     for b in badges:
         progress, _ = UserBadgeProgress.objects.get_or_create(user=user, badge=b)
 
-        total = b.target
-        value = progress.progress
-        percent = min(100, round((value / total) * 100)) if total > 0 else 0
-        completed = value >= total
+        percent = 0
+        if b.target > 0:
+            percent = min(100, round((progress.progress / b.target) * 100))
+
+        completed = progress.progress >= b.target
 
         item = {
+            "id": b.id,
             "name": b.name,
             "icon": b.icon,
-            "target": total,
-            "progress": value,
+            "target": b.target,
+            "progress": progress.progress,
             "percent": percent,
             "type": b.get_type_display(),
             "completed": completed,
-            "color": b.color,
+            "color": b.color, # ✅ SỬA LỖI: Thêm dòng này
         }
+
         progress_data.append(item)
 
         if completed:
-            achieved_badges.append(item)
+            achieved.append(item) # "achieved" giờ cũng sẽ có "color"
 
     profile, _ = UserProfile.objects.get_or_create(user=user)
 
-    current_display = profile.display_badge.name if profile.display_badge else ""
-    current_display_icon = profile.display_badge.icon if profile.display_badge else ""
-
     context = {
         "progress_data": progress_data,
-        "achieved_badges": achieved_badges,
-        "achieved_badges_json": json.dumps(achieved_badges, cls=DjangoJSONEncoder),
-        "current_display": current_display,
-        "current_display_icon": current_display_icon,
+        "achieved_badges": achieved,
+        "achieved_badges_json": json.dumps(achieved, cls=DjangoJSONEncoder),
+        "current_display_id": profile.display_badge.id if profile.display_badge else None,
     }
-
     return render(request, "badge/user_badges.html", context)
 
 
@@ -118,27 +115,24 @@ def save_display_badge(request):
     if request.method != "POST":
         return JsonResponse({"status": "error", "message": "Invalid request"})
 
-    badge_name = request.POST.get("badge_name")
+    badge_id = request.POST.get("badge_id")
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-    if badge_name == "none":
+    if badge_id == "none":
         profile.display_badge = None
         profile.save(update_fields=['display_badge'])
         return JsonResponse({"status": "success"})
 
     try:
-        badge = Badge.objects.get(name=badge_name)
+        badge = Badge.objects.get(id=badge_id)
     except Badge.DoesNotExist:
         return JsonResponse({"status": "error", "message": "Danh hiệu không tồn tại"})
 
-    try:
-        progress = UserBadgeProgress.objects.get(user=request.user, badge=badge)
-    except UserBadgeProgress.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "Chưa có tiến trình cho danh hiệu này"})
-
-    if progress.progress < badge.target:
+    progress = UserBadgeProgress.objects.filter(user=request.user, badge=badge).first()
+    if not progress or progress.progress < badge.target:
         return JsonResponse({"status": "error", "message": "Chưa đạt danh hiệu này"})
 
     profile.display_badge = badge
     profile.save(update_fields=['display_badge'])
+
     return JsonResponse({"status": "success"})

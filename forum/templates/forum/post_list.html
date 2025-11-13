@@ -40,7 +40,25 @@
   height: 100%;
   object-fit: cover;
 }
-
+.badge-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:2px 8px;
+    font-size:12px;
+    font-weight:600;
+    border-radius:10px;
+    background:#fff4c2;
+    border:1px solid #f7d98b;
+    color:#8a5a00;
+    transition:0.2s;
+}
+.badge-chip:hover{
+    background:#ffe89b;
+    border-color:#ffdd70;
+    transform:translateY(-1px);
+    box-shadow:0 2px 6px rgba(0,0,0,0.15);
+}
 /* === Ô nhập câu hỏi nhanh === */
 .trigger-input {
   flex: 1;
@@ -365,10 +383,23 @@
             {{ post.username.username|slice:":1"|upper }}
           {% endif %}
         </div>
-        <div>
-          <div style="font-weight:700;color:#003459">{{ post.username.username }}</div>
-          <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
-        </div>
+<div>
+    <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#003459;">
+        {{ post.username.username }}
+
+        <!-- ⭐ BADGE HERE -->
+        {% if post.username.userprofile.display_badge %}
+            <span class="badge-chip">
+                {{ post.username.userprofile.display_badge.icon }}
+                {{ post.username.userprofile.display_badge.name }}
+            </span>
+        {% endif %}
+
+        <!-- ⭐ END BADGE -->
+    </div>
+
+    <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
+</div>
       </div>
 
       <h3 class="post-title">{{ post.title }}</h3>
