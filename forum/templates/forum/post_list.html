@@ -40,25 +40,51 @@
   height: 100%;
   object-fit: cover;
 }
-.badge-chip{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    padding:2px 8px;
-    font-size:12px;
-    font-weight:600;
-    border-radius:10px;
-    background:#fff4c2;
-    border:1px solid #f7d98b;
-    color:#8a5a00;
-    transition:0.2s;
+
+/* === ✅ SỬA: CSS CHO CHIP DANH HIỆU ĐA MÀU === */
+.badge-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px; /* Giảm gap 1 chút */
+    padding: 2px 8px; /* Dùng padding nhỏ */
+    font-size: 12px;  /* Font nhỏ */
+    font-weight: 600; /* Giảm độ đậm */
+    border-radius: 10px; /* Bo tròn ít hơn */
+    border: 1px solid;
+    cursor: default; /* Không cần hover ở đây */
+
+    /* ✅ THÊM MỚI: Hiệu ứng */
+    transition: all 0.2s ease-out;
+    animation: badgeGlow 3s ease-in-out infinite;
 }
-.badge-chip:hover{
-    background:#ffe89b;
-    border-color:#ffdd70;
-    transform:translateY(-1px);
-    box-shadow:0 2px 6px rgba(0,0,0,0.15);
+
+/* ✅ THÊM MỚI: Hiệu ứng Hover */
+.badge-chip:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    animation: none; /* Tắt glow khi hover */
 }
+
+/* ✅ THÊM MỚI: Animation "glow" nhẹ */
+@keyframes badgeGlow {
+  0%, 100% {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  50% {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  }
+}
+
+/* Các màu cho chip (dựa trên user_badges.html) */
+.badge-color-gold { background: #fff4c2; border-color: #f7d98b; color: #8a5a00; }
+.badge-color-blue { background: #e0f2fe; border-color: #7dd3fc; color: #0369a1; }
+.badge-color-green { background: #dcfce7; border-color: #86efac; color: #15803d; }
+.badge-color-red { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+.badge-color-cyan { background: #cffafe; border-color: #67e8f9; color: #0e7490; }
+.badge-color-lime { background: #f7fee7; border-color: #bef264; color: #4d7c0f; }
+/* === HẾT CSS MỚI === */
+
+
 /* === Ô nhập câu hỏi nhanh === */
 .trigger-input {
   flex: 1;
@@ -387,17 +413,15 @@
     <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#003459;">
         {{ post.username.username }}
 
-        <!-- ⭐ BADGE HERE -->
         {% if post.username.userprofile.display_badge %}
-            <span class="badge-chip">
-                {{ post.username.userprofile.display_badge.icon }}
-                {{ post.username.userprofile.display_badge.name }}
+            {% with badge=post.username.userprofile.display_badge %}
+            <span class="badge-chip badge-color-{{ badge.color }}">
+                {{ badge.icon }}
+                {{ badge.name }}
             </span>
+            {% endwith %}
         {% endif %}
-
-        <!-- ⭐ END BADGE -->
     </div>
-
     <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
 </div>
       </div>
@@ -570,7 +594,6 @@ document.querySelectorAll('.vote-box').forEach(box=>{
 // === Modal báo cáo ===
 document.addEventListener('click',e=>{
   const btn=e.target.closest('.js-open-report');
-  // ✅ SỬA LỖI 2 (TYPO): Sửa .target() thành .dataset.target
   if(btn){const id=btn.dataset.target;const m=document.getElementById(id);if(m)m.style.display='flex';}
   const modal=e.target.closest('.modal');
   if(modal&&(e.target===modal||e.target.hasAttribute('data-close')))modal.style.display='none';
@@ -637,7 +660,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.overflow = 'auto';
   };
 
-  // ✅ SỬA LỖI 3: Thêm hàm chuyển ảnh
   const nextImage = () => { currentImageIndex = (currentImageIndex + 1) % lightboxImages.length; updateLightboxImage(); };
   const prevImage = () => { currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length; updateLightboxImage(); };
 
@@ -666,7 +688,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  // ✅ SỬA LỖI 3: Thêm Event Listener cho bàn phím
   document.addEventListener('keydown', (e) => {
     if (lightbox.style.display === 'block' && lightboxImages.length > 1) { // Thêm điều kiện > 1
       if (e.key === 'ArrowRight') {
