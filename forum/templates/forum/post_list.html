@@ -52,30 +52,18 @@
     border-radius: 10px; /* Bo tròn ít hơn */
     border: 1px solid;
     cursor: default; /* Không cần hover ở đây */
-
-    /* ✅ THÊM MỚI: Hiệu ứng */
     transition: all 0.2s ease-out;
     animation: badgeGlow 3s ease-in-out infinite;
 }
-
-/* ✅ THÊM MỚI: Hiệu ứng Hover */
 .badge-chip:hover {
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
     animation: none; /* Tắt glow khi hover */
 }
-
-/* ✅ THÊM MỚI: Animation "glow" nhẹ */
 @keyframes badgeGlow {
-  0%, 100% {
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  }
-  50% {
-    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-  }
+  0%, 100% { box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  50% { box-shadow: 0 3px 8px rgba(0,0,0,0.08); }
 }
-
-/* Các màu cho chip (dựa trên user_badges.html) */
 .badge-color-gold { background: #fff4c2; border-color: #f7d98b; color: #8a5a00; }
 .badge-color-blue { background: #e0f2fe; border-color: #7dd3fc; color: #0369a1; }
 .badge-color-green { background: #dcfce7; border-color: #86efac; color: #15803d; }
@@ -140,10 +128,7 @@
   cursor: pointer;
   transition: transform 0.2s;
 }
-.post-images img:hover {
-  transform: scale(1.03);
-}
-/* Các layout grid */
+.post-images img:hover { transform: scale(1.03); }
 .images-count-1 { display: flex; justify-content: center; max-height: 450px; }
 .images-count-1 img { position: relative; object-fit: contain; max-height: 450px; width: auto; max-width: 100%; cursor: zoom-in; }
 .images-count-2 { grid-template-columns: 1fr 1fr; height: 300px; }
@@ -152,7 +137,6 @@
 .images-count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
 .images-count-more { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
 .images-count-more .image-wrapper:nth-child(n+5) { display: none; }
-
 .images-count-more .image-wrapper[data-more-count]::after {
   content: attr(data-more-count);
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -368,8 +352,53 @@
   padding: 4px 0;
   color: #003459;
 }
-</style>
 
+
+/* ================================================= */
+/* === ✅ (MỚI) CSS CHO XEM TRƯỚC ẢNH & LOADING === */
+/* ================================================= */
+#image-preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+.image-preview-wrapper {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.image-preview-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* === CSS Nút loading === */
+.btn-primary.is-loading {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+.btn-primary.is-loading .fa-spinner {
+  margin-left: 8px;
+  /* Thêm animation xoay */
+  animation: spin 1s linear infinite;
+}
+/* Định nghĩa animation 'spin' */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+/* ================================== */
+/* === HẾT CSS MỚI === */
+/* ================================== */
+
+
+</style>
 {% endblock %}
 
 {% block content %}
@@ -391,7 +420,7 @@
     <input name="q" value="{{ request.GET.q|default:'' }}" placeholder="Tìm theo tiêu đề/nội dung…">
     <select name="topic">
       <option value="">— Tất cả chủ đề —</option>
-      {% for value,label in topic_choices %}
+      {% for value,label in all_topic_choices %}
         <option value="{{ value }}" {% if request.GET.topic == value %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
@@ -409,21 +438,21 @@
             {{ post.username.username|slice:":1"|upper }}
           {% endif %}
         </div>
-<div>
-    <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#003459;">
-        {{ post.username.username }}
+        <div>
+            <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#003459;">
+                {{ post.username.username }}
 
-        {% if post.username.userprofile.display_badge %}
-            {% with badge=post.username.userprofile.display_badge %}
-            <span class="badge-chip badge-color-{{ badge.color }}">
-                {{ badge.icon }}
-                {{ badge.name }}
-            </span>
-            {% endwith %}
-        {% endif %}
-    </div>
-    <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
-</div>
+                {% if post.username.userprofile.display_badge %}
+                    {% with badge=post.username.userprofile.display_badge %}
+                    <span class="badge-chip badge-color-{{ badge.color }}">
+                        {{ badge.icon }}
+                        {{ badge.name }}
+                    </span>
+                    {% endwith %}
+                {% endif %}
+            </div>
+            <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
+        </div>
       </div>
 
       <h3 class="post-title">{{ post.title }}</h3>
@@ -495,7 +524,6 @@
         {% endwith %}
       {% endif %}
 
-
       <div class="actions">
         <div class="vote-box" data-post="{{ post.post_id }}">
           <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
@@ -529,27 +557,35 @@
       <h3 style="margin:0;color:#003459">Tạo bài viết mới</h3>
       <button class="close-x" data-close>&times;</button>
     </div>
-    <form method="post" action="{% url 'forum:create_post' %}" enctype="multipart/form-data">
+
+    <form id="create-post-form" method="post" action="{% url 'forum:create_post' %}" enctype="multipart/form-data">
       {% csrf_token %}
       <div style="display:grid;gap:10px">
         <input class="form-control" name="title" placeholder="Tiêu đề" required>
+
         <select class="form-control" name="topic" required>
           <option value="" disabled selected>— Chọn chủ đề —</option>
-          {% for value,label in topic_choices %}
+
+          {% for value,label in all_topic_choices %}
             <option value="{{ value }}">{{ label }}</option>
           {% endfor %}
+
         </select>
         <textarea class="form-control" name="content" rows="4" placeholder="Chia sẻ điều gì đó…"></textarea>
-        <input class="form-control" type="file" name="images" accept="image/*" multiple>
+
+        <input id="post-images-input" class="form-control" type="file" name="images" accept="image/*" multiple>
+
+        <div id="image-preview-container"></div>
+
       </div>
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px">
         <button type="button" class="btn-ghost" data-close>Hủy</button>
-        <button type="submit" class="btn-primary">Đăng</button>
+
+        <button id="create-post-submit" type="submit" class="btn-primary">Đăng</button>
       </div>
     </form>
   </div>
 </div>
-
 <div id="image-lightbox" class="lightbox">
   <span class="lightbox-close">×</span>
   <img class="lightbox-content" id="lightbox-img">
@@ -635,14 +671,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const lightboxNext = document.getElementById('lightbox-next');
   const lightboxClose = document.querySelector('.lightbox-close');
 
-  // Đảm bảo các phần tử tồn tại trước khi thêm event
   if (!lightbox || !lightboxImg || !lightboxPrev || !lightboxNext || !lightboxClose) {
     console.error("Lỗi: Không tìm thấy các phần tử Lightbox!");
     return;
   }
-
   const openLightbox = (postElement, src) => {
-    // Tìm tất cả ảnh (bao gồm cả ảnh ẩn trong layout 'more')
     lightboxImages = Array.from(postElement.querySelectorAll('.js-lightbox-trigger')).map(img => img.src);
     currentImageIndex = lightboxImages.indexOf(src);
     updateLightboxImage();
@@ -659,47 +692,31 @@ document.addEventListener("DOMContentLoaded", () => {
     lightbox.style.display = 'none';
     document.body.style.overflow = 'auto';
   };
-
   const nextImage = () => { currentImageIndex = (currentImageIndex + 1) % lightboxImages.length; updateLightboxImage(); };
   const prevImage = () => { currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length; updateLightboxImage(); };
-
   lightboxNext.onclick = nextImage;
   lightboxPrev.onclick = prevImage;
   lightboxClose.onclick = closeLightbox;
   lightbox.onclick = e => { if (e.target === lightbox) closeLightbox(); };
-
-  // Thêm listener cho tất cả ảnh
   document.querySelectorAll('.js-lightbox-trigger').forEach(img => {
     img.addEventListener('click', (e) => {
       e.preventDefault();
       openLightbox(img.closest('.post-images'), img.src);
     });
   });
-
-  // Thêm listener cho nút "+X"
   document.querySelectorAll('.images-count-more .image-wrapper[data-more-count]').forEach(wrapper => {
       wrapper.addEventListener('click', (e) => {
           e.preventDefault();
-          // Mở ảnh đầu tiên
           const firstImg = wrapper.parentElement.querySelector('.js-lightbox-trigger');
-          if(firstImg) {
-            openLightbox(wrapper.closest('.post-images'), firstImg.src);
-          }
+          if(firstImg) { openLightbox(wrapper.closest('.post-images'), firstImg.src); }
       });
   });
-
   document.addEventListener('keydown', (e) => {
-    if (lightbox.style.display === 'block' && lightboxImages.length > 1) { // Thêm điều kiện > 1
-      if (e.key === 'ArrowRight') {
-        nextImage();
-      } else if (e.key === 'ArrowLeft') {
-        prevImage();
-      } else if (e.key === 'Escape') {
-        closeLightbox();
-      }
-    } else if (e.key === 'Escape') {
-        closeLightbox();
-    }
+    if (lightbox.style.display === 'block' && lightboxImages.length > 1) {
+      if (e.key === 'ArrowRight') { nextImage(); }
+      else if (e.key === 'ArrowLeft') { prevImage(); }
+      else if (e.key === 'Escape') { closeLightbox(); }
+    } else if (e.key === 'Escape') { closeLightbox(); }
   });
 });
 </script>
@@ -713,5 +730,72 @@ if(textarea){
   textarea.addEventListener('input',()=>autoGrow(textarea));
   autoGrow(textarea);
 }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // === 1. Hiệu ứng loading khi Đăng bài ===
+  const postForm = document.getElementById('create-post-form');
+  const submitButton = document.getElementById('create-post-submit');
+
+  if (postForm && submitButton) {
+    postForm.addEventListener('submit', () => {
+      // Thêm class 'is-loading'
+      submitButton.classList.add('is-loading');
+
+      // Vô hiệu hóa nút
+      submitButton.disabled = true;
+
+      // Thay đổi nội dung (nhớ thêm fa-spin để nó xoay)
+      submitButton.innerHTML = 'Đang đăng <i class="fa-solid fa-spinner fa-spin"></i>';
+
+      // Khi form submit (full page reload), nút sẽ tự reset.
+      // Nếu sau này bạn đổi sang AJAX, hãy gỡ bỏ class/disabled khi AJAX hoàn tất.
+    });
+  }
+
+  // === 2. Xem trước ảnh khi upload ===
+  const fileInput = document.getElementById('post-images-input');
+  const previewContainer = document.getElementById('image-preview-container');
+
+  if (fileInput && previewContainer) {
+    fileInput.addEventListener('change', (event) => {
+      // Xóa các ảnh xem trước cũ
+      previewContainer.innerHTML = '';
+
+      const files = event.target.files;
+
+      // Giới hạn 5 ảnh
+      if (files.length > 5) {
+          alert("Bạn chỉ có thể tải lên tối đa 5 ảnh.");
+          fileInput.value = ""; // Xóa các file đã chọn
+          return;
+      }
+
+      // Lặp qua các file và tạo preview
+      for (const file of files) {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('image-preview-wrapper');
+
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = file.name;
+
+            wrapper.appendChild(img);
+            previewContainer.appendChild(wrapper);
+          };
+
+          // Đọc file
+          reader.readAsDataURL(file);
+        }
+      }
+    });
+  }
+});
 </script>
 {% endblock %}

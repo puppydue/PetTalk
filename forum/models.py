@@ -7,10 +7,23 @@ from django.contrib.auth.models import User
 # ============================
 class Post(models.Model):
     TOPIC_CHOICES = [
-        ('chamsoc', 'Chăm sóc thú cưng'),
-        ('dinhduong', 'Dinh dưỡng'),
-        ('huanluyen', 'Huấn luyện'),
-        ('capcuu', 'Cấp cứu'),
+        # === Nhóm 1: Sức khỏe & Kỹ thuật ===
+        ('dinhduong', 'Dinh dưỡng & Thức ăn'),
+        ('suckhoe_benhly', 'Sức khỏe & Bệnh lý'),
+        ('huanluyen', 'Huấn luyện & Hành vi'),
+        ('cham_soc', 'Chăm sóc & Vệ sinh'),
+        ('capcuu', 'Cấp cứu & Khẩn cấp'),
+
+        # === Nhóm 2: Cộng đồng & Đời sống ===
+        ('hinh_anh', 'Khoe ảnh Thú cưng'),
+        ('review', 'Đánh giá Dịch vụ & SP'),
+        ('pet_friendly', 'Địa điểm Pet-Friendly'),
+        ('cuu_ho', 'Cứu hộ & Nhận nuôi'),
+
+        # === Nhóm 3: Khác ===
+        ('tim_nha', 'Tìm nhà / Phối giống'),
+        ('ky_niem', 'Kỷ niệm & Tạm biệt'),
+        ('chung', 'Thảo luận chung'),
     ]
 
     post_id = models.AutoField(primary_key=True)

@@ -36,7 +36,7 @@ def post_list(request):
     return render(request, 'forum/post_list.html', {
         'posts': posts,
         'form': form,
-        'topic_choices': Post.TOPIC_CHOICES
+        'all_topic_choices': Post.TOPIC_CHOICES
     })
 
 
