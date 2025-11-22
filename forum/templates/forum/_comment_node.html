@@ -1,0 +1,73 @@
+{% load forum_extras %}
+
+<div class="comment-node {% if c.parent %}is-child{% endif %}" id="comment-{{ c.id }}" style="margin-top: 12px;">
+
+    <div class="comment-box" style="background:{% if c.parent %}#f8fafc{% else %}#f9fafb{% endif %}; padding:12px 14px; border-radius:16px; position:relative; border: 1px solid #f1f5f9;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="avatar">
+            {% if c.username.userprofile.avatar_image %}
+              <img src="{{ c.username.userprofile.avatar_image.url }}" alt="avatar">
+            {% else %}
+              {{ c.username.username|slice:":1"|upper }}
+            {% endif %}
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#003459; font-size:15px;">
+                {{ c.username.username }}
+                {% if c.username.userprofile.display_badge %}
+                    {% with badge=c.username.userprofile.display_badge %}
+                    <span class="badge-chip badge-color-{{ badge.color }}" style="transform:scale(0.9);">
+                        {{ badge.icon }} {{ badge.name }}
+                    </span>
+                    {% endwith %}
+                {% endif %}
+            </div>
+            <small style="color:#94a3b8; font-size:13px"> • {{ c.created_at|date:"d/m/Y H:i" }}</small>
+          </div>
+        </div>
+
+        <div class="comment-menu-wrapper" style="position:relative;">
+          <button class="comment-menu-btn" aria-label="Menu">
+            <i class="fa-solid fa-ellipsis"></i>
+          </button>
+          <div class="comment-menu">
+            {% if c.username == request.user %}
+              <button type="button" class="menu-item js-edit-comment" data-id="{{ c.id }}">
+                <i class="fa-solid fa-pen"></i> Chỉnh sửa
+              </button>
+              <button type="button" class="menu-item danger js-delete-comment" data-id="{{ c.id }}">
+                <i class="fa-solid fa-trash"></i> Xóa
+              </button>
+            {% else %}
+              <button type="button" class="menu-item js-open-report-comment" data-target="report-comment-{{ c.id }}">
+                <i class="fa-solid fa-flag"></i> Báo cáo
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="comment-content">{{ c.content|linebreaksbr }}</div>
+
+      <div style="margin-top: 8px; display:flex; gap:10px;">
+          <button class="js-reply-trigger" data-id="{{ c.id }}" style="background:none; border:none; color:#64748b; font-weight:600; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              <i class="fa-solid fa-reply"></i> Trả lời
+          </button>
+      </div>
+
+      {% include "forum/_report_comment_modal.html" with comment=c %}
+    </div>
+    <div class="reply-form-container hidden" id="reply-form-{{ c.id }}" style="margin-top:10px; margin-left:20px;"></div>
+
+    {% if c.replies.all %}
+        <div class="replies-list" style="margin-left: 24px; padding-left: 10px; border-left: 2px solid #e2e8f0; display: flex; flex-direction: column;">
+            {% for reply in c.replies.all %}
+                {% with c=reply %}
+                    {% include "forum/_comment_node.html" %}
+                {% endwith %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

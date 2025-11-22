@@ -7,20 +7,15 @@ from django.contrib.auth.models import User
 # ============================
 class Post(models.Model):
     TOPIC_CHOICES = [
-        # === Nhóm 1: Sức khỏe & Kỹ thuật ===
         ('dinhduong', 'Dinh dưỡng & Thức ăn'),
         ('suckhoe_benhly', 'Sức khỏe & Bệnh lý'),
         ('huanluyen', 'Huấn luyện & Hành vi'),
         ('cham_soc', 'Chăm sóc & Vệ sinh'),
         ('capcuu', 'Cấp cứu & Khẩn cấp'),
-
-        # === Nhóm 2: Cộng đồng & Đời sống ===
         ('hinh_anh', 'Khoe ảnh Thú cưng'),
         ('review', 'Đánh giá Dịch vụ & SP'),
         ('pet_friendly', 'Địa điểm Pet-Friendly'),
         ('cuu_ho', 'Cứu hộ & Nhận nuôi'),
-
-        # === Nhóm 3: Khác ===
         ('tim_nha', 'Tìm nhà / Phối giống'),
         ('ky_niem', 'Kỷ niệm & Tạm biệt'),
         ('chung', 'Thảo luận chung'),
@@ -57,7 +52,6 @@ class Post(models.Model):
 # 2️⃣ ẢNH TRONG BÀI VIẾT
 # ============================
 class PostsImage(models.Model):
-    # ❌ bỏ dòng: image_id = models.AutoField(primary_key=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='posts/')
     order = models.PositiveIntegerField(default=0, help_text="Thứ tự hiển thị ảnh trong bài viết")
@@ -66,6 +60,7 @@ class PostsImage(models.Model):
         ordering = ['order']
         verbose_name = "Hình ảnh bài viết"
         verbose_name_plural = "Danh sách hình ảnh"
+
 
 # ============================
 # 3️⃣ REACTION (UP/DOWN VOTE)
@@ -88,11 +83,14 @@ class Reaction(models.Model):
 
 
 # ============================
-# 4️⃣ COMMENT
+# 4️⃣ COMMENT (CHỈ GIỮ 1 CÁI NÀY THÔI)
 # ============================
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     username = models.ForeignKey(User, on_delete=models.CASCADE)
+    # 👇 Dòng quan trọng để làm Reply 👇
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+
     content = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -101,6 +99,10 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.username}: {self.content[:40]}"
+
+    @property
+    def children_count(self):
+        return self.replies.count()
 
 
 # ============================
@@ -116,31 +118,30 @@ class ReportsPost(models.Model):
 
     def __str__(self):
         return f"Report {self.post} by {self.reporter}"
+
+
 class ReportsComment(models.Model):
-    rpcmt_id = models.AutoField(primary_key=True)  # Khóa chính
-    username = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='reported_comments'
-    )  # Người báo cáo
+    rpcmt_id = models.AutoField(primary_key=True)
+    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reported_comments')
     comment = models.ForeignKey(
-        'Comment',
+        'Comment',  # Dùng string 'Comment' để tránh lỗi circular import nếu có
         on_delete=models.SET_NULL,
         related_name='reports',
-        null=True,  # 👈 tạm cho phép null để migrate
+        null=True,
         blank=True
-    ) # Bình luận bị báo cáo
-    reason = models.CharField(max_length=255)  # Lý do báo cáo
-    details = models.TextField(blank=True, null=True)  # Chi tiết bổ sung
-    created_at = models.DateTimeField(auto_now_add=True)  # Ngày giờ tạo
-    status = models.CharField(max_length=20, default='pending')  # Trạng thái xử lý
+    )
+    reason = models.CharField(max_length=255)
+    details = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, default='pending')
 
     class Meta:
-        db_table = 'reports_comment'  # Giữ đúng tên bảng như ERD
+        db_table = 'reports_comment'
         ordering = ['-created_at']
         verbose_name = "Báo cáo bình luận"
         verbose_name_plural = "Danh sách báo cáo bình luận"
-        unique_together = ('username', 'comment')  # Mỗi người chỉ báo cáo 1 lần/1 bình luận
+        unique_together = ('username', 'comment')
 
     def __str__(self):
         return f"ReportComment #{self.rpcmt_id} - {self.username} → Comment {self.comment.id}"
+
