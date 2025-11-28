@@ -9,11 +9,11 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
 
 /* Tổng thể */
 .profile-wrapper {
-  max-width: 950px;
-  margin: 0 auto;
-  padding: 0 20px;
-  box-sizing: border-box;
+    width: 100%;
+    padding: 0 10px 30px 10px;
+    box-sizing: border-box;
 }
+
 
 /* Header */
 .profile-header {
@@ -486,132 +486,174 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
 {% endblock %}
 
 {% block content %}
+<div class="forum-container">
 <div class="profile-wrapper">
 
   <div class="profile-header">
     <img src="{% if user_info.avatar_image %}{{ user_info.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Avatar">
+
     <div>
-      <h2>{{ request.user.get_full_name|default:request.user.username }}</h2>
-      <p>@{{ request.user.username }}</p>
-      <p>Thành viên từ: {{ request.user.date_joined|date:"Y" }} · {{ posts_count|default:"0" }} bài viết · {{ comments_count|default:"0" }} bình luận</p>
+      <h2>{{ view_user.get_full_name|default:view_user.username }}</h2>
+      <p>@{{ view_user.username }}</p>
+      <p>Thành viên từ: {{ view_user.date_joined|date:"Y" }} · {{ posts_count }} bài viết · {{ comments_count }} bình luận</p>
     </div>
+
   </div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="showTab('overview')">Overview</div>
-    <div class="tab" onclick="showTab('posts')">Posts</div>
-    <div class="tab" onclick="showTab('comments')">Comments</div>
-  </div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('overview')">Overview</div>
+  <div class="tab" onclick="showTab('posts')">Posts</div>
+  <div class="tab" onclick="showTab('comments')">Comments</div>
+</div>
 
-  <div id="overview" class="section active">
-    <div class="card">
-      <h3>Thông tin cá nhân</h3>
+<div id="overview" class="section active">
+
+  <div class="card">
+    <h3>Thông tin cá nhân</h3>
+
+    {% if is_owner %}
+      <!-- FORM CHỈNH SỬA KHI XEM CHÍNH MÌNH -->
       <form method="POST" action="{% url 'profiles:my_profile' %}" enctype="multipart/form-data" class="info-form no-box">
         {% csrf_token %}
         <input type="hidden" name="form_name" value="user_form">
+
         <div><label>Họ và tên</label><input type="text" name="first_name" value="{{ request.user.first_name }}"></div>
         <div><label>Ngày sinh</label>{{ form.birthdate }}</div>
         <div><label>Số điện thoại</label>{{ form.phone }}</div>
         <div><label>Email</label><input type="email" name="email" value="{{ request.user.email }}"></div>
         <div><label>Địa chỉ</label>{{ form.location }}</div>
+
         <div>
           <label>Vai trò</label>
-          <input type="text" value="{{ user_info.get_role_display }}" readonly style="background:#f5f5f5; font-weight:600;">
+          <input type="text" value="{{ user_info.get_role_display }}" readonly>
         </div>
+
         <div class="full-width avatar-upload-container" data-preview-target="user_avatar_preview">
           <label>Ảnh đại diện</label>
           <div class="avatar-upload-wrapper">
-            <img src="{% if user_info.avatar_image %}{{ user_info.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Xem trước" class="avatar-preview" id="user_avatar_preview">
+            <img src="{% if user_info.avatar_image %}{{ user_info.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" id="user_avatar_preview" class="avatar-preview">
+
             <div class="avatar-controls">
-              <button type="button" class="btn-change-avatar" onclick="triggerAvatarInput(this)">
-                <span>🖼️ Đổi ảnh</span>
-              </button>
+              <button type="button" class="btn-change-avatar" onclick="triggerAvatarInput(this)">🖼️ Đổi ảnh</button>
+
               {% if user_info.avatar_image %}
-              <button type="button" class="btn-clear-avatar" onclick="clearAvatarInput(this)">
-                <span>🗑️ Xóa ảnh</span>
-              </button>
+              <button type="button" class="btn-clear-avatar" onclick="clearAvatarInput(this)">🗑️ Xóa ảnh</button>
               {% endif %}
+
               <div class="django-avatar-field">
                 {{ form.avatar_image }}
               </div>
+
             </div>
           </div>
         </div>
-        <div class="full-width" style="display:flex;align-items:center;gap:12px;">
+
+        <div class="full-width">
           <button type="submit" class="btn-primary">💾 Lưu thông tin</button>
         </div>
-      </form>
-    </div>
 
-    <div class="card">
-      <h3>Thông tin thú cưng</h3>
-      {% for pet, pform in pet_form_pairs %}
-        <div class="pet-item">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-            <div style="display:flex;align-items:center;gap:16px;">
-              <div style="width:70px;height:70px;border-radius:14px;overflow:hidden;background:#f0f0f0;">
-                {% if pet.avatar_image %}
-                  <img src="{{ pet.avatar_image.url }}" style="width:100%;height:100%;object-fit:cover;">
-                {% else %}
-                  <img src="{% static 'images/default_avatar.png' %}" style="width:100%;height:100%;object-fit:cover;opacity:0.5;">
-                {% endif %}
-              </div>
-              <div>
-                <h4 style="margin:0;">{{ pet.name }}</h4>
-                <small>{{ pet.species }}{% if pet.sex %} · {{ pet.get_sex_display }}{% endif %}</small>
-              </div>
+      </form>
+
+    {% else %}
+      <!-- CHẾ ĐỘ XEM NGƯỜI KHÁC -->
+      <div class="info-form no-box">
+        <div><label>Họ và tên</label><p>{{ view_user.get_full_name|default:"Chưa cập nhật" }}</p></div>
+        <div><label>Ngày sinh</label><p>{{ user_info.birthdate|default:"Chưa cập nhật" }}</p></div>
+        <div><label>Số điện thoại</label><p>{{ user_info.phone|default:"Chưa cập nhật" }}</p></div>
+        <div><label>Email</label><p>{{ view_user.email|default:"Không hiển thị" }}</p></div>
+        <div><label>Địa chỉ</label><p>{{ user_info.location|default:"Chưa cập nhật" }}</p></div>
+        <div><label>Vai trò</label><p>{{ user_info.get_role_display }}</p></div>
+      </div>
+    {% endif %}
+
+  </div>
+
+  <div class="card">
+    <h3>Thông tin thú cưng</h3>
+
+    {% for pet, pform in pet_form_pairs %}
+
+      <div class="pet-item">
+        <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+          <div style="display:flex; gap:16px;">
+            <div style="width:70px;height:70px;border-radius:14px;overflow:hidden">
+              {% if pet.avatar_image %}
+                <img src="{{ pet.avatar_image.url }}" style="width:100%;height:100%;object-fit:cover;">
+              {% else %}
+                <img src="{% static 'images/default_avatar.png' %}" style="opacity:0.5">
+              {% endif %}
             </div>
-            <div style="display:flex;gap:24px;text-align:center;">
-              <div><h4 style="margin:0;color:#003459;">{{ pet.age_years|default:"—" }}</h4><p style="margin:0;color:#6c757d;font-size:14px;">Tuổi</p></div>
-              <div><h4 style="margin:0;color:#003459;">{{ pet.weight_kg|default:"—" }}</h4><p style="margin:0;color:#6c757d;font-size:14px;">Kg</p></div>
+
+            <div>
+              <h4>{{ pet.name }}</h4>
+              <small>{{ pet.species }}{% if pet.sex %} · {{ pet.get_sex_display }}{% endif %}</small>
             </div>
           </div>
 
+          <div style="display:flex; gap:24px;">
+            <div><h4>{{ pet.age_years }}</h4><p>Tuổi</p></div>
+            <div><h4>{{ pet.weight_kg }}</h4><p>Kg</p></div>
+          </div>
+        </div>
+
+        {% if is_owner %}
+          <!-- FORM CHỈNH SỬA PET -->
           <form method="POST" action="{% url 'profiles:pet_update' pet.id %}" enctype="multipart/form-data" class="info-form no-box">
             {% csrf_token %}
             <input type="hidden" name="form_name" value="pet_form_{{ pet.id }}">
+
             <div><label>Tên thú cưng</label>{{ pform.name }}</div>
             <div><label>Giới tính</label>{{ pform.sex }}</div>
             <div><label>Loài</label>{{ pform.species }}</div>
             <div><label>Ngày sinh</label>{{ pform.birthdate }}</div>
-            <div><label>Cân nặng (kg)</label>{{ pform.weight_kg }}</div>
+            <div><label>Cân nặng</label>{{ pform.weight_kg }}</div>
+
             <div class="full-width avatar-upload-container" data-preview-target="pet_avatar_preview_{{ pet.id }}">
               <label>Ảnh đại diện</label>
               <div class="avatar-upload-wrapper">
-                <img src="{% if pet.avatar_image %}{{ pet.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Xem trước" class="avatar-preview" id="pet_avatar_preview_{{ pet.id }}">
+                <img src="{% if pet.avatar_image %}{{ pet.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}"
+                     id="pet_avatar_preview_{{ pet.id }}" class="avatar-preview">
+
                 <div class="avatar-controls">
-                  <button type="button" class="btn-change-avatar" onclick="triggerAvatarInput(this)">
-                    <span>🖼️ Đổi ảnh</span>
-                  </button>
+                  <button type="button" class="btn-change-avatar" onclick="triggerAvatarInput(this)">🖼️ Đổi ảnh</button>
+
                   {% if pet.avatar_image %}
-                  <button type="button" class="btn-clear-avatar" onclick="clearAvatarInput(this)">
-                    <span>🗑️ Xóa ảnh</span>
-                  </button>
+                  <button type="button" class="btn-clear-avatar" onclick="clearAvatarInput(this)">🗑️ Xóa ảnh</button>
                   {% endif %}
-                  <div class="django-avatar-field">
-                    {{ pform.avatar_image }}
-                  </div>
+
+                  <div class="django-avatar-field">{{ pform.avatar_image }}</div>
                 </div>
+
               </div>
             </div>
-            <div class="full-width" style="display:flex;align-items:center;gap:12px;">
-              <button type="submit" class="btn-primary">💾 Lưu thú cưng</button>
-              <a href="{% url 'profiles:pet_delete' pet.id %}"
-                 class="btn-danger"
-                 onclick="return confirm('Bạn có chắc muốn xóa thú cưng {{ pet.name|escapejs }}? Hành động này không thể hoàn tác.');">
-                🗑️ Xóa thú cưng
-              </a>
-            </div>
-          </form>
-        </div>
-      {% empty %}
-        <p style="text-align:center;color:#6c757d;">Chưa có thú cưng nào. Hãy thêm mới bên dưới 🐾</p>
-      {% endfor %}
-    </div>
 
-  <div class="card add-pet">
-    <button id="openAddPet" class="btn-primary" type="button" style="font-size:16px;">➕ Thêm thú cưng mới</button>
+            <div class="full-width">
+              <button type="submit" class="btn-primary">💾 Lưu thú cưng</button>
+              <a href="{% url 'profiles:pet_delete' pet.id %}" class="btn-danger">🗑️ Xóa</a>
+            </div>
+
+          </form>
+
+        {% endif %}
+
+      </div>
+
+    {% empty %}
+      <p style="color:#6c757d;text-align:center;">Không có thú cưng.</p>
+    {% endfor %}
+
   </div>
+
+
+  {% if is_owner %}
+  <div class="card add-pet">
+    <button id="openAddPet" class="btn-primary">➕ Thêm thú cưng mới</button>
+  </div>
+
+  {% endif %}
+
+</div>
+
 </div> <div id="addPetPopup" class="popup">
   <div class="popup-content" style="flex-direction:column; align-items:stretch; width:520px; max-width:95%;">
     <h3 style="text-align:center; color:#003459; margin-bottom:16px;">Thêm thú cưng mới</h3>
@@ -647,84 +689,97 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
 
 
   <div id="posts" class="section" style="display:none;">
-    <div class="post-list">
-      {% for post in posts %}
-        {% reaction_of post request.user as me_react %}
-        <article class="post-card" data-post="{{ post.post_id }}">
-          <div class="user-info" style="display:flex;gap:10px;align-items:center;">
-            <div class="avatar">
-              {% if post.username.userprofile.avatar_image %}
-                <img src="{{ post.username.userprofile.avatar_image.url }}" alt="avatar">
-              {% else %}
-                {{ post.username.username|slice:":1"|upper }}
-              {% endif %}
-            </div>
-            <div>
-              <div style="font-weight:700;color:#003459">{{ post.username.username }}</div>
-              <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
-            </div>
+  <div class="post-list">
+    {% for post in posts %}
+      {% reaction_of post request.user as me_react %}
+      <article class="post-card" data-post="{{ post.post_id }}">
+
+        <div class="user-info" style="display:flex;gap:10px;align-items:center;">
+          <div class="avatar">
+            {% if post.username.userprofile.avatar_image %}
+              <img src="{{ post.username.userprofile.avatar_image.url }}" alt="avatar">
+            {% else %}
+              {{ post.username.username|slice:":1"|upper }}
+            {% endif %}
+          </div>
+          <div>
+            <div style="font-weight:700;color:#003459">{{ post.username.username }}</div>
+            <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
+          </div>
+        </div>
+
+        <h3 class="post-title">{{ post.title }}</h3>
+        <div class="post-content">{{ post.content|linebreaksbr }}</div>
+
+        {% if post.images.all %}
+          <div class="post-images">
+            {% for img in post.images.all %}
+              <img src="{{ img.image.url }}" alt="post image">
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="actions">
+
+          <!-- Vote -->
+          <div class="vote-box" data-post="{{ post.post_id }}">
+            <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <span class="vote-count js-count">{{ post.total_votes|default:0 }}</span>
+            <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote">
+              <i class="fa-solid fa-arrow-down"></i>
+            </button>
           </div>
 
-          <h3 class="post-title">{{ post.title }}</h3>
-          <div class="post-content">{{ post.content|linebreaksbr }}</div>
+          <!-- Count comments -->
+          <a class="btn-ghost" href="{% url 'forum:post_detail' post.post_id %}">
+            <i class="fa-regular fa-comment"></i> {{ post.comments.count }}
+          </a>
 
-          {% if post.images.all %}
-            <div class="post-images">
-              {% for img in post.images.all %}
-                <img src="{{ img.image.url }}" alt="post image">
-              {% endfor %}
-            </div>
-          {% endif %}
-
-          <div class="actions">
-            <div class="vote-box" data-post="{{ post.post_id }}">
-              <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
-                <i class="fa-solid fa-arrow-up"></i>
-              </button>
-              <span class="vote-count js-count">{{ post.total_votes|default:0 }}</span>
-              <button class="vote-btn js-vote {% if me_react == 'downvote' %}active-down{% endif %}" data-type="downvote">
-                <i class="fa-solid fa-arrow-down"></i>
-              </button>
-            </div>
-
-            <a class="btn-ghost" href="{% url 'forum:post_detail' post.post_id %}">
-              <i class="fa-regular fa-comment"></i> {{ post.comments.count }}
-            </a>
-
+          {% if is_owner %}
+            <!-- Chỉ hiện khi chủ sở hữu -->
             <a href="{% url 'forum:post_edit' post.post_id %}" class="btn-ghost btn-edit" style="margin-left: auto;">
                 ✏️ Sửa
             </a>
-            <a href="{% url 'forum:post_delete' post.post_id %}" class="btn-ghost btn-delete" onclick="return confirm('Bạn có chắc muốn xóa bài viết này?');">
+            <a href="{% url 'forum:post_delete' post.post_id %}" class="btn-ghost btn-delete"
+               onclick="return confirm('Bạn có chắc muốn xóa bài viết này?');">
                 🗑️ Xóa
             </a>
+          {% endif %}
 
-          </div>
-        </article>
-      {% empty %}
-        <p style="color:#64748b;text-align:center; padding: 20px;">Chưa có bài viết nào.</p>
-      {% endfor %}
-    </div>
-  </div>
-
-  <div id="comments" class="section profile-item-list" style="display:none;">
-    <div class="card">
-      {% for comment in comments %}
-        <div class="profile-comment-item">
-          <div class="profile-item-content">
-            <p>"{{ comment.content|truncatewords:20 }}"</p>
-            <small>
-              Bình luận trong bài:
-              <strong><a href="{% url 'forum:post_detail' comment.post.post_id %}">{{ comment.post.title }}</a></strong>
-            </small>
-          </div>
         </div>
-      {% empty %}
-        <p style="text-align:center;color:#6c757d;padding: 20px 0;">Chưa có bình luận nào.</p>
-      {% endfor %}
-    </div>
-  </div>
 
-</div> <script>
+      </article>
+    {% empty %}
+      <p style="color:#64748b;text-align:center; padding: 20px;">Người dùng chưa có bài viết nào.</p>
+    {% endfor %}
+  </div>
+</div>
+
+
+<div id="comments" class="section profile-item-list" style="display:none;">
+  <div class="card">
+    {% for comment in comments %}
+      <div class="profile-comment-item">
+        <div class="profile-item-content">
+          <p>"{{ comment.content|truncatewords:20 }}"</p>
+          <small>
+            Bình luận trong:
+            <strong><a href="{% url 'forum:post_detail' comment.post.post_id %}">{{ comment.post.title }}</a></strong>
+          </small>
+        </div>
+      </div>
+    {% empty %}
+      <p style="text-align:center;color:#6c757d;padding: 20px 0;">Người dùng chưa có bình luận nào.</p>
+    {% endfor %}
+  </div>
+</div>
+
+
+</div>
+
+<script>
 // --- JAVASCRIPT ---
 
 // ✅ JS MỚI: getCookie và csrftoken (cho Vote)
