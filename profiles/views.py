@@ -71,10 +71,11 @@ def my_profile(request):
 
 
 @login_required
+@login_required
 def view_user_profile(request, username):
     user_obj = get_object_or_404(User, username=username)
 
-    # Nếu người xem chính là chủ → chuyển sang my_profile (cho đồng nhất)
+    # Nếu người xem chính là chủ → chuyển sang my_profile
     if user_obj == request.user:
         return redirect("profiles:my_profile")
 
@@ -82,27 +83,36 @@ def view_user_profile(request, username):
     profile = get_object_or_404(UserProfile, user=user_obj)
     pets = PetProfile.objects.filter(user=user_obj).order_by("created_at")
 
+    # ⭐⭐⭐ QUAN TRỌNG: GHÉP CẶP (pet, None) — vì người xem không có quyền sửa
+    pet_form_pairs = [(pet, None) for pet in pets]
+
     # Lấy bài viết & bình luận của người đó
     posts = Post.objects.filter(username=user_obj).order_by('-created_at')
     comments = Comment.objects.filter(username=user_obj).select_related('post').order_by('-created_at')
 
     ctx = {
         "user_info": profile,
-        "form": None,          # KHÔNG có form chỉnh sửa
+        "form": None,
         "add_pet_form": None,
-        "pet_form_pairs": [],  # KHÔNG có form sửa pet
+
+        # ⭐⭐⭐ BẢN CHUẨN ĐỂ TEMPLATE HIỂN THỊ PET CHO NGƯỜI KHÁC
+        "pet_form_pairs": pet_form_pairs,
+
         "saved_user": False,
         "saved_pet_id": None,
         "added_pet": False,
+
         "posts": posts,
         "comments": comments,
         "posts_count": posts.count(),
         "comments_count": comments.count(),
-        "is_owner": False,     # ⭐ QUAN TRỌNG
-        "view_user": user_obj, # để hiển thị tên đúng
+
+        "is_owner": False,
+        "view_user": user_obj,
     }
 
     return render(request, "profiles/profile_detail.html", ctx)
+
 
 
 @login_required

@@ -571,76 +571,85 @@ body { background: #fff8ed; font-family: 'Be Vietnam Pro', sans-serif; }
   <div class="card">
     <h3>Thông tin thú cưng</h3>
 
-    {% for pet, pform in pet_form_pairs %}
+   {% for pet, pform in pet_form_pairs %}
 
-      <div class="pet-item">
-        <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-          <div style="display:flex; gap:16px;">
-            <div style="width:70px;height:70px;border-radius:14px;overflow:hidden">
+  <div class="pet-item">
+    <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+      <div style="display:flex; gap:16px;">
+        <div style="width:70px;height:70px;border-radius:14px;overflow:hidden">
+          {% if pet.avatar_image %}
+            <img src="{{ pet.avatar_image.url }}" style="width:100%;height:100%;object-fit:cover;">
+          {% else %}
+            <img src="{% static 'images/default_avatar.png' %}" style="opacity:0.5">
+          {% endif %}
+        </div>
+
+        <div>
+          <h4>{{ pet.name }}</h4>
+          <small>{{ pet.species }}{% if pet.sex %} · {{ pet.get_sex_display }}{% endif %}</small>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:24px;">
+        <div><h4>{{ pet.age_years }}</h4><p>Tuổi</p></div>
+        <div><h4>{{ pet.weight_kg }}</h4><p>Kg</p></div>
+      </div>
+    </div>
+
+    {% if is_owner %}
+      <!-- FORM CHỈNH SỬA THÚ CƯNG -->
+      <form method="POST" action="{% url 'profiles:pet_update' pet.id %}" enctype="multipart/form-data" class="info-form no-box">
+        {% csrf_token %}
+        <input type="hidden" name="form_name" value="pet_form_{{ pet.id }}">
+
+        <div><label>Tên thú cưng</label>{{ pform.name }}</div>
+        <div><label>Giới tính</label>{{ pform.sex }}</div>
+        <div><label>Loài</label>{{ pform.species }}</div>
+        <div><label>Ngày sinh</label>{{ pform.birthdate }}</div>
+        <div><label>Cân nặng</label>{{ pform.weight_kg }}</div>
+
+        <div class="full-width avatar-upload-container" data-preview-target="pet_avatar_preview_{{ pet.id }}">
+          <label>Ảnh đại diện</label>
+          <div class="avatar-upload-wrapper">
+            <img src="{% if pet.avatar_image %}{{ pet.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}"
+                 id="pet_avatar_preview_{{ pet.id }}" class="avatar-preview">
+
+            <div class="avatar-controls">
+              <button type="button" class="btn-change-avatar" onclick="triggerAvatarInput(this)">🖼️ Đổi ảnh</button>
+
               {% if pet.avatar_image %}
-                <img src="{{ pet.avatar_image.url }}" style="width:100%;height:100%;object-fit:cover;">
-              {% else %}
-                <img src="{% static 'images/default_avatar.png' %}" style="opacity:0.5">
+              <button type="button" class="btn-clear-avatar" onclick="clearAvatarInput(this)">🗑️ Xóa ảnh</button>
               {% endif %}
+
+              <div class="django-avatar-field">{{ pform.avatar_image }}</div>
             </div>
 
-            <div>
-              <h4>{{ pet.name }}</h4>
-              <small>{{ pet.species }}{% if pet.sex %} · {{ pet.get_sex_display }}{% endif %}</small>
-            </div>
-          </div>
-
-          <div style="display:flex; gap:24px;">
-            <div><h4>{{ pet.age_years }}</h4><p>Tuổi</p></div>
-            <div><h4>{{ pet.weight_kg }}</h4><p>Kg</p></div>
           </div>
         </div>
 
-        {% if is_owner %}
-          <!-- FORM CHỈNH SỬA PET -->
-          <form method="POST" action="{% url 'profiles:pet_update' pet.id %}" enctype="multipart/form-data" class="info-form no-box">
-            {% csrf_token %}
-            <input type="hidden" name="form_name" value="pet_form_{{ pet.id }}">
+        <div class="full-width">
+          <button type="submit" class="btn-primary">💾 Lưu thú cưng</button>
+          <a href="{% url 'profiles:pet_delete' pet.id %}" class="btn-danger">🗑️ Xóa</a>
+        </div>
+      </form>
 
-            <div><label>Tên thú cưng</label>{{ pform.name }}</div>
-            <div><label>Giới tính</label>{{ pform.sex }}</div>
-            <div><label>Loài</label>{{ pform.species }}</div>
-            <div><label>Ngày sinh</label>{{ pform.birthdate }}</div>
-            <div><label>Cân nặng</label>{{ pform.weight_kg }}</div>
-
-            <div class="full-width avatar-upload-container" data-preview-target="pet_avatar_preview_{{ pet.id }}">
-              <label>Ảnh đại diện</label>
-              <div class="avatar-upload-wrapper">
-                <img src="{% if pet.avatar_image %}{{ pet.avatar_image.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}"
-                     id="pet_avatar_preview_{{ pet.id }}" class="avatar-preview">
-
-                <div class="avatar-controls">
-                  <button type="button" class="btn-change-avatar" onclick="triggerAvatarInput(this)">🖼️ Đổi ảnh</button>
-
-                  {% if pet.avatar_image %}
-                  <button type="button" class="btn-clear-avatar" onclick="clearAvatarInput(this)">🗑️ Xóa ảnh</button>
-                  {% endif %}
-
-                  <div class="django-avatar-field">{{ pform.avatar_image }}</div>
-                </div>
-
-              </div>
-            </div>
-
-            <div class="full-width">
-              <button type="submit" class="btn-primary">💾 Lưu thú cưng</button>
-              <a href="{% url 'profiles:pet_delete' pet.id %}" class="btn-danger">🗑️ Xóa</a>
-            </div>
-
-          </form>
-
-        {% endif %}
-
+    {% else %}
+      <!-- 🔵 CHẾ ĐỘ XEM NGƯỜI KHÁC: CHỈ HIỂN THỊ, KHÔNG CHỈNH SỬA -->
+      <div class="info-form no-box">
+        <div><label>Tên thú cưng</label><p>{{ pet.name }}</p></div>
+        <div><label>Giới tính</label><p>{{ pet.get_sex_display|default:"Không rõ" }}</p></div>
+        <div><label>Loài</label><p>{{ pet.species }}</p></div>
+        <div><label>Ngày sinh</label><p>{{ pet.birthdate|default:"Chưa cập nhật" }}</p></div>
+        <div><label>Cân nặng</label><p>{{ pet.weight_kg }} kg</p></div>
       </div>
+    {% endif %}
 
-    {% empty %}
-      <p style="color:#6c757d;text-align:center;">Không có thú cưng.</p>
-    {% endfor %}
+  </div>
+
+{% empty %}
+  <p style="color:#6c757d;text-align:center;">Không có thú cưng.</p>
+{% endfor %}
+
 
   </div>
 
