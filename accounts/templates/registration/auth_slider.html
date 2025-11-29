@@ -58,45 +58,62 @@
     {% endif %}
 
     <div class="container {% if active_panel == 'register' %}right-panel-active{% endif %}" id="container">
+        <div class="form-container sign-in">
+          <form method="post" action="">
+            {% csrf_token %}
+            <h2>Đăng nhập</h2>
 
-      <div class="form-container sign-in">
-        <form method="post" action="">
-          {% csrf_token %}
-          <h2>Đăng nhập</h2>
-          {{ login_form.username }}
-          {{ login_form.password }}
-          <input type="hidden" name="next" value="{{ request.GET.next }}">
-          <a href="{% url 'password_reset' %}">Quên mật khẩu?</a>
-          <button class="btn" type="submit" name="login">Đăng nhập</button>
-        </form>
-      </div>
+            {% if login_form.non_field_errors %}
+              <div class="form-error">
+                {{ login_form.non_field_errors }}
+              </div>
+            {% endif %}
+            {{ login_form.username }}
+            {% if login_form.username.errors %}
+                <div class="form-error">{{ login_form.username.errors }}</div>
+            {% endif %}
 
-      <div class="form-container sign-up">
-        <form method="post" action="">
-          {% csrf_token %}
-          <h2>Tạo tài khoản mới</h2>
+            {{ login_form.password }}
+            {% if login_form.password.errors %}
+                <div class="form-error">{{ login_form.password.errors }}</div>
+            {% endif %}
 
-          {% if register_form.non_field_errors %}
-            <div class="form-error">
-              {{ register_form.non_field_errors }}
-            </div>
-          {% endif %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            <a href="{% url 'password_reset' %}">Quên mật khẩu?</a>
+            <button class="btn" type="submit" name="login">Đăng nhập</button>
+          </form>
+        </div>
 
-          {{ register_form.username }}
-          {% if register_form.username.errors %}
-            <div class="form-error">{{ register_form.username.errors }}</div>
-          {% endif %}
+        <div class="form-container sign-up">
+          <form method="post" action="">
+            {% csrf_token %}
+            <h2>Tạo tài khoản mới</h2>
 
-          {{ register_form.password1 }}
+            {% if register_form.non_field_errors %}
+              <div class="form-error">
+                {{ register_form.non_field_errors }}
+              </div>
+            {% endif %}
 
-          {{ register_form.password2 }}
-          {% if register_form.password2.errors %}
-            <div class="form-error">{{ register_form.password2.errors }}</div>
-          {% endif %}
+            {{ register_form.username }}
+            {% if register_form.username.errors %}
+              <div class="form-error">{{ register_form.username.errors }}</div>
+            {% endif %}
 
-          <button class="btn" type="submit" name="register">Đăng ký</button>
-        </form>
-      </div>
+            {{ register_form.email }}
+            {% if register_form.email.errors %}
+              <div class="form-error">{{ register_form.email.errors }}</div>
+            {% endif %}
+            {{ register_form.password1 }}
+
+            {{ register_form.password2 }}
+            {% if register_form.password2.errors %}
+              <div class="form-error">{{ register_form.password2.errors }}</div>
+            {% endif %}
+
+            <button class="btn" type="submit" name="register">Đăng ký</button>
+          </form>
+        </div>
 
       <div class="overlay-container">
         <div class="overlay">

@@ -59,10 +59,17 @@ class CustomRegisterForm(UserCreationForm):
             'password_mismatch': _("Mật khẩu nhập lại không khớp."),
         }
     )
+    email = forms.EmailField(
+        label="",
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Email (Bắt buộc)',
+            'class': 'input-field'
+        })
+    )
 
     class Meta:
         model = User
-        fields = ['username']  # Chỉ cần username ở đây, password sẽ được xử lý riêng
+        fields = ['username', 'email']
 
     # Bạn cũng có thể thêm các thông báo lỗi cho mật khẩu ở đây
     # Ghi đè phương thức clean_password2 để kiểm tra và trả về lỗi tùy chỉnh
@@ -75,8 +82,8 @@ class CustomRegisterForm(UserCreationForm):
                 code='password_mismatch'  # Mã này khớp với error_messages ở trên
             )
         return password_2
-
-    # Django tự động validate các lỗi mật khẩu khác
-    # (quá ngắn, quá phổ biến, v.v.)
-    # Để dịch chúng, bạn cần cấu hình trong file settings.py
-    # nhưng cách trên là đủ cho các lỗi cơ bản rồi.
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Email này đã được sử dụng bởi tài khoản khác.")
+        return email
