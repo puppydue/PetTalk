@@ -396,8 +396,54 @@
 /* ================================== */
 /* === HẾT CSS MỚI === */
 /* ================================== */
+.post-menu-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #64748b;
+}
+.post-menu-btn:hover { color: #003459; }
 
+.post-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.1);
+  padding: 8px;
+  min-width: 140px;
+  z-index: 99;
+}
+.post-menu button,
+.post-menu a {
+  display: block;
+  text-align: left;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 8px;
+  color: #0f172a;
+}
+.post-menu button:hover,
+.post-menu a:hover {
+  background: #f7f7f7;
+}
 
+.post-images {
+  display: grid;
+  gap: 4px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 15px;
+  place-items: center;        /* Dòng này sẽ căn giữa mọi trường hợp */
+}
 </style>
 {% endblock %}
 
@@ -453,6 +499,18 @@
             </div>
             <small style="color:#64748b">{{ post.created_at|date:"d/m/Y H:i" }}</small>
         </div>
+          {% if post.username == request.user %}
+<div class="post-menu-wrapper" style="margin-left:auto; position:relative;">
+  <button class="post-menu-btn" data-menu="{{ post.post_id }}">⋯</button>
+
+  <div class="post-menu" id="menu-{{ post.post_id }}">
+    <button class="js-open-edit" data-post="{{ post.post_id }}">✏️ Sửa</button>
+    <a href="{% url 'forum:post_delete' post.post_id %}"
+       onclick="return confirm('Bạn chắc muốn xóa bài này?')">🗑️ Xóa</a>
+  </div>
+</div>
+{% endif %}
+
       </div>
 
       <h3 class="post-title">{{ post.title }}</h3>
@@ -593,6 +651,46 @@
   <a class="lightbox-prev" id="lightbox-prev">&#10094;</a>
   <a class="lightbox-next" id="lightbox-next">&#10095;</a>
 </div>
+<div id="edit-post-modal" class="modal">
+  <div class="modal__panel" style="max-width: 680px;">
+    <div class="modal__head">
+      <h3>Chỉnh sửa bài viết</h3>
+      <button class="close-x" data-close>&times;</button>
+    </div>
+
+    <form id="edit-post-form" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div style="display:grid; gap:12px;">
+        <input type="text" id="edit-title" name="title" placeholder="Tiêu đề" required>
+        <select id="edit-topic" name="topic" required>
+          <option value="" disabled>— Chọn chủ đề —</option>
+          {% for value,label in all_topic_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+        <textarea id="edit-content" name="content" rows="5" placeholder="Nội dung..."></textarea>
+
+        <!-- Ảnh hiện có -->
+        <div>
+        <div id="old-images" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+
+        <!-- Thêm ảnh mới -->
+        <input type="file" name="images" accept="image/*" multiple id="edit-images-input">
+        <div id="edit-preview" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;"></div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-ghost" data-close>Hủy</button>
+        <button type="submit" class="btn-primary is-loading-hide">
+          <span class="text">Lưu thay đổi</span>
+          <i class="fa-solid fa-spinner fa-spin" style="display:none"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 
 {% endblock %}
 
@@ -607,58 +705,61 @@ document.getElementById('btn-open-create')?.addEventListener('click',()=>modal.s
 modal?.addEventListener('click',e=>{if(e.target===modal||e.target.hasAttribute('data-close'))modal.style.display='none'});
 
 // === Vote AJAX ===
-document.querySelectorAll('.vote-box').forEach(box=>{
-  const buttons=box.querySelectorAll('.js-vote');
-  const countEl=box.querySelector('.js-count');
-  buttons.forEach(btn=>{
-    btn.addEventListener('click',async()=>{
-      const type=btn.dataset.type;
-      const postId=box.dataset.post;
-      const url=`/forum/${postId}/react/${type}/`;
-      const res=await fetch(url,{method:'POST',headers:{'X-CSRFToken':csrftoken,'X-Requested-With':'XMLHttpRequest'}});
-      if(res.ok){
-        const data=await res.json();
-        countEl.textContent=data.total_votes??0;
-        buttons.forEach(b=>b.classList.remove('active-up','active-down'));
-        if(data.reaction==='upvote')box.querySelector('[data-type="upvote"]').classList.add('active-up');
-        if(data.reaction==='downvote')box.querySelector('[data-type="downvote"]').classList.add('active-down');
-      }
+document.querySelectorAll(".js-open-edit").forEach(btn => {
+  btn.addEventListener("click", async () => {
+
+    const postId = btn.dataset.post;
+    const modal = document.getElementById("edit-post-modal");
+    modal.style.display = "flex";
+
+    const res = await fetch(`/forum/${postId}/edit-data/`);
+    const data = await res.json();
+
+    // Điền nội dung
+    document.getElementById("edit-title").value = data.title;
+    document.getElementById("edit-content").value = data.content;
+    document.getElementById("edit-topic").value = data.topic;
+
+    // Action của form
+document.getElementById("edit-post-form").action = `/forum/post/${postId}/edit/`;
+
+    // Load ảnh cũ
+    const oldBox = document.getElementById("old-images");
+    oldBox.innerHTML = "";
+
+    data.images.forEach(img => {
+      oldBox.innerHTML += `
+        <div style="position:relative; display:inline-block; margin:6px;">
+          <img src="${img.url}" style="width:90px;height:90px;border-radius:8px;">
+          <button class="remove-old-img"
+                  data-id="${img.id}"
+                  style="position:absolute;top:2px;right:2px;background:#fff;border:none;width:22px;height:22px;border-radius:50%;">✖</button>
+        </div>
+      `;
     });
   });
 });
 
+
 // === Modal báo cáo ===
-document.addEventListener('click',e=>{
-  const btn=e.target.closest('.js-open-report');
-  if(btn){const id=btn.dataset.target;const m=document.getElementById(id);if(m)m.style.display='flex';}
-  const modal=e.target.closest('.modal');
-  if(modal&&(e.target===modal||e.target.hasAttribute('data-close')))modal.style.display='none';
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".remove-old-img");
+  if (!btn) return;
+
+  const id = btn.dataset.id;
+
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = "delete_images";
+  hidden.value = id;
+
+  document.getElementById("edit-post-form").appendChild(hidden);
+
+  btn.parentElement.remove();
 });
+
     // === Xử lý gửi form báo cáo bài viết ===
-document.addEventListener('submit', async (e) => {
-  const form = e.target.closest('.js-report-form[data-post]');
-  if (!form) return;
-  e.preventDefault();
 
-  const postId = form.dataset.post;
-  const url = `/forum/${postId}/report/`;
-  const formData = new FormData(form);
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
-    body: formData
-  });
-
-  if (res.ok) {
-    const data = await res.json();
-    if (data.status === 'ok') {
-      alert('✅ Gửi báo cáo thành công!');
-      form.closest('.modal').style.display = 'none';
-      form.reset();
-    } else alert('❌ Lỗi khi gửi báo cáo.');
-  } else alert('❌ Lỗi server khi gửi báo cáo.');
-});
 </script>
 
 <script>
@@ -795,6 +896,464 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+  }
+});
+</script>
+<script>document.addEventListener("click", function(e){
+  const btn = e.target.closest(".post-menu-btn");
+
+  if (btn){
+    const id = btn.dataset.menu;
+    document.querySelectorAll(".post-menu").forEach(m=>m.style.display="none");
+    document.getElementById("menu-"+id).style.display="block";
+    return;
+  }
+
+  // Click bên ngoài -> đóng menu
+  if (!e.target.closest(".post-menu")){
+    document.querySelectorAll(".post-menu").forEach(m=>m.style.display="none");
+  }
+});
+</script>
+<script>document.addEventListener("DOMContentLoaded", () => {
+    const editForm = document.getElementById("edit-post-form");
+    const editCard = document.getElementById("edit-card");
+    const postPreview = document.getElementById("post-preview");
+    const previewTitle = document.getElementById("preview-title");
+    const previewContent = document.getElementById("preview-content");
+    const previewImages = document.getElementById("preview-images");
+
+    // Xử lý xóa ảnh cũ (tương tự post_list)
+    document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".remove-old-img");
+        if (!btn) return;
+
+        const id = btn.dataset.id;
+        const hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = "delete_images";
+        hidden.value = id;
+        editForm.appendChild(hidden);
+
+        btn.parentElement.remove();
+    });
+
+    // Xem trước ảnh mới (tương tự post_list)
+    const fileInput = editForm.querySelector('input[type="file"]');
+    const previewContainer = document.getElementById("edit-preview");
+    if (fileInput) {
+        fileInput.addEventListener("change", (event) => {
+            previewContainer.innerHTML = "";
+            const files = event.target.files;
+            if (files.length > 5) {
+                alert("Tối đa 5 ảnh.");
+                fileInput.value = "";
+                return;
+            }
+            for (const file of files) {
+                if (file.type.startsWith("image/")) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const wrapper = document.createElement("div");
+                        wrapper.classList.add("image-preview-wrapper");
+                        wrapper.style = "width:90px;height:90px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;";
+                        const img = document.createElement("img");
+                        img.src = e.target.result;
+                        img.style = "width:100%;height:100%;object-fit:cover;";
+                        wrapper.appendChild(img);
+                        previewContainer.appendChild(wrapper);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    }
+
+    // Submit AJAX
+    editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+
+
+        const res = await fetch(editForm.action, {
+            method: "POST",
+            body: formData,
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        });
+
+        const data = await res.json();
+
+        if (data.status === "ok") {
+            // Sau khi thêm ảnh mới vào DOM
+if (data.images && data.images.length > 0) {
+    const newBox = document.createElement("div");
+    const count = data.images.length;
+    newBox.className = `post-images images-count-${count > 4 ? 'more' : count}`;
+
+    newBox.innerHTML = data.images.map(url => `
+        <div class="image-wrapper">
+            <img src="${url}" class="js-lightbox-trigger" style="cursor:pointer;">
+        </div>
+    `).join("");
+
+    // Xóa box cũ và thêm box mới
+    const oldBox = article.querySelector(".post-images");
+    if (oldBox) oldBox.remove();
+    article.querySelector(".actions").before(newBox);
+
+    // Gắn lại event lightbox cho ảnh mới (vì DOM mới tạo)
+    newBox.querySelectorAll('.js-lightbox-trigger').forEach(img => {
+        img.addEventListener('click', (e) => {
+            e.preventDefault();
+            openLightbox(img.closest('.post-images'), img.src);
+        });
+    });
+}
+            // Ẩn khung chỉnh sửa
+            editCard.style.display = "none";
+
+            // Hiển thị preview cập nhật
+            previewTitle.textContent = data.title;
+            previewContent.innerHTML = data.content.replace(/\n/g, "<br>");
+            previewImages.innerHTML = data.images.map(url => `<img src="${url}">`).join("");
+            postPreview.style.display = "block";
+
+            // Tùy chọn: Redirect tự động sau 3s về my_profile
+            // setTimeout(() => { window.location.href = "{% url 'profiles:my_profile' %}"; }, 3000);
+        } else {
+            alert("Có lỗi xảy ra!");
+        }
+    });
+});
+
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Script loaded!"); // Debug: Kiểm tra script chạy chưa
+
+    const editForm = document.getElementById("edit-post-form");
+    const editCard = document.getElementById("edit-card");
+    const postPreview = document.getElementById("post-preview");
+    const previewTitle = document.getElementById("preview-title");
+    const previewContent = document.getElementById("preview-content");
+    const previewImages = document.getElementById("preview-images");
+
+    if (!editForm || !editCard || !postPreview) {
+        console.error("Lỗi: Không tìm thấy element form hoặc preview!");
+        return;
+    }
+
+    // Xử lý xóa ảnh cũ
+    document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".remove-old-img");
+        if (!btn) return;
+
+        const id = btn.dataset.id;
+        const hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = "delete_images";
+        hidden.value = id;
+        editForm.appendChild(hidden);
+
+        btn.parentElement.remove();
+        console.log("Ảnh cũ ID " + id + " đã xóa khỏi UI"); // Debug
+    });
+
+    // Xem trước ảnh mới
+    const fileInput = document.getElementById("edit-images-input");
+    const previewContainer = document.getElementById("edit-preview");
+    if (fileInput) {
+        fileInput.addEventListener("change", (event) => {
+            previewContainer.innerHTML = "";
+            const files = event.target.files;
+            if (files.length > 5) {
+                alert("Tối đa 5 ảnh.");
+                fileInput.value = "";
+                return;
+            }
+            for (const file of files) {
+                if (file.type.startsWith("image/")) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const wrapper = document.createElement("div");
+                        wrapper.classList.add("image-preview-wrapper");
+                        wrapper.style = "width:90px;height:90px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;";
+                        const img = document.createElement("img");
+                        img.src = e.target.result;
+                        img.style = "width:100%;height:100%;object-fit:cover;";
+                        wrapper.appendChild(img);
+                        previewContainer.appendChild(wrapper);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            console.log("Đã chọn " + files.length + " ảnh mới"); // Debug
+        });
+    }
+
+    // Submit AJAX
+    editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        console.log("Form submit intercepted! Bắt đầu AJAX..."); // Debug
+
+        const formData = new FormData(editForm);
+
+        try {
+            const res = await fetch(editForm.action, {
+                method: "POST",
+                body: formData,
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            });
+
+            if (!res.ok) {
+                throw new Error("Response not OK: " + res.status);
+            }
+
+            const data = await res.json();
+            console.log("Response data:", data); // Debug: Xem JSON trả về
+
+            if (data.status === "ok") {
+                // Ẩn form
+                editCard.style.display = "none";
+                console.log("Ẩn edit-card thành công"); // Debug
+
+                // Hiển thị preview
+                previewTitle.textContent = data.title;
+                previewContent.innerHTML = data.content.replace(/\n/g, "<br>");
+                previewImages.innerHTML = data.images.map(url => `<img src="${url}">`).join("");
+                postPreview.style.display = "block";
+                console.log("Hiện preview thành công"); // Debug
+
+                // Optional: Redirect sau 3s
+                // setTimeout(() => { window.location.href = "{% url 'profiles:my_profile' %}"; }, 3000);
+            } else {
+                alert("Có lỗi từ server: " + (data.error || "Không rõ"));
+            }
+        } catch (error) {
+            console.error("Lỗi AJAX:", error);
+            alert("Có lỗi khi submit: " + error.message);
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  let currentPostId = null;
+  const editModal = document.getElementById("edit-post-modal");
+  const editForm = document.getElementById("edit-post-form");
+  const oldImages = document.getElementById("old-images");
+  const editPreview = document.getElementById("edit-preview");
+  const submitBtn = editForm.querySelector(".btn-primary");
+  const submitText = submitBtn.querySelector(".text");
+  const spinner = submitBtn.querySelector("i");
+
+  // === MỞ MODAL CHỈNH SỬA ===
+  document.querySelectorAll(".js-open-edit").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      currentPostId = btn.dataset.post;
+      const res = await fetch(`/forum/${currentPostId}/edit-data/`);
+      const data = await res.json();
+
+      document.getElementById("edit-title").value = data.title;
+      document.getElementById("edit-content").value = data.content;
+      document.getElementById("edit-topic").value = data.topic;
+      editForm.action = `/forum/post/${currentPostId}/edit/`;
+
+      // Load ảnh cũ
+      oldImages.innerHTML = "";
+      data.images.forEach(img => {
+        oldImages.innerHTML += `
+          <div style="position:relative;display:inline-block;margin:4px;">
+            <img src="${img.url}" style="width:90px;height:90px;object-fit:cover;border-radius:8px;">
+            <button type="button" class="remove-old-img" data-id="${img.id}"
+              style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:24px;height:24px;font-size:12px;">×</button>
+          </div>`;
+      });
+
+      editPreview.innerHTML = "";
+      editModal.style.display = "flex";
+    });
+  });
+
+  // === ĐÓNG MODAL ===
+  editModal.addEventListener("click", e => {
+    if (e.target === editModal || e.target.hasAttribute("data-close")) {
+      editModal.style.display = "none";
+    }
+  });
+
+  // === XÓA ẢNH CŨ ===
+  oldImages.addEventListener("click", e => {
+    const btn = e.target.closest(".remove-old-img");
+    if (!btn) return;
+    const hidden = document.createElement("input");
+    hidden.type = "hidden"; hidden.name = "delete_images"; hidden.value = btn.dataset.id;
+    editForm.appendChild(hidden);
+    btn.parentElement.remove();
+  });
+
+  // === XEM TRƯỚC ẢNH MỚI ===
+  document.getElementById("edit-images-input").addEventListener("change", e => {
+    editPreview.innerHTML = "";
+    const files = e.target.files;
+    if (files.length > 5) { alert("Tối đa 5 ảnh!"); e.target.value = ""; return; }
+    [...files].forEach(file => {
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "image-preview-wrapper";
+          const img = document.createElement("img");
+          img.src = ev.target.result;
+          wrapper.appendChild(img);
+          editPreview.appendChild(wrapper);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+
+  // === SUBMIT CHỈNH SỬA (AJAX) ===
+  editForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    submitText.style.display = "none";
+    spinner.style.display = "inline-block";
+    submitBtn.disabled = true;
+
+    // === FIX BUG: THÊM 1 ẢNH HIỆN 2 + ẢNH CŨ HỒI SINH ===
+const formData = new FormData();
+
+// 1. Các field text bình thường
+formData.append('title', document.getElementById('edit-title').value);
+formData.append('content', document.getElementById('edit-content').value);
+formData.append('topic', document.getElementById('edit-topic').value);
+
+// 2. CSRF
+formData.append('csrfmiddlewaretoken', csrftoken);
+
+// 3. Chỉ lấy ảnh MỚI từ input file (không lấy file cũ còn sót)
+const newImageFiles = document.getElementById('edit-images-input').files;
+for (let i = 0; i < newImageFiles.length; i++) {
+  formData.append('images', newImageFiles[i]);
+}
+
+// 4. Ảnh cần xóa (từ các hidden input bạn tạo khi bấm ×)
+document.querySelectorAll('input[name="delete_images"]').forEach(input => {
+  formData.append('delete_images', input.value);
+});
+    try {
+      const res = await fetch(editForm.action, {
+        method: "POST",
+        body: formData,
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      });
+      const data = await res.json();
+
+      if (data.status === "ok") {
+        editModal.style.display = "none";
+
+        const article = document.querySelector(`article[data-post="${currentPostId}"]`);
+        article.querySelector(".post-title").textContent = data.title;
+        article.querySelector(".post-content").innerHTML = data.content.replace(/\n/g, "<br>");
+
+        // Xóa ảnh cũ
+        const oldBox = article.querySelector(".post-images");
+        if (oldBox) oldBox.remove();
+
+        // Thêm ảnh mới (và quan trọng: gắn lại lightbox!)
+        if (data.images.length > 0) {
+          const count = data.images.length;
+          const newBox = document.createElement("div");
+          newBox.className = `post-images images-count-${count > 4 ? "more" : count}`;
+
+          newBox.innerHTML = data.images.map(url => `
+            <div class="image-wrapper">
+              <img src="${url}" class="js-lightbox-trigger" style="cursor:pointer;">
+            </div>
+          `).join("");
+
+          article.querySelector(".actions").before(newBox);
+
+          // ★ ĐOẠN QUAN TRỌNG NHẤT: gắn lại sự kiện click cho ảnh mới
+          newBox.querySelectorAll(".js-lightbox-trigger").forEach(img => {
+            img.addEventListener("click", ev => {
+              ev.preventDefault();
+              openLightbox(img.closest(".post-images"), img.src);
+            });
+          });
+
+          // Nếu có "+3" thì cũng gắn lightbox
+          const moreWrapper = newBox.querySelector("[data-more-count]");
+          if (moreWrapper) {
+            moreWrapper.addEventListener("click", () => {
+              const firstImg = newBox.querySelector(".js-lightbox-trigger");
+              if (firstImg) openLightbox(newBox, firstImg.src);
+            });
+          }
+        }
+
+        alert("Đã sửa bài viết thành công!");
+      } else {
+        alert("Lỗi: " + JSON.stringify(data));
+      }
+    } catch (err) {
+      alert("Lỗi mạng!");
+    }
+    finally {
+  submitText.style.display = "";
+  spinner.style.display = "none";
+  submitBtn.disabled = false;
+
+  // SIÊU QUAN TRỌNG: làm trống input file để lần sau không bị gửi ảnh cũ
+  document.getElementById('edit-images-input').value = "";
+}
+  });
+});
+
+// === LIGHTBOX (giữ nguyên, chỉ để lại 1 lần) ===
+let lightboxImages = [], currentImageIndex = 0;
+const lightbox = document.getElementById('image-lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const lightboxPrev = document.getElementById('lightbox-prev');
+const lightboxNext = document.getElementById('lightbox-next');
+const lightboxClose = document.querySelector('.lightbox-close');
+
+const openLightbox = (postElement, src) => {
+  lightboxImages = Array.from(postElement.querySelectorAll('.js-lightbox-trigger')).map(img => img.src);
+  currentImageIndex = lightboxImages.indexOf(src);
+  updateLightboxImage();
+  lightbox.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+};
+const updateLightboxImage = () => {
+  lightboxImg.src = lightboxImages[currentImageIndex];
+  lightboxPrev.style.display = lightboxImages.length > 1 ? 'block' : 'none';
+  lightboxNext.style.display = lightboxImages.length > 1 ? 'block' : 'none';
+};
+const closeLightbox = () => {
+  lightbox.style.display = 'none';
+  document.body.style.overflow = 'auto';
+};
+const nextImage = () => {
+  currentImageIndex = (currentImageIndex + 1) % lightboxImages.length;
+  updateLightboxImage();
+};
+
+const prevImage = () => {
+  currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length;
+  updateLightboxImage();
+};
+lightboxNext.onclick = nextImage;
+lightboxPrev.onclick = prevImage;
+lightboxClose.onclick = closeLightbox;
+lightbox.onclick = e => { if (e.target === lightbox) closeLightbox(); };
+document.addEventListener('keydown', e => {
+  if (lightbox.style.display === 'block') {
+    if (e.key === 'ArrowRight') nextImage();
+    if (e.key === 'ArrowLeft') prevImage();
+    if (e.key === 'Escape') closeLightbox();
   }
 });
 </script>

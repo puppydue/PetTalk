@@ -184,17 +184,42 @@ def delete_comment(request, id):
 @login_required
 def post_edit(request, pk):
     post = get_object_or_404(Post, pk=pk, username=request.user)
+
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
+
         if form.is_valid():
-            form.save()
-            messages.success(request, "Cập nhật bài viết thành công!")
+            post = form.save()  # Lưu title, content, topic trước
+
+            # 1. XÓA ẢNH CŨ (nếu người dùng bấm X)
+            delete_ids = request.POST.getlist('delete_images')  # danh sách ID ảnh cần xóa
+            if delete_ids:
+                PostsImage.objects.filter(id__in=delete_ids, post=post).delete()
+
+            # 2. THÊM ẢNH MỚI
+            new_images = request.FILES.getlist('images')
+            for img_file in new_images:
+                PostsImage.objects.create(post=post, image=img_file)
+
+            # 3. Nếu là AJAX → trả JSON để frontend cập nhật ảnh
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({
+                    "status": "ok",
+                    "title": post.title,
+                    "content": post.content,
+                    "images": [img.image.url for img in post.images.all()],  # ← quan trọng: trả danh sách ảnh mới nhất
+                })
+
             return redirect('profiles:my_profile')
-    else:
-        form = PostForm(instance=post)
+
+        else:
+            # Nếu form lỗi + AJAX → trả lỗi
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({"status": "error", "errors": form.errors}, status=400)
+
+    # GET request
+    form = PostForm(instance=post)
     return render(request, 'forum/post_edit.html', {'form': form, 'post': post})
-
-
 @login_required
 def post_delete(request, pk):
     post = get_object_or_404(Post, pk=pk, username=request.user)
@@ -205,3 +230,20 @@ def post_delete(request, pk):
     except Exception as e:
         messages.error(request, f"Có lỗi xảy ra khi xóa: {e}")
     return redirect('profiles:my_profile')
+def post_edit_data(request, post_id):
+    post = get_object_or_404(Post, post_id=post_id)
+
+    if post.username != request.user:
+        return JsonResponse({"error": "forbidden"}, status=403)
+
+    images = [
+        {"id": img.id, "url": img.image.url}
+        for img in post.images.all()
+    ]
+
+    return JsonResponse({
+        "title": post.title,
+        "content": post.content,
+        "topic": post.topic,
+        "images": images,
+    })
