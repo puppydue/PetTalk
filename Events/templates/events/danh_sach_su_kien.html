@@ -10,11 +10,12 @@
 
   <h2> Danh sách sự kiện</h2>
 
-  <!-- 👤 SỰ KIỆN CỦA TÔI --><section class="my-events">
+  <!-- 👤 SỰ KIỆN CỦA TÔI -->
+  <section class="my-events">
     <h3> Sự kiện của tôi</h3>
 
     {% if su_kien_cua_toi %}
-    <div class="carousel-wrapper"> {# Bỏ class 'has-scroll' ở đây #}
+    <div class="carousel-wrapper">
       <button class="carousel-btn left" onclick="scrollCarousel('myEventsCarousel', -1)">&#10094;</button>
 
       <div class="carousel-container" id="myEventsCarousel">
@@ -28,8 +29,7 @@
             <p><strong>Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
             <p><strong>👥 Số lượng:</strong> {{ e.participants.count }} / {{ e.capacity|default:"∞" }}</p>
 
-
-            <div class="status-wrapper"> {# Đã thêm margin-top qua CSS #}
+            <div class="status-wrapper">
               <strong>Trạng thái:</strong>
               {% if e.status == 'approved' %}
                 <span class="status-badge status-approved"> Đã phê duyệt</span>
@@ -42,18 +42,17 @@
 
             {% if not e.is_past %}
               <div class="event-actions">
-                  <div>
-                    <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">Chỉnh sửa</a>
-                    <a href="{% url 'xoa_su_kien' e.id %}" class="cancel-btn">Xóa</a>
-                  </div>
-
-                  {% if e.status == 'approved' %}
-                    <div style="margin-top: 10px;">
-                      <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">Xem danh sách người tham gia</a>
-                    </div>
-                  {% endif %}
+                <div>
+                  <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">Chỉnh sửa</a>
+                  <a href="{% url 'xoa_su_kien' e.id %}" class="cancel-btn">Xóa</a>
                 </div>
 
+                {% if e.status == 'approved' %}
+                  <div style="margin-top: 10px;">
+                    <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">Xem danh sách người tham gia</a>
+                  </div>
+                {% endif %}
+              </div>
             {% else %}
               <div class="event-ended"> Sự kiện đã kết thúc</div>
             {% endif %}
@@ -62,7 +61,6 @@
       </div>
 
       <button class="carousel-btn right" onclick="scrollCarousel('myEventsCarousel', 1)">&#10095;</button>
-      {# Dấu hiệu trượt mới #}
       <div class="carousel-fade left-fade"></div>
       <div class="carousel-fade right-fade"></div>
     </div>
@@ -71,7 +69,8 @@
     {% endif %}
   </section>
 
-  <!-- 🌍 DANH SÁCH SỰ KIỆN --><section class="community-events">
+  <!-- 🌍 DANH SÁCH SỰ KIỆN -->
+  <section class="community-events">
     <h3> Danh sách sự kiện</h3>
 
     {% if danh_sach_su_kien %}
@@ -83,7 +82,6 @@
           {% endif %}
           <h4>{{ e.title }}</h4>
 
-          {# ĐÃ CẬP NHẬT THEO YÊU CẦU #}
           <p class="creator-highlight">
             👤 Tạo bởi: <span class="highlight-username">{{ e.creator.username }}</span>
           </p>
@@ -92,10 +90,9 @@
           <p><strong>📍 Địa điểm:</strong> {{ e.location }}</p>
           <p><strong>🕓 Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
           <p>
-              <strong>👥 Số lượng:</strong>
-              {{ e.participants.count }} / {{ e.capacity|default:"∞" }} người tham gia
+            <strong>👥 Số lượng:</strong>
+            {{ e.participants.count }} / {{ e.capacity|default:"∞" }} người tham gia
           </p>
-
 
           {% if e.is_past %}
             <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
@@ -117,8 +114,8 @@
   </section>
 </div>
 
-<!-- ✅ CSS --><style>
-/* CHỈ ÁP DỤNG CHO TRANG DANH SÁCH SỰ KIỆN */
+<!-- ⭐ CSS -->
+<style>
 .main-content .event-list {
   width: 100%;
   max-width: 100%;
@@ -129,18 +126,27 @@
   box-sizing: border-box;
 }
 
-/* Các style khác giữ nguyên */
-.carousel-wrapper { position: relative; margin-bottom: 40px; overflow: hidden; padding: 0 50px; }
+/* ⭐⭐ SỬA DUY NHẤT DÒNG NÀY — TỪ 50px → 115px */
+.carousel-wrapper {
+  position: relative;
+  margin-bottom: 40px;
+  overflow: hidden;
+  padding: 0 105px;   /* 👈 GIẤU HOÀN TOÀN CARD THỨ 2 */
+}
+
 .carousel-fade { position: absolute; top: 0; bottom: 0; width: 50px; pointer-events: none; z-index: 10; }
 .left-fade { left: 0; background: linear-gradient(to right, #fff8ed, rgba(255,248,237,0)); }
 .right-fade { right: 0; background: linear-gradient(to left, #fff8ed, rgba(255,248,237,0)); }
+
 .carousel-container { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 25px; padding: 10px 0; scrollbar-width: none; }
 .carousel-container::-webkit-scrollbar { display: none; }
+
 .carousel-btn { background: #ffb84d; border: none; color: white; font-size: 20px; padding: 8px 12px; border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); position: absolute; top: 50%; transform: translateY(-50%); z-index: 11; }
 .carousel-btn:hover { background: #ff9800; transform: translateY(-50%) scale(1.1); }
 .left { left: 5px; }
 .right { right: 5px; }
 
+/* PHẦN CÒN LẠI GIỮ NGUYÊN */
 .status-wrapper { margin-top: 15px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
 .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 13px; white-space: nowrap; }
 .status-badge.status-approved { background: #dcfce7; color: #166534; }
@@ -172,6 +178,7 @@
 .event-ended { text-align: center; font-weight: 600; color: #666; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #bbb; }
 </style>
 
+
 <script>
 function scrollCarousel(carouselId, direction) {
   const container = document.getElementById(carouselId);
@@ -181,4 +188,3 @@ function scrollCarousel(carouselId, direction) {
 </script>
 
 {% endblock %}
-
