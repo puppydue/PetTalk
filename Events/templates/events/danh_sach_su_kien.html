@@ -21,9 +21,23 @@
       <div class="carousel-container" id="myEventsCarousel">
         {% for e in su_kien_cua_toi %}
           <div class="event-card">
+
+            <!-- ⭐ FIX ĐỒNG BỘ ẢNH & KHUNG TRỐNG -->
             {% if e.image %}
-              <img src="{{ e.image.url }}" alt="{{ e.title }}">
+              <img src="{{ e.image.url }}" alt="{{ e.title }}"
+                   style="width:100%;height:140px;object-fit:cover;border-radius:12px;margin-bottom:12px;">
+            {% else %}
+              <div style="
+                  width:100%;
+                  height:140px;
+                  border-radius:12px;
+                  margin-bottom:12px;
+                  background:#f3f4f6;
+                  border:2px dashed #cbd5e1;">
+              </div>
             {% endif %}
+            <!-- ⭐ END FIX -->
+
             <h4>{{ e.title }}</h4>
             <p>{{ e.description|truncatechars:80 }}</p>
             <p><strong>Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
@@ -49,7 +63,9 @@
 
                 {% if e.status == 'approved' %}
                   <div style="margin-top: 10px;">
-                    <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">Xem danh sách người tham gia</a>
+                    <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">
+                      Xem danh sách người tham gia
+                    </a>
                   </div>
                 {% endif %}
               </div>
@@ -61,6 +77,7 @@
       </div>
 
       <button class="carousel-btn right" onclick="scrollCarousel('myEventsCarousel', 1)">&#10095;</button>
+
       <div class="carousel-fade left-fade"></div>
       <div class="carousel-fade right-fade"></div>
     </div>
@@ -80,6 +97,7 @@
           {% if e.image %}
             <img src="{{ e.image.url }}" alt="{{ e.title }}">
           {% endif %}
+
           <h4>{{ e.title }}</h4>
 
           <p class="creator-highlight">
@@ -98,9 +116,13 @@
             <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
           {% else %}
             {% if e.creator == user %}
-              <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn"> Xem danh sách người tham gia</a>
+              <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">
+                Xem danh sách người tham gia
+              </a>
             {% elif user in e.participants.all %}
-              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn"> Hủy đăng ký</a>
+              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn">
+                Hủy đăng ký
+              </a>
             {% else %}
               <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn"> Tham gia</a>
             {% endif %}
@@ -126,12 +148,11 @@
   box-sizing: border-box;
 }
 
-/* ⭐⭐ SỬA DUY NHẤT DÒNG NÀY — TỪ 50px → 115px */
 .carousel-wrapper {
   position: relative;
   margin-bottom: 40px;
   overflow: hidden;
-  padding: 0 105px;   /* 👈 GIẤU HOÀN TOÀN CARD THỨ 2 */
+  padding: 0 105px;
 }
 
 .carousel-fade { position: absolute; top: 0; bottom: 0; width: 50px; pointer-events: none; z-index: 10; }
@@ -146,38 +167,46 @@
 .left { left: 5px; }
 .right { right: 5px; }
 
-/* PHẦN CÒN LẠI GIỮ NGUYÊN */
 .status-wrapper { margin-top: 15px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-.status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 13px; white-space: nowrap; }
+.status-badge { padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 13px; }
 .status-badge.status-approved { background: #dcfce7; color: #166534; }
 .status-badge.status-pending { background: #fef9c3; color: #713f12; }
 .status-badge.status-rejected { background: #fee2e2; color: #991b1b; }
 
-.creator-highlight { font-size: 14px; color: #475569; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-.creator-highlight .highlight-username { background: #e0f2fe; color: #003459; padding: 4px 10px; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 13px; display: inline-block; }
+.creator-highlight { font-size: 14px; margin-bottom: 6px; }
+.creator-highlight .highlight-username {
+  background: #e0f2fe;
+  color: #003459;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+}
 
-.event-card { flex: 0 0 280px; background: #ffffff; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 18px; text-align: left; border: 1.5px solid #003459; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; min-height: 350px; }
+.event-card { flex: 0 0 280px; background: #ffffff; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 18px; border: 1.5px solid #003459; transition: 0.3s; display: flex; flex-direction: column; min-height: 350px; }
 .event-card:hover { transform: translateY(-4px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
+
 .event-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
 
-.event-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-.edit-btn, .join-btn, .view-btn, .cancel-btn, .delete-btn { display: inline-block; font-size: 14px; font-weight: 600; border-radius: 8px; text-decoration: none; transition: 0.25s; padding: 8px 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.15); width: fit-content; text-align: center; }
+.event-actions { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+.edit-btn, .join-btn, .view-btn, .cancel-btn, .delete-btn {
+  padding: 8px 14px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: 0.25s;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
 .edit-btn { background: linear-gradient(135deg, #ffb84d, #ff9800); color: white; }
 .delete-btn { background: linear-gradient(135deg, #b71c1c, #f44336); color: white; }
 .join-btn, .view-btn { background: #003459; color: white; }
 .view-btn { background: linear-gradient(135deg, #6ba6ff, #1e88e5); }
 .cancel-btn { background: linear-gradient(135deg, #ff6b6b, #ff4757); color: white; }
-.edit-btn:hover, .join-btn:hover, .view-btn:hover, .cancel-btn:hover, .delete-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
 
-.event-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 10px; }
+.event-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
 
-.create-event-wrapper { display: flex; justify-content: flex-end; margin-bottom: 10px; }
-.create-event-btn { background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; font-weight: 600; padding: 10px 18px; border-radius: 10px; text-decoration: none; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-.create-event-btn:hover { background: linear-gradient(135deg, #43A047, #1B5E20); transform: translateY(-2px); }
+.create-event-wrapper { justify-content: flex-end; display: flex; margin-bottom: 10px; }
+.create-event-btn { background: linear-gradient(135deg, #4CAF50, #2E7D32); padding: 10px 18px; border-radius: 10px; color: white; font-weight: 600; text-decoration: none; }
 
-.event-ended { text-align: center; font-weight: 600; color: #666; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #bbb; }
+.event-ended { text-align: center; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #bbb; }
 </style>
-
 
 <script>
 function scrollCarousel(carouselId, direction) {
