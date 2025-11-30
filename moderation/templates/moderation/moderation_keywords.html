@@ -1,0 +1,126 @@
+{% extends "basemode.html" %}
+{% load static %}
+
+{% block title %}Từ khóa cấm • Moderator Center{% endblock %}
+
+{% block extra_css %}
+<style>
+.keyword-box {
+    background: #fff;
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: #003459;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+button:hover {
+    background: #002744;
+}
+
+.tab-wrapper {
+  display: flex;
+  gap: 16px;
+  margin: 24px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tab-btn {
+  padding: 8px 10px 12px 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+  color: #003459;
+  border-bottom-color: #003459;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="keyword-box">
+  <h2>Từ khóa cấm</h2>
+
+  <div class="tab-wrapper">
+    <a href="{% url 'moderation_reports' %}"
+       class="tab-btn {% if 'reports' in request.path %}active{% endif %}">
+        Báo cáo vi phạm
+    </a>
+
+    <a href="{% url 'moderation_events' %}"
+       class="tab-btn {% if 'events' in request.path %}active{% endif %}">
+        Đăng ký sự kiện
+    </a>
+
+    <a href="{% url 'moderation_stats' %}"
+       class="tab-btn {% if 'stats' in request.path %}active{% endif %}">
+        Thống kê
+    </a>
+
+    <a href="{% url 'moderation_keywords' %}"
+       class="tab-btn {% if 'keywords' in request.path %}active{% endif %}">
+        Từ khóa cấm
+    </a>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <input type="text" name="keyword" placeholder="Nhập từ khóa cấm..." required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <hr style="margin:20px 0;">
+
+  <h3>Danh sách từ khóa cấm</h3>
+    <ul style="margin-top: 10px; padding-left: 0; list-style: none;">
+        {% for kw in keywords %}
+            <li style="
+                margin-bottom: 10px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                padding: 10px 14px;
+                border-radius: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                max-width: 98%;
+            ">
+                <span>{{ kw.word }}</span>
+
+                <a href="{% url 'delete_keyword' kw.id %}"
+                   onclick="return confirm('Bạn có chắc muốn xoá từ khóa này?')"
+                   style="
+                       background: #dc2626;
+                       color: white;
+                       padding: 5px 10px;
+                       border-radius: 6px;
+                       text-decoration: none;
+                       font-size: 13px;
+                       font-weight: 600;
+                   ">
+                    Xoá
+                </a>
+            </li>
+        {% empty %}
+            <p style="color: gray;">Chưa có từ khóa nào.</p>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}

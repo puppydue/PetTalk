@@ -159,9 +159,28 @@
   <h2>Duyệt đăng ký sự kiện</h2>
 
   <div class="tab-wrapper">
-    <a href="{% url 'moderation_reports' %}" class="tab-btn">Báo cáo vi phạm</a>
-    <a href="{% url 'moderation_events' %}" class="tab-btn active">Đăng ký sự kiện</a>
+    <a href="{% url 'moderation_reports' %}"
+       class="tab-btn {% if 'reports' in request.path %}active{% endif %}">
+        Báo cáo vi phạm
+    </a>
+
+    <a href="{% url 'moderation_events' %}"
+       class="tab-btn {% if 'events' in request.path %}active{% endif %}">
+        Đăng ký sự kiện
+    </a>
+
+    <a href="{% url 'moderation_stats' %}"
+       class="tab-btn {% if 'stats' in request.path %}active{% endif %}">
+        Thống kê
+    </a>
+
+    <a href="{% url 'moderation_keywords' %}"
+       class="tab-btn {% if 'keywords' in request.path %}active{% endif %}">
+        Từ khóa cấm
+    </a>
   </div>
+
+
 
   <table class="styled-table">
     <thead>
