@@ -1,0 +1,235 @@
+{% extends "basemode.html" %}
+{% load static %}
+
+{% block title %}Thống kê báo cáo • Moderator Center{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+}
+.card h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #003459;
+  margin: 0 0 20px;
+}
+
+/* 4 ô thống kê */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-box {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+}
+.stat-title {
+  color: #475569;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #003459;
+}
+
+/* Mini bar chart (progress bar) */
+.bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: #e2e8f0;
+  margin-top: 6px;
+}
+.bar-fill {
+  height: 100%;
+  background: #003459;
+  border-radius: 5px;
+}
+
+/* Tables */
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.styled-table th,
+.styled-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+.styled-table th {
+  background: #f8fafc;
+  color: #003459;
+  font-weight: 600;
+}
+.tab-wrapper {
+  display: flex;
+  gap: 16px;
+  margin: 24px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tab-btn {
+  padding: 8px 10px 12px 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+  color: #003459;
+  border-bottom-color: #003459;
+}
+
+.stats-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+}
+
+.apply-btn {
+  background: #003459;
+  color: white;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.apply-btn:hover {
+  background: #002a3a;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <h2>Thống kê báo cáo</h2>
+
+  <div class="tab-wrapper">
+    <a href="{% url 'moderation_reports' %}"
+       class="tab-btn {% if 'reports' in request.path %}active{% endif %}">
+        Báo cáo vi phạm
+    </a>
+
+    <a href="{% url 'moderation_events' %}"
+       class="tab-btn {% if 'events' in request.path %}active{% endif %}">
+        Đăng ký sự kiện
+    </a>
+
+    <a href="{% url 'moderation_stats' %}"
+       class="tab-btn {% if 'stats' in request.path %}active{% endif %}">
+        Thống kê
+    </a>
+
+    <a href="{% url 'moderation_keywords' %}"
+       class="tab-btn {% if 'keywords' in request.path %}active{% endif %}">
+        Từ khóa cấm
+    </a>
+ </div>
+
+  <form method="get" class="stats-filter">
+    <select name="range" class="filter-select">
+        <option value="today" {% if range_filter == "today" %}selected{% endif %}>Hôm nay</option>
+        <option value="yesterday" {% if range_filter == "yesterday" %}selected{% endif %}>Hôm qua</option>
+        <option value="week" {% if range_filter == "week" %}selected{% endif %}>Tuần này</option>
+        <option value="month" {% if range_filter == "month" %}selected{% endif %}>Tháng này</option>
+        <option value="all" {% if range_filter == "all" %}selected{% endif %}>Toàn thời gian</option>
+    </select>
+
+
+    <button type="submit" class="apply-btn">Lọc</button>
+  </form>
+  <!-- 4 ô thống kê -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-title">Tổng số báo cáo</div>
+      <div class="stat-value">{{ total_reports }}</div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-title">Báo cáo bài viết</div>
+      <div class="stat-value">{{ total_post }}</div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-title">Báo cáo bình luận</div>
+      <div class="stat-value">{{ total_comment }}</div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-title">Tỷ lệ xử lý</div>
+      <div class="stat-value">{{ handled_rate }}%</div>
+      <div class="bar"><div class="bar-fill" style="width: {{ handled_rate }}%"></div></div>
+    </div>
+  </div>
+
+  <!-- Bảng trạng thái -->
+  <h3 style="margin-top:20px;">Tình trạng xử lý</h3>
+  <table class="styled-table">
+    <tr><th>Pending</th><td>{{ pending }}</td></tr>
+    <tr><th>Approved</th><td>{{ approved }}</td></tr>
+    <tr><th>Rejected</th><td>{{ rejected }}</td></tr>
+  </table>
+
+  <!-- TOP REPORTS -->
+  <h3 style="margin-top:30px;">Top bài viết đang bị báo cáo</h3>
+  <table class="styled-table">
+    <thead>
+      <tr><th>ID bài viết</th><th>Số lần bị báo cáo</th></tr>
+    </thead>
+    <tbody>
+      {% for item in top_post %}
+      <tr>
+        <td>#{{ item.post_id }} - {{ item.post__title }}</td>
+        <td>{{ item.count }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="2" style="text-align:center;color:gray;">Không có dữ liệu.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:30px;">Top bình luận đang bị báo cáo</h3>
+  <table class="styled-table">
+    <thead>
+      <tr><th>ID bình luận</th><th>Số lần bị báo cáo</th></tr>
+    </thead>
+    <tbody>
+      {% for item in top_comment %}
+      <tr>
+        <td>#{{ item.comment_id }} - {{ item.comment__content|truncatechars:50 }}</td>
+        <td>{{ item.count }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="2" style="text-align:center;color:gray;">Không có dữ liệu.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+{% endblock %}
