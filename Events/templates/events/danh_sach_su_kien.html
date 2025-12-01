@@ -137,7 +137,31 @@
 </div>
 
 <!-- ⭐ CSS -->
+
 <style>
+
+.event-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    object-position: 50% 30%; /* ⭐ GIÚP ẢNH ĐẸP NHẤT */
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+
+/* Đảm bảo ảnh sự kiện ở cả hai khu vực hiển thị đồng bộ */
+.event-card img {
+    width: 100%;
+    height: 180px;          /* giống phần Sự kiện của tôi */
+    object-fit: cover;      /* giữ bố cục đẹp không méo */
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+
 .main-content .event-list {
   width: 100%;
   max-width: 100%;
