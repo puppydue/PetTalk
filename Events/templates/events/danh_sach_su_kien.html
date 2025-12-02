@@ -1,241 +1,391 @@
 {% extends "base.html" %}
-{% block title %}Danh sách sự kiện{% endblock %}
+{% load static %}
+{% block title %}Sự kiện PetTalk{% endblock %}
+
 {% block content %}
 
-<div class="event-list">
+<div class="event-page-container fade-in-up">
 
-  <div class="create-event-wrapper">
-    <a href="{% url 'tao_su_kien' %}" class="create-event-btn"> Tạo sự kiện mới</a>
+  <!-- 1. HEADER -->
+  <div class="event-header">
+    <div class="header-text">
+      <h2>🎉 Khám phá Sự kiện</h2>
+      <p>Tham gia vui chơi, offline cùng cộng đồng thú cưng</p>
+    </div>
+    <a href="{% url 'tao_su_kien' %}" class="btn-create-event pulse-effect">
+      <i class="fa-solid fa-plus"></i> Tạo sự kiện mới
+    </a>
   </div>
 
-  <h2> Danh sách sự kiện</h2>
+  <!-- 2. SỰ KIỆN CỦA TÔI (CAROUSEL) -->
+  {% if su_kien_cua_toi %}
+  <section class="section-my-events">
+    <div class="section-title">
+      <h3><i class="fa-solid fa-user-gear"></i> Sự kiện bạn quản lý</h3>
+      <div class="carousel-nav">
+        <button onclick="scrollCarousel('myEventsCarousel', -1)"><i class="fa-solid fa-chevron-left"></i></button>
+        <button onclick="scrollCarousel('myEventsCarousel', 1)"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
 
-  <!-- 👤 SỰ KIỆN CỦA TÔI -->
-  <section class="my-events">
-    <h3> Sự kiện của tôi</h3>
-
-    {% if su_kien_cua_toi %}
     <div class="carousel-wrapper">
-      <button class="carousel-btn left" onclick="scrollCarousel('myEventsCarousel', -1)">&#10094;</button>
-
       <div class="carousel-container" id="myEventsCarousel">
         {% for e in su_kien_cua_toi %}
-          <div class="event-card">
-
-            <!-- ⭐ FIX ĐỒNG BỘ ẢNH & KHUNG TRỐNG -->
-            {% if e.image %}
-              <img src="{{ e.image.url }}" alt="{{ e.title }}"
-                   style="width:100%;height:140px;object-fit:cover;border-radius:12px;margin-bottom:12px;">
-            {% else %}
-              <div style="
-                  width:100%;
-                  height:140px;
-                  border-radius:12px;
-                  margin-bottom:12px;
-                  background:#f3f4f6;
-                  border:2px dashed #cbd5e1;">
-              </div>
-            {% endif %}
-            <!-- ⭐ END FIX -->
-
-            <h4>{{ e.title }}</h4>
-            <p>{{ e.description|truncatechars:80 }}</p>
-            <p><strong>Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
-            <p><strong>👥 Số lượng:</strong> {{ e.participants.count }} / {{ e.capacity|default:"∞" }}</p>
-
-            <div class="status-wrapper">
-              <strong>Trạng thái:</strong>
-              {% if e.status == 'approved' %}
-                <span class="status-badge status-approved"> Đã phê duyệt</span>
-              {% elif e.status == 'rejected' %}
-                <span class="status-badge status-rejected"> Bị từ chối</span>
+          <!-- Bỏ class hover-lift, glass-card để tránh bóng đổ cắt viền -->
+          <div class="event-card my-card">
+            <!-- Ảnh Cover -->
+            <div class="card-cover">
+              {% if e.image %}
+                <img src="{{ e.image.url }}" alt="{{ e.title }}">
               {% else %}
-                <span class="status-badge status-pending"> Chờ phê duyệt</span>
+                <div class="img-placeholder"><i class="fa-solid fa-image"></i></div>
               {% endif %}
+
+              <div class="status-badge {{ e.status }}">
+                {% if e.status == 'approved' %}Đã duyệt
+                {% elif e.status == 'rejected' %}Từ chối
+                {% else %}Đang chờ{% endif %}
+              </div>
             </div>
 
-            {% if not e.is_past %}
-              <div class="event-actions">
-                <div>
-                  <a href="{% url 'chinh_sua_su_kien' e.id %}" class="edit-btn">Chỉnh sửa</a>
-                  <a href="{% url 'xoa_su_kien' e.id %}" class="cancel-btn">Xóa</a>
-                </div>
+            <div class="card-body">
+              <div class="date-box">
+                <span class="day">{{ e.date|date:"d" }}</span>
+                <span class="month">TH{{ e.date|date:"m" }}</span>
+              </div>
 
-                {% if e.status == 'approved' %}
-                  <div style="margin-top: 10px;">
-                    <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">
-                      Xem danh sách người tham gia
+              <div class="info-content">
+                <h4 class="card-title">{{ e.title|truncatechars:40 }}</h4>
+                <div class="meta-row">
+                  <span><i class="fa-regular fa-clock"></i> {{ e.date|date:"H:i" }}</span>
+                  <span><i class="fa-solid fa-users"></i> {{ e.participants.count }}/{{ e.capacity|default:"∞" }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="card-footer">
+              {% if not e.is_past %}
+                <div class="action-row">
+                  <div class="icon-group">
+                    <a href="{% url 'chinh_sua_su_kien' e.id %}" class="btn-icon edit" title="Sửa">
+                      <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <a href="{% url 'xoa_su_kien' e.id %}" class="btn-icon delete" title="Xóa">
+                      <i class="fa-solid fa-trash"></i>
                     </a>
                   </div>
-                {% endif %}
-              </div>
-            {% else %}
-              <div class="event-ended"> Sự kiện đã kết thúc</div>
-            {% endif %}
+
+                  {% if e.status == 'approved' %}
+                    <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="btn-view-list">
+                      DS Tham gia <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              {% else %}
+                <!-- Nút "Đã kết thúc" đồng bộ kích thước -->
+                <div class="ended-block">
+                  <i class="fa-solid fa-hourglass-end"></i> Đã kết thúc
+                </div>
+              {% endif %}
+            </div>
           </div>
         {% endfor %}
       </div>
-
-      <button class="carousel-btn right" onclick="scrollCarousel('myEventsCarousel', 1)">&#10095;</button>
-
-      <div class="carousel-fade left-fade"></div>
-      <div class="carousel-fade right-fade"></div>
     </div>
-    {% else %}
-      <p>Bạn chưa tạo sự kiện nào.</p>
-    {% endif %}
   </section>
+  {% endif %}
 
-  <!-- 🌍 DANH SÁCH SỰ KIỆN -->
-  <section class="community-events">
-    <h3> Danh sách sự kiện</h3>
+  <!-- 3. SỰ KIỆN CỘNG ĐỒNG (GRID) -->
+  <section class="section-community">
+    <div class="section-title">
+      <h3><i class="fa-solid fa-fire"></i> Sự kiện sắp diễn ra</h3>
+    </div>
 
     {% if danh_sach_su_kien %}
     <div class="event-grid">
-      {% for e in danh_sach_su_kien %}
-        <div class="event-card">
-          {% if e.image %}
-            <img src="{{ e.image.url }}" alt="{{ e.title }}">
-          {% endif %}
 
-          <h4>{{ e.title }}</h4>
-
-          <p class="creator-highlight">
-            👤 Tạo bởi: <span class="highlight-username">{{ e.creator.username }}</span>
-          </p>
-
-          <p>{{ e.description|truncatechars:80 }}</p>
-          <p><strong>📍 Địa điểm:</strong> {{ e.location }}</p>
-          <p><strong>🕓 Thời gian:</strong> {{ e.date|date:"d/m/Y H:i" }}</p>
-          <p>
-            <strong>👥 Số lượng:</strong>
-            {{ e.participants.count }} / {{ e.capacity|default:"∞" }} người tham gia
-          </p>
-
-          {% if e.is_past %}
-            <div class="event-ended">🕓 Sự kiện đã kết thúc</div>
-          {% else %}
-            {% if e.creator == user %}
-              <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="view-btn">
-                Xem danh sách người tham gia
+      <!-- LƯỢT 1: SẮP DIỄN RA -->
+      {% for e in danh_sach_su_kien|dictsort:"date" %}
+        {% if not e.is_past %}
+          <div class="event-card public-card">
+            <div class="card-creator">
+              <a href="{% url 'profiles:view_user_profile' e.creator.username %}" class="creator-link">
+                <div class="creator-avatar">
+                  {% if e.creator.userprofile.avatar_image %}
+                    <img src="{{ e.creator.userprofile.avatar_image.url }}" alt="{{ e.creator.username }}">
+                  {% else %}
+                    <span>{{ e.creator.username|slice:":1"|upper }}</span>
+                  {% endif %}
+                </div>
+                <div class="creator-info">
+                  <span class="creator-name">{{ e.creator.username }}</span>
+                </div>
               </a>
-            {% elif user in e.participants.all %}
-              <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="cancel-btn">
-                Hủy đăng ký
-              </a>
-            {% else %}
-              <a href="{% url 'dang_ky_tham_gia' e.id %}" class="join-btn"> Tham gia</a>
-            {% endif %}
-          {% endif %}
-        </div>
+            </div>
+
+            <div class="card-main">
+              <div class="main-image">
+                {% if e.image %}
+                  <img src="{{ e.image.url }}" alt="{{ e.title }}">
+                {% else %}
+                  <img src="https://placehold.co/600x400/fff8ed/003459?text=PetTalk+Event" alt="No Image">
+                {% endif %}
+              </div>
+
+              <div class="main-content">
+                <h4 class="card-title-lg">{{ e.title }}</h4>
+
+                <div class="event-details">
+                  <p><i class="fa-solid fa-location-dot"></i> {{ e.location|default:"Chưa cập nhật địa điểm"|truncatechars:30 }}</p>
+                  <p><i class="fa-regular fa-calendar-check"></i> <strong>{{ e.date|date:"d/m/Y" }}</strong> lúc {{ e.date|date:"H:i" }}</p>
+                  <p><i class="fa-solid fa-user-group"></i> Đã đăng ký: <strong>{{ e.participants.count }}</strong> thành viên</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-action-lg">
+              {% if e.creator == user %}
+                <a href="{% url 'danh_sach_nguoi_dang_ky' e.id %}" class="btn-lg owner">Quản lý danh sách</a>
+              {% elif user in e.participants.all %}
+                <a href="{% url 'huy_dang_ky_tham_gia' e.id %}" class="btn-lg cancel">Hủy tham gia</a>
+              {% else %}
+                <a href="{% url 'dang_ky_tham_gia' e.id %}" class="btn-lg join">Tham gia ngay</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
       {% endfor %}
+
+      <!-- LƯỢT 2: ĐÃ KẾT THÚC -->
+      {% for e in danh_sach_su_kien|dictsortreversed:"date" %}
+        {% if e.is_past %}
+          <div class="event-card public-card faded">
+            <div class="card-creator">
+              <a href="{% url 'profiles:view_user_profile' e.creator.username %}" class="creator-link">
+                <div class="creator-avatar">
+                  {% if e.creator.userprofile.avatar_image %}
+                    <img src="{{ e.creator.userprofile.avatar_image.url }}" alt="{{ e.creator.username }}">
+                  {% else %}
+                    <span>{{ e.creator.username|slice:":1"|upper }}</span>
+                  {% endif %}
+                </div>
+                <div class="creator-info">
+                  <span class="creator-name">{{ e.creator.username }}</span>
+                </div>
+              </a>
+            </div>
+
+            <div class="card-main">
+              <div class="main-image grayscale">
+                {% if e.image %}
+                  <img src="{{ e.image.url }}" alt="{{ e.title }}">
+                {% else %}
+                  <img src="https://placehold.co/600x400/fff8ed/003459?text=PetTalk+Event" alt="No Image">
+                {% endif %}
+              </div>
+
+              <div class="main-content">
+                <h4 class="card-title-lg">{{ e.title }}</h4>
+                <div class="event-details">
+                  <p><i class="fa-solid fa-location-dot"></i> {{ e.location|default:"Chưa cập nhật địa điểm"|truncatechars:30 }}</p>
+                  <p><i class="fa-regular fa-calendar-check"></i> {{ e.date|date:"d/m/Y H:i" }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-action-lg">
+              <!-- Nút Đã kết thúc làm giống hệt nút Tham gia nhưng disabled -->
+              <button class="btn-lg disabled-flat">
+                <i class="fa-solid fa-lock"></i> Đã kết thúc
+              </button>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+
     </div>
     {% else %}
-      <p>Chưa có sự kiện nào được phê duyệt.</p>
+      <div class="empty-state">
+        <i class="fa-regular fa-calendar-xmark" style="font-size: 48px; color: #cbd5e1; margin-bottom: 10px;"></i>
+        <p>Chưa có sự kiện nào sắp diễn ra.</p>
+      </div>
     {% endif %}
   </section>
+
 </div>
 
-<!-- ⭐ CSS -->
-
 <style>
-
-.event-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    object-position: 50% 30%; /* ⭐ GIÚP ẢNH ĐẸP NHẤT */
-    border-radius: 12px;
-    margin-bottom: 12px;
-    display: block;
+/* --- 1. CONFIG CHUNG --- */
+.event-page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  color: #003459;
 }
+h2, h3, h4 { color: #003459; }
 
-
-/* Đảm bảo ảnh sự kiện ở cả hai khu vực hiển thị đồng bộ */
-.event-card img {
-    width: 100%;
-    height: 180px;          /* giống phần Sự kiện của tôi */
-    object-fit: cover;      /* giữ bố cục đẹp không méo */
-    border-radius: 12px;
-    margin-bottom: 12px;
-    display: block;
+/* --- 2. HEADER --- */
+.event-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 40px; background: #ffffff; padding: 25px 30px;
+  border-radius: 24px; border: 1px solid #e2e8f0;
+  /* Bỏ bóng đổ nếu không thích */
+  /* box-shadow: 0 4px 20px rgba(0,0,0,0.02); */
 }
-
-
-.main-content .event-list {
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 20px;
-  background: none;
-  border: none;
-  box-sizing: border-box;
+.header-text h2 { margin: 0; font-weight: 800; font-size: 28px; }
+.header-text p { margin: 5px 0 0; color: #64748b; font-weight: 600; font-size: 15px; }
+.btn-create-event {
+  background: #003459; color: #fff; padding: 12px 24px; border-radius: 12px;
+  font-weight: 700; text-decoration: none; transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 52, 89, 0.15); display: inline-flex; align-items: center; gap: 8px;
 }
+.btn-create-event:hover { background: #004e85; transform: translateY(-2px); }
 
-.carousel-wrapper {
-  position: relative;
-  margin-bottom: 40px;
-  overflow: hidden;
-  padding: 0 105px;
+/* --- 3. MY EVENTS --- */
+.section-my-events { margin-bottom: 50px; padding: 10px 0; }
+.section-title h3 { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+
+.carousel-nav button {
+  width: 38px; height: 38px; border-radius: 50%; border: 1px solid #e2e8f0;
+  background: #fff; color: #003459; cursor: pointer; transition: 0.2s;
 }
+.carousel-nav button:hover { background: #003459; color: #fff; }
 
-.carousel-fade { position: absolute; top: 0; bottom: 0; width: 50px; pointer-events: none; z-index: 10; }
-.left-fade { left: 0; background: linear-gradient(to right, #fff8ed, rgba(255,248,237,0)); }
-.right-fade { right: 0; background: linear-gradient(to left, #fff8ed, rgba(255,248,237,0)); }
-
-.carousel-container { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 25px; padding: 10px 0; scrollbar-width: none; }
+.carousel-wrapper { overflow: hidden; padding: 10px 5px; }
+.carousel-container { display: flex; gap: 20px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
 .carousel-container::-webkit-scrollbar { display: none; }
 
-.carousel-btn { background: #ffb84d; border: none; color: white; font-size: 20px; padding: 8px 12px; border-radius: 50%; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); position: absolute; top: 50%; transform: translateY(-50%); z-index: 11; }
-.carousel-btn:hover { background: #ff9800; transform: translateY(-50%) scale(1.1); }
-.left { left: 5px; }
-.right { right: 5px; }
+/* === MY CARD - FIXED: BỎ BÓNG ĐỔ, BỎ VIỀN, BỎ HOVER LIFT === */
+.my-card {
+  min-width: 290px; max-width: 290px;
+  background: #fff;
+  border-radius: 24px;
+  border: 1px solid #eef2f6; /* Viền siêu nhạt thay vì shadow */
+  overflow: hidden;
+  display: flex; flex-direction: column;
 
-.status-wrapper { margin-top: 15px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-.status-badge { padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 13px; }
-.status-badge.status-approved { background: #dcfce7; color: #166534; }
-.status-badge.status-pending { background: #fef9c3; color: #713f12; }
-.status-badge.status-rejected { background: #fee2e2; color: #991b1b; }
-
-.creator-highlight { font-size: 14px; margin-bottom: 6px; }
-.creator-highlight .highlight-username {
-  background: #e0f2fe;
-  color: #003459;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-weight: 600;
+  /* Fix lỗi render */
+  transform: translateZ(0);
 }
 
-.event-card { flex: 0 0 280px; background: #ffffff; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 18px; border: 1.5px solid #003459; transition: 0.3s; display: flex; flex-direction: column; min-height: 350px; }
-.event-card:hover { transform: translateY(-4px); box-shadow: 0 6px 14px rgba(0,0,0,0.15); }
+.card-cover { position: relative; height: 180px; }
+.card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-.event-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
+/* STATUS BADGE - LÀM RÕ HƠN */
+.status-badge {
+  position: absolute; top: 12px; right: 12px; padding: 6px 14px;
+  border-radius: 8px; /* Bo góc vuông hơn xíu cho cứng cáp */
+  font-size: 12px; font-weight: 800; text-transform: uppercase;
+  background: #fff; border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Bóng nhẹ riêng cho badge */
+}
+.status-badge.approved { color: #047857; border-color: #d1fae5; background: #ecfdf5; }
+.status-badge.rejected { color: #b91c1c; border-color: #fee2e2; background: #fff1f2; }
+.status-badge.pending { color: #b45309; border-color: #fef3c7; background: #fffbeb; }
 
-.event-actions { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; }
+.card-body { padding: 20px; display: flex; gap: 14px; align-items: flex-start; }
+.date-box {
+  background: #fff8ed; border-radius: 14px;
+  padding: 8px 12px; text-align: center; display: flex; flex-direction: column;
+  min-width: 55px; height: fit-content; color: #003459;
+}
+.date-box .day { font-size: 22px; font-weight: 800; line-height: 1; margin-bottom: 2px; }
+.date-box .month { font-size: 12px; font-weight: 700; color: #d97706; text-transform: uppercase; }
 
-.edit-btn, .join-btn, .view-btn, .cancel-btn, .delete-btn {
-  padding: 8px 14px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: 0.25s;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+.info-content { flex: 1; }
+.card-title { margin: 0 0 8px; font-size: 16px; font-weight: 700; color: #003459; line-height: 1.4; }
+.meta-row { font-size: 13px; color: #64748b; display: flex; gap: 12px; font-weight: 500; }
+.meta-row i { color: #003459; }
+
+.card-footer { padding: 15px 20px; background: #fff; border-top: 1px solid #f8f8f8; }
+.action-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.icon-group { display: flex; gap: 10px; }
+
+.btn-icon {
+  width: 38px; height: 38px; border-radius: 50%; background: #f8fafc; border: 1px solid #e2e8f0;
+  display: flex; align-items: center; justify-content: center; color: #64748b;
+  transition: 0.2s; text-decoration: none !important;
+}
+.btn-icon:hover { background: #e0f2fe; color: #003459; border-color: #003459; }
+.btn-icon.delete:hover { background: #fee2e2; color: #ef4444; }
+
+.btn-view-list {
+  font-size: 13px; font-weight: 700; color: #003459; text-decoration: none;
+  background: #e0f2fe; padding: 10px 16px; border-radius: 20px; transition: 0.2s;
+}
+.btn-view-list:hover { background: #bae6fd; }
+
+/* FIX: Nút "Đã kết thúc" trong My Events ngang hàng nút khác */
+.ended-block {
+  text-align: center; font-weight: 700; font-size: 13px; color: #64748b;
+  padding: 10px 0; background: #f8fafc; border-radius: 12px; width: 100%;
 }
 
-.edit-btn { background: linear-gradient(135deg, #ffb84d, #ff9800); color: white; }
-.delete-btn { background: linear-gradient(135deg, #b71c1c, #f44336); color: white; }
-.join-btn, .view-btn { background: #003459; color: white; }
-.view-btn { background: linear-gradient(135deg, #6ba6ff, #1e88e5); }
-.cancel-btn { background: linear-gradient(135deg, #ff6b6b, #ff4757); color: white; }
+/* 4. PUBLIC EVENTS */
+.event-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; }
 
-.event-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+/* Bỏ bóng đổ public card luôn */
+.public-card {
+  background: #fff; border-radius: 24px;
+  border: 1px solid #eef2f6; overflow: hidden; display: flex; flex-direction: column;
+}
+.public-card.faded { opacity: 0.8; background: #fafafa; }
+.public-card.faded .grayscale { filter: grayscale(100%); }
 
-.create-event-wrapper { justify-content: flex-end; display: flex; margin-bottom: 10px; }
-.create-event-btn { background: linear-gradient(135deg, #4CAF50, #2E7D32); padding: 10px 18px; border-radius: 10px; color: white; font-weight: 600; text-decoration: none; }
+.main-image { overflow: hidden; height: 180px; width: 100%; background: #fffcf5; }
+.main-image img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s ease; }
 
-.event-ended { text-align: center; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #bbb; }
+.card-creator { padding: 14px 18px; border-bottom: 1px solid #fbfbfb; background: #fff; }
+.creator-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; transition: opacity 0.2s; }
+.creator-link:hover { opacity: 0.8; }
+
+.creator-avatar { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; border: 2px solid #e0f2fe; }
+.creator-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.creator-avatar span {
+  width: 100%; height: 100%; background: #003459; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px;
+}
+.creator-name { font-size: 16px; font-weight: 700; color: #003459; }
+
+.main-content { padding: 25px 20px 20px; flex: 1; }
+.card-title-lg { font-size: 20px; font-weight: 800; color: #003459; margin: 0 0 18px; line-height: 1.35; }
+
+.event-details p { margin: 12px 0; font-size: 14px; color: #334155; display: flex; align-items: center; gap: 12px; font-weight: 500; }
+.event-details i { width: 18px; color: #003459; font-size: 16px; text-align: center; }
+
+.card-action-lg { padding: 20px; background: #fff; border-top: 1px dashed #e2e8f0; }
+.btn-lg {
+  display: block; width: 100%; padding: 14px; text-align: center; border-radius: 12px;
+  font-weight: 700; text-decoration: none; font-size: 15px; transition: 0.2s; box-sizing: border-box;
+}
+.btn-lg.join { background: #003459; color: #fff; margin-bottom: 4px; }
+.btn-lg.join:hover { background: #004270; }
+
+.btn-lg.cancel { background: #fff; border: 2px solid #fee2e2; color: #ef4444; }
+.btn-lg.cancel:hover { background: #fef2f2; }
+
+.btn-lg.owner { background: #e0f2fe; color: #003459; border: 2px solid transparent; }
+.btn-lg.owner:hover { background: #bae6fd; }
+
+/* FIX: Nút "Đã kết thúc" phẳng, ngang hàng với nút tham gia */
+.btn-lg.disabled-flat {
+  background: #f1f5f9; color: #94a3b8; border: none; cursor: default;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.empty-state { text-align: center; padding: 60px 20px; background: #fff; border-radius: 20px; border: 2px dashed #e2e8f0; }
+
+@media (max-width: 768px) {
+  .event-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+  .btn-create-event { width: 100%; justify-content: center; }
+}
 </style>
 
 <script>
 function scrollCarousel(carouselId, direction) {
   const container = document.getElementById(carouselId);
-  const scrollAmount = container.offsetWidth * 0.8;
+  const scrollAmount = 320;
   container.scrollBy({ left: scrollAmount * direction, behavior: 'smooth' });
 }
 </script>
