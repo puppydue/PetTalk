@@ -5,71 +5,255 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forum.css' %}">
 <style>
-/* === GIỮ NGUYÊN TOÀN BỘ CSS CŨ CỦA BẠN === */
+/* ================================================= */
+/* 1. STYLE BÁO CÁO (REPORT) - ĐỒNG BỘ VỚI LIST     */
+/* ================================================= */
+.report-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.report-radio-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #334155;
+  font-weight: 500;
+}
+.report-radio-label:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+.report-radio-label input[type="radio"] {
+  margin-right: 12px;
+  width: 18px;
+  height: 18px;
+  accent-color: #003459;
+}
+.report-radio-label:has(input:checked) {
+  background: #f0f9ff;
+  border-color: #003459;
+  color: #003459;
+  font-weight: 600;
+}
+
+/* ================================================= */
+/* 2. MENU & UI ELEMENTS CƠ BẢN                     */
+/* ================================================= */
 .comment-menu { display: none; position: absolute; right: 0; top: 100%; margin-top: 6px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); min-width: 160px; z-index: 20; overflow: hidden; font-size: 14px; }
 .comment-menu .menu-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 14px; background: none; border: none; text-align: left; cursor: pointer; color: #334155; transition: background 0.2s; }
 .comment-menu .menu-item i { width: 16px; text-align: center; color: #64748b; }
 .comment-menu .menu-item:hover { background-color: #f8fafc; }
 .comment-menu .menu-item.danger:hover { background-color: #fef2f2; color: #dc2626; }
 .comment-menu .menu-item.danger:hover i { color: #dc2626; }
-.comment-menu .menu-item + .menu-item { border-top: 1px solid #f1f5f9; }
-.comment-menu.menu-up { top: auto !important; bottom: 100%; margin-bottom: 6px; }
-.comment-menu-btn { background: #fff; border: 1px solid #e2e8f0; font-size: 14px; color: #64748b; cursor: pointer; padding: 0; border-radius: 10px; transition: all 0.2s; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; line-height: 1; }
-.comment-menu-btn:hover { background-color: #f8fafc; color: #003459; border-color: #cbd5e1; }
+.comment-menu-btn { background: none; border: none; font-size: 16px; color: #94a3b8; cursor: pointer; padding: 4px 8px; border-radius: 50%; transition: all 0.2s; }
+.comment-menu-btn:hover { background-color: #f1f5f9; color: #003459; }
+
 .avatar { width: 40px; height: 40px; border-radius: 9999px; background: #003459; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; overflow: hidden; flex-shrink: 0; }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
-.badge-chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; font-size: 12px; font-weight: 600; border-radius: 10px; border: 1px solid; cursor: default; transition: all 0.2s ease-out; animation: badgeGlow 3s ease-in-out infinite; }
-.badge-chip:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12); animation: none; }
-@keyframes badgeGlow { 0%, 100% { box-shadow: 0 1px 2px rgba(0,0,0,0.05); } 50% { box-shadow: 0 3px 8px rgba(0,0,0,0.08); } }
+.avatar.sm { width: 32px; height: 32px; font-size: 12px; }
+
+.badge-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid; cursor: default; white-space: nowrap; }
 .badge-color-gold { background: #fff4c2; border-color: #f7d98b; color: #8a5a00; }
 .badge-color-blue { background: #e0f2fe; border-color: #7dd3fc; color: #0369a1; }
 .badge-color-green { background: #dcfce7; border-color: #86efac; color: #15803d; }
 .badge-color-red { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
 .badge-color-cyan { background: #cffafe; border-color: #67e8f9; color: #0e7490; }
 .badge-color-lime { background: #f7fee7; border-color: #bef264; color: #4d7c0f; }
-.comment-content { white-space: pre-wrap; word-break: break-word; line-height: 1.5; color: #1e293b; margin-top: 6px; }
-textarea[name="content"] { width: 100%; min-height: 50px; max-height: 500px; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 12px; resize: none; font-family: inherit; line-height: 1.5; overflow-y: hidden; }
-.edit-form-container { margin-top: 10px; animation: slideDown 0.2s ease; }
-.edit-form { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-.edit-form textarea { width: 100%; min-height: 80px; max-height: 180px; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; resize: none; font-family: inherit; line-height: 1.5; margin-bottom: 8px; outline: none; transition: border 0.2s; }
-.edit-form textarea:focus { border-color: #003459; }
-.edit-help-text { font-size: 12px; color: #64748b; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
-.edit-help-text .old { color: #94a3b8; font-style: italic; }
-.edit-form .btn-group { display: flex; justify-content: flex-end; gap: 8px; }
-@keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-.actions { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
-.vote-btn { width: 42px; height: 42px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f8fafc; color: #003459; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: all 0.25s ease; }
-.vote-btn:hover { background: #f7dba7; }
-.vote-count { font-weight: 700; font-size: 15px; min-width: 28px; text-align: center; color: #003459; }
+
+/* ================================================= */
+/* 3. COMMENT STYLE MỚI (THREADED)                  */
+/* ================================================= */
+.comment-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Container của 1 comment (bao gồm cả replies con) */
+.comment-node {
+  position: relative;
+}
+
+/* Flex chứa Avatar + Nội dung chính */
+.comment-main {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* Cột Avatar bên trái */
+.comment-left {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Phần nội dung bên phải (Bubble) */
+.comment-right {
+  flex: 1;
+  max-width: 100%;
+}
+
+/* Cái bong bóng nội dung */
+.comment-bubble {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 10px 14px;
+  position: relative;
+  transition: all 0.2s;
+}
+.comment-bubble:hover {
+  background: #fff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.comment-author-name {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 14px;
+  text-decoration: none;
+  margin-right: 6px;
+}
+.comment-time {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-left: 6px;
+  font-weight: 400;
+}
+.comment-content {
+  color: #334155;
+  font-size: 14.5px;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* Thanh hành động bên dưới (Reply/Like) */
+.comment-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 6px;
+  margin-left: 4px;
+}
+
+.action-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+}
+.action-link:hover { color: #003459; }
+.action-link i { font-size: 12px; }
+
+/* Container chứa các comment con (Reply) */
+.replies-container {
+  margin-left: 20px; /* Thụt vào so với avatar cha */
+  padding-left: 16px; /* Khoảng cách với đường kẻ */
+  border-left: 2px solid #e2e8f0; /* Đường kẻ dọc */
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Form phản hồi/chỉnh sửa */
+.reply-form-container, .edit-form-container {
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease;
+}
+.reply-form textarea, .edit-form textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: none;
+  min-height: 80px;
+}
+.reply-form textarea:focus {
+  outline: none;
+  border-color: #003459;
+  box-shadow: 0 0 0 3px rgba(0,52,89,0.1);
+}
+
+/* ================================================= */
+/* 4. POST CARD & IMAGES (ĐỒNG BỘ LIST)             */
+/* ================================================= */
+.post-card {
+  max-width: 780px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.post-images { display: grid; gap: 4px; border-radius: 12px; overflow: hidden; margin-top: 20px; }
+.image-wrapper { position: relative; width: 100%; height: 100%; background: #f8fafc; }
+.post-images img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.2s; }
+.post-images img:hover { transform: scale(1.03); }
+
+/* Đồng bộ logic hiển thị ảnh với List */
+.images-count-1 { display: flex; justify-content: center; align-items: center; padding: 10px; background: #f8fafc; border-radius: 12px; }
+.images-count-1 .image-wrapper { width: 100%; height: auto; position: relative; }
+.images-count-1 img { position: relative !important; width: 100%; height: auto; max-height: 500px; object-fit: contain; }
+
+.images-count-2 { grid-template-columns: 1fr 1fr; height: 320px; }
+.images-count-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; height: 420px; }
+.images-count-3 .image-wrapper:first-child { grid-row: span 2; }
+.images-count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 420px; }
+.images-count-more { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 420px; }
+.images-count-more .image-wrapper:nth-child(n+5) { display: none; }
+.images-count-more .image-wrapper[data-more-count]::after { content: attr(data-more-count); position: absolute; inset: 0; background: rgba(15,23,42,0.6); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 800; }
+
+/* Vote & Action buttons */
+.actions { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.vote-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid #cbd5e1; background: #fff; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+.vote-btn:hover { background: #f1f5f9; color: #003459; }
+.vote-count { font-weight: 700; font-size: 16px; min-width: 30px; text-align: center; color: #0f172a; }
 .vote-btn.active-up { background: #ff4500; color: #fff; border-color: #ff4500; }
 .vote-btn.active-down { background: #6a5cff; color: #fff; border-color: #6a5cff; }
-.btn-ghost { border: 1px solid #003459; color: #003459; background: #fff; padding: 8px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; text-decoration: none !important; display: flex; align-items: center; gap: 6px; transition: all 0.25s ease; }
-.btn-ghost:hover { background: #f7dba7; border-color: #003459; }
-.btn-primary { border: none; color: #fff; background: #003459; padding: 8px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: background 0.25s ease; }
-.btn-primary:hover { background: #00509e; }
-.post-images { display: grid; gap: 4px; border-radius: 12px; overflow: hidden; margin-top: 15px; }
-.image-wrapper { position: relative; width: 100%; height: 100%; background: #f8fafc; }
-.post-images img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.2s; }
-.post-images img:hover { transform: scale(1.03); }
-.images-count-1 { display: flex; justify-content: center; max-height: 450px; }
-.images-count-1 img { position: relative; object-fit: contain; max-height: 450px; width: auto; max-width: 100%; cursor: zoom-in; }
-.images-count-2 { grid-template-columns: 1fr 1fr; height: 300px; }
-.images-count-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
-.images-count-3 .image-wrapper:first-child { grid-row: span 2; }
-.images-count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
-.images-count-more { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 400px; }
-.images-count-more .image-wrapper:nth-child(n+5) { display: none; }
-.images-count-more .image-wrapper[data-more-count]::after { content: attr(data-more-count); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; cursor: pointer; }
-.lightbox { position: fixed; z-index: 9990; padding-top: 50px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.9); display: none; animation: fadeIn 0.3s ease; }
-.lightbox-content { margin: auto; display: block; max-width: 90%; max-height: 85vh; animation: zoom 0.3s ease; }
-.lightbox-close { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; }
-.lightbox-close:hover { color: #bbb; }
-.lightbox-prev, .lightbox-next { cursor: pointer; position: absolute; top: 50%; width: auto; padding: 16px; margin-top: -50px; color: white; font-weight: bold; font-size: 30px; user-select: none; }
-.lightbox-next { right: 0; border-radius: 3px 0 0 3px; }
-.lightbox-prev { left: 0; }
+
+.btn-ghost { border: 1px solid #cbd5e1; color: #475569; background: #fff; padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; height: 40px; }
+.btn-ghost:hover { background: #f8fafc; border-color: #94a3b8; color: #0f172a; }
+.btn-primary { border: none; color: #fff; background: #003459; padding: 8px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: background 0.2s; height: 40px; }
+.btn-primary:hover { background: #004475; }
+
+/* Lightbox */
+.lightbox { position: fixed; z-index: 9990; padding-top: 50px; inset: 0; overflow: auto; background-color: rgba(0,0,0,0.95); display: none; animation: fadeIn 0.2s ease; }
+.lightbox-content { margin: auto; display: block; max-width: 95%; max-height: 90vh; object-fit: contain; animation: zoom 0.3s ease; }
+.lightbox-close { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; cursor: pointer; opacity: 0.8; }
+.lightbox-close:hover { opacity: 1; }
+.lightbox-prev, .lightbox-next { cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); padding: 20px; color: white; font-weight: bold; font-size: 30px; user-select: none; background: rgba(0,0,0,0.2); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+.lightbox-next { right: 20px; } .lightbox-prev { left: 20px; }
 .lightbox-prev:hover, .lightbox-next:hover { background-color: rgba(255,255,255,0.2); }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes zoom { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+@keyframes zoom { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
 .hidden { display: none; }
 </style>
 {% endblock %}
@@ -79,8 +263,9 @@ textarea[name="content"] { width: 100%; min-height: 50px; max-height: 500px; pad
 {% block content %}
 {% reaction_of post request.user as me_react %}
 
-<article class="post-card" style="max-width:780px;margin:0 auto;background:#fff;border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
-  <div class="user-info" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+<article class="post-card">
+  <!-- Header bài viết -->
+  <div class="user-info" style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
     <div class="avatar">
       {% if post.username.userprofile.avatar_image %}
         <img src="{{ post.username.userprofile.avatar_image.url }}" alt="avatar">
@@ -89,21 +274,24 @@ textarea[name="content"] { width: 100%; min-height: 50px; max-height: 500px; pad
       {% endif %}
     </div>
     <div style="display:flex;flex-direction:column;">
-      <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#003459; font-size:15px;">
-        {{ post.username.username }}
+      <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#0f172a; font-size:16px;">
+        <a href="{% url 'profiles:view_user_profile' post.username.username %}" style="color:inherit;text-decoration:none;">
+          {{ post.username.username }}
+        </a>
         {% if post.username.userprofile.display_badge %}
             {% with badge=post.username.userprofile.display_badge %}
             <span class="badge-chip badge-color-{{ badge.color }}">{{ badge.icon }} {{ badge.name }}</span>
             {% endwith %}
         {% endif %}
       </div>
-      <small style="color:#64748b;font-size:13px;">{{ post.created_at|date:"d/m/Y H:i" }}</small>
+      <small style="color:#64748b;font-size:13px;">{{ post.created_at|date:"d/m/Y • H:i" }}</small>
     </div>
   </div>
 
-  <h1 class="post-title" style="font-size:22px;margin:8px 0">{{ post.title }}</h1>
-  <div class="post-content" style="line-height:1.6;color:#1e293b;">{{ post.content|linebreaksbr }}</div>
+  <h1 class="post-title" style="font-size:24px; margin:0 0 12px; color:#0f172a; line-height:1.3;">{{ post.title }}</h1>
+  <div class="post-content" style="line-height:1.7; color:#334155; font-size:16px;">{{ post.content|linebreaksbr }}</div>
 
+  <!-- Ảnh bài viết (Đồng bộ scale với List) -->
   {% if post.images.all %}
     {% with all_images=post.images.all %}
       {% with image_count=all_images|length %}
@@ -159,8 +347,9 @@ textarea[name="content"] { width: 100%; min-height: 50px; max-height: 500px; pad
     {% endwith %}
   {% endif %}
 
+  <!-- Actions -->
   <div class="actions">
-    <div class="vote-box" data-post="{{ post.post_id }}">
+    <div class="vote-box" data-post="{{ post.post_id }}" style="display:flex;align-items:center;gap:8px;">
       <button class="vote-btn js-vote {% if me_react == 'upvote' %}active-up{% endif %}" data-type="upvote">
         <i class="fa-solid fa-arrow-up"></i>
       </button>
@@ -169,6 +358,7 @@ textarea[name="content"] { width: 100%; min-height: 50px; max-height: 500px; pad
         <i class="fa-solid fa-arrow-down"></i>
       </button>
     </div>
+    <div style="flex:1"></div> <!-- Spacer -->
     <button class="btn-ghost js-open-report" data-target="report-{{ post.post_id }}">
       <i class="fa-solid fa-flag"></i> Báo cáo
     </button>
@@ -176,41 +366,62 @@ textarea[name="content"] { width: 100%; min-height: 50px; max-height: 500px; pad
   {% include "forum/_report_modal.html" with post=post %}
 </article>
 
-<section class="comment-section" style="max-width:780px;margin:20px auto 0;">
-  <hr style="border:none;border-top:1px solid #eef2f7;margin:16px 0">
-  <h3 style="color:#003459;margin:0 0 8px 0;font-size:18px">Bình luận ({{ post.comments.count }})</h3>
+<!-- COMMENT SECTION -->
+<section class="comment-section" style="max-width:780px; margin:30px auto 60px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+    <h3 style="color:#0f172a; margin:0; font-size:20px; font-weight:700;">
+      Bình luận <span style="color:#64748b; font-weight:500;">({{ post.comments.count }})</span>
+    </h3>
+  </div>
 
-  <form method="post" style="margin-bottom:16px">
-    {% csrf_token %}
-    <input type="hidden" name="comment" value="1">
-    {{ comment_form.content }}
-    <div style="display:flex;justify-content:flex-end;margin-top:8px">
-      <button class="btn-primary" type="submit">Đăng</button>
+  <!-- Form viết bình luận chính -->
+  <div style="display:flex; gap:12px; margin-bottom:30px;">
+    <div class="avatar">
+        {% if request.user.userprofile.avatar_image %}
+          <img src="{{ request.user.userprofile.avatar_image.url }}">
+        {% else %}
+          {{ request.user.username|slice:":1"|upper }}
+        {% endif %}
     </div>
-  </form>
+    <form method="post" style="flex:1;">
+      {% csrf_token %}
+      <input type="hidden" name="comment" value="1">
+      <textarea name="content" placeholder="Viết bình luận của bạn..."
+                style="width:100%; border:1px solid #cbd5e1; border-radius:12px; padding:12px; min-height:80px; resize:vertical; font-family:inherit;"></textarea>
+      <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+        <button class="btn-primary" type="submit">Đăng bình luận</button>
+      </div>
+    </form>
+  </div>
 
-  <div class="comment-tree" style="display:flex; flex-direction:column; gap:12px;">
+  <!-- Danh sách bình luận -->
+  <div class="comment-tree">
     {% for c in comments %}
        {% include "forum/_comment_node.html" %}
     {% empty %}
-        <p style="color:#64748b; text-align:center; margin-top:20px;">Chưa có bình luận nào.</p>
+        <div style="text-align:center; padding:40px; background:#f8fafc; border-radius:12px; color:#64748b;">
+          <i class="fa-regular fa-comments" style="font-size:32px; margin-bottom:10px; display:block;"></i>
+          Chưa có bình luận nào. Hãy là người đầu tiên!
+        </div>
     {% endfor %}
   </div>
 </section>
 
-<div id="reply-form-template" style="display:none;">
-    <form method="post" class="reply-form" style="background:#fff; border:1px solid #cbd5e1; padding:10px; border-radius:12px;">
+<!-- Template form reply (ẩn) -->
+<div id="reply-form-template" class="hidden">
+    <form method="post" class="reply-form" style="background:#fff; border:1px solid #e2e8f0; padding:15px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
         {% csrf_token %}
         <input type="hidden" name="comment" value="1">
         <input type="hidden" name="parent_id" value="">
-        <textarea name="content" placeholder="Phản hồi của bạn..." style="width:100%; min-height:60px; border:1px solid #e2e8f0; border-radius:8px; padding:8px; resize:none;"></textarea>
-        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
-            <button type="button" class="btn-ghost js-cancel-reply" style="padding:4px 10px; font-size:13px;">Hủy</button>
-            <button type="submit" class="btn-primary" style="padding:4px 10px; font-size:13px;">Gửi</button>
+        <textarea name="content" placeholder="Viết phản hồi..."></textarea>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+            <button type="button" class="btn-ghost js-cancel-reply" style="height:36px;">Hủy</button>
+            <button type="submit" class="btn-primary" style="height:36px;">Gửi phản hồi</button>
         </div>
     </form>
 </div>
 
+<!-- Lightbox -->
 <div id="image-lightbox" class="lightbox">
   <span class="lightbox-close">×</span>
   <img class="lightbox-content" id="lightbox-img">
@@ -222,25 +433,17 @@ textarea[name="content"] { width: 100%; min-height: 50px; max-height: 500px; pad
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const csrftoken = document.cookie.split('; ')
-    .find(row => row.startsWith('csrftoken='))?.split('=')[1];
+  const csrftoken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
 
-  // === Auto grow ===
+  // === Auto grow textarea ===
   const autoGrow = el => {
     if (!el) return;
-    const maxHeight = parseInt(getComputedStyle(el).maxHeight, 10) || 0;
     el.style.height = 'auto';
-    const scrollHeight = el.scrollHeight;
-    el.style.height = (maxHeight && scrollHeight > maxHeight)
-      ? maxHeight + 'px' : scrollHeight + 'px';
-    el.style.overflowY = (maxHeight && scrollHeight > maxHeight)
-      ? 'auto' : 'hidden';
+    el.style.height = el.scrollHeight + 'px';
   };
-  const mainTextarea = document.querySelector('textarea[name="content"]');
-  if (mainTextarea) {
-    mainTextarea.addEventListener('input', () => autoGrow(mainTextarea));
-    autoGrow(mainTextarea);
-  }
+  document.querySelectorAll('textarea').forEach(el => {
+    el.addEventListener('input', () => autoGrow(el));
+  });
 
   // === Vote ===
   document.querySelectorAll('.vote-box').forEach(box => {
@@ -267,7 +470,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // === Lightbox Logic Cũ ===
+  // === Lightbox Logic ===
   let lightboxImages = [], currentImageIndex = 0;
   const lightbox = document.getElementById('image-lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
@@ -275,7 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const lightboxNext = document.getElementById('lightbox-next');
   const lightboxClose = document.querySelector('.lightbox-close');
 
-  if (lightbox && lightboxImg && lightboxPrev && lightboxNext && lightboxClose) {
+  if (lightbox && lightboxImg) {
     const openLightbox = (postElement, src) => {
       lightboxImages = Array.from(postElement.querySelectorAll('.js-lightbox-trigger')).map(img => img.src);
       currentImageIndex = lightboxImages.indexOf(src);
@@ -296,39 +499,22 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = 'auto';
     };
 
-    const nextImage = () => {
-      if (lightboxImages.length > 1) {
-        currentImageIndex = (currentImageIndex + 1) % lightboxImages.length;
-        updateLightboxImage();
-      }
-    };
-
-    const prevImage = () => {
-      if (lightboxImages.length > 1) {
-        currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length;
-        updateLightboxImage();
-      }
-    };
-
-    lightboxNext.onclick = nextImage;
-    lightboxPrev.onclick = prevImage;
+    lightboxNext.onclick = (e) => { e.stopPropagation(); if (lightboxImages.length > 1) { currentImageIndex = (currentImageIndex + 1) % lightboxImages.length; updateLightboxImage(); }};
+    lightboxPrev.onclick = (e) => { e.stopPropagation(); if (lightboxImages.length > 1) { currentImageIndex = (currentImageIndex - 1 + lightboxImages.length) % lightboxImages.length; updateLightboxImage(); }};
     lightboxClose.onclick = closeLightbox;
     lightbox.onclick = e => { if (e.target === lightbox) closeLightbox(); };
 
     document.addEventListener('keydown', e => {
       if (lightbox.style.display === 'block') {
-        if (e.key === 'ArrowRight') nextImage();
-        else if (e.key === 'ArrowLeft') prevImage();
+        if (e.key === 'ArrowRight') lightboxNext.click();
+        else if (e.key === 'ArrowLeft') lightboxPrev.click();
         else if (e.key === 'Escape') closeLightbox();
       }
     });
 
-    // === Main Click Handler (menus, modals, edit, delete, lightbox trigger) ===
+    // Handle clicks
     document.addEventListener('click', async e => {
-      const allMenus = document.querySelectorAll('.comment-menu');
-      const menuBtn = e.target.closest('.comment-menu-btn');
-
-      // Lightbox Trigger (Bao gồm xử lý +X)
+      // Lightbox
       const imgTrigger = e.target.closest('.js-lightbox-trigger, .image-wrapper[data-more-count]');
       if (imgTrigger) {
         e.preventDefault();
@@ -342,89 +528,80 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // Menu "..."
+      // Menu Comment (3 chấm)
+      const menuBtn = e.target.closest('.comment-menu-btn');
+      const allMenus = document.querySelectorAll('.comment-menu');
+
       if (menuBtn) {
         e.stopPropagation();
-        const menu = menuBtn.parentElement.querySelector('.comment-menu');
+        const menu = menuBtn.nextElementSibling; // Menu ngay sau nút
         const isOpen = menu.style.display === 'block';
-        allMenus.forEach(m => { if (m !== menu) m.style.display = 'none'; });
-        if (isOpen) { menu.style.display = 'none'; return; }
-        menu.classList.remove('menu-up');
-        menu.style.visibility = 'hidden';
-        menu.style.display = 'block';
-        const spaceBelow = window.innerHeight - menuBtn.getBoundingClientRect().bottom;
-        if (spaceBelow < menu.offsetHeight + 20) menu.classList.add('menu-up');
-        menu.style.visibility = 'visible';
+        allMenus.forEach(m => m.style.display = 'none'); // Đóng hết cái khác
+        if (!isOpen) {
+            menu.style.display = 'block';
+        }
         return;
       }
+      if (!e.target.closest('.comment-menu')) {
+          allMenus.forEach(m => m.style.display = 'none');
+      }
 
-      if (!e.target.closest('.comment-menu-wrapper')) allMenus.forEach(m => m.style.display = 'none');
-
-      const reportBtn = e.target.closest('.js-open-report, .js-open-report-comment');
+      // Modal Report
+      const reportBtn = e.target.closest('.js-open-report');
       if (reportBtn) {
         const targetId = reportBtn.dataset.target;
         if (targetId) document.getElementById(targetId).style.display = 'flex';
         return;
       }
-
       const modal = e.target.closest('.modal');
       if (modal && (e.target === modal || e.target.hasAttribute('data-close'))) {
         modal.style.display = 'none';
         return;
       }
 
-      // === Edit Comment ===
+      // === EDIT COMMENT ===
       const editBtn = e.target.closest('.js-edit-comment');
       if (editBtn) {
         e.preventDefault();
         const id = editBtn.dataset.id;
-        const commentBox = document.getElementById(`comment-${id}`).querySelector('.comment-box'); // Tìm box cha
-        const contentDiv = commentBox.querySelector('.comment-content');
+        const commentNode = document.getElementById(`comment-${id}`);
+        const contentDiv = commentNode.querySelector('.comment-content');
 
-        // Chỉ mở nếu chưa mở form edit trong này
-        if (commentBox.querySelector('.edit-form-container.editing')) return;
+        if (commentNode.querySelector('.edit-form-container')) return; // Đang edit rồi thì thôi
 
-        const rawText = contentDiv.textContent || contentDiv.innerText;
+        const rawText = contentDiv.textContent.trim();
         const editContainer = document.createElement('div');
-        editContainer.className = 'edit-form-container editing'; // Thêm class đánh dấu
+        editContainer.className = 'edit-form-container';
         editContainer.innerHTML = `
           <form class="edit-form" data-id="${id}">
-            <div class="edit-help-text"><span>Nội dung cũ:</span><span class="old">${rawText.replace(/\n/g, ' [Enter] ')}</span></div>
-            <textarea placeholder="Nhập nội dung mới...">${rawText}</textarea>
-            <div class="btn-group">
-              <button type="button" class="btn-ghost js-cancel-edit">Hủy</button>
-              <button type="submit" class="btn-primary">Lưu</button>
+            <textarea>${rawText}</textarea>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+              <button type="button" class="btn-ghost js-cancel-edit" style="height:32px; font-size:13px;">Hủy</button>
+              <button type="submit" class="btn-primary" style="height:32px; font-size:13px;">Lưu</button>
             </div>
           </form>`;
 
-        // Chèn vào sau content
-        contentDiv.style.display = 'none'; // Ẩn nội dung cũ
+        contentDiv.style.display = 'none';
         contentDiv.parentNode.insertBefore(editContainer, contentDiv.nextSibling);
-
-        const textarea = editContainer.querySelector('textarea');
-        textarea.focus();
-        autoGrow(textarea);
+        editContainer.querySelector('textarea').focus();
         return;
       }
 
-      // Hủy Edit
-      const cancelEditBtn = e.target.closest('.js-cancel-edit');
-      if (cancelEditBtn) {
-        e.preventDefault();
-        const container = cancelEditBtn.closest('.edit-form-container');
-        const commentBox = container.closest('.comment-box');
-        commentBox.querySelector('.comment-content').style.display = 'block'; // Hiện lại nội dung cũ
+      // Cancel Edit
+      if (e.target.closest('.js-cancel-edit')) {
+        const container = e.target.closest('.edit-form-container');
+        container.previousElementSibling.style.display = 'block'; // Hiện lại text cũ
         container.remove();
-        return;
       }
 
-      // Lưu Edit
+      // Save Edit
       const saveForm = e.target.closest('.edit-form');
       if (saveForm && e.target.type === 'submit') {
         e.preventDefault();
         const id = saveForm.dataset.id;
         const newContent = saveForm.querySelector('textarea').value.trim();
-        if (!newContent) { alert('Nội dung không được để trống!'); return; }
+        if (!newContent) return;
+
         const res = await fetch(`/forum/comment/${id}/edit/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
@@ -433,18 +610,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (res.ok) {
           const data = await res.json();
           const container = saveForm.closest('.edit-form-container');
-          const commentBox = container.closest('.comment-box');
-          const contentDiv = commentBox.querySelector('.comment-content');
-          contentDiv.innerHTML = data.new_content_html;
+          const contentDiv = container.previousElementSibling;
+          contentDiv.innerHTML = data.new_content_html || newContent.replace(/\n/g, '<br>');
           contentDiv.style.display = 'block';
           container.remove();
         } else {
-          alert('Lỗi khi lưu bình luận.');
+            alert('Lỗi khi lưu.');
         }
-        return;
       }
 
-      // Xóa Comment
+      // Delete Comment
       const deleteBtn = e.target.closest('.js-delete-comment');
       if (deleteBtn) {
         if (!confirm('Xóa bình luận này?')) return;
@@ -453,78 +628,63 @@ document.addEventListener("DOMContentLoaded", () => {
           method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }
         });
         if (res.ok) {
-          const data = await res.json();
-          if (data.status === 'deleted') {
-            const el = document.getElementById(`comment-${id}`);
-            el.style.transition = 'opacity .3s';
-            el.style.opacity = '0';
-            setTimeout(() => el.remove(), 300);
-          }
+           const node = document.getElementById(`comment-${id}`);
+           node.style.opacity = '0.5';
+           node.innerHTML = '<div style="padding:10px; color:#94a3b8; font-style:italic;">Bình luận đã bị xóa</div>';
         }
       }
 
-      // === MỚI: XỬ LÝ NÚT REPLY ===
+      // === REPLY ===
       const replyBtn = e.target.closest('.js-reply-trigger');
       if (replyBtn) {
           const commentId = replyBtn.dataset.id;
-          const container = document.getElementById(`reply-form-${commentId}`);
+          const container = document.getElementById(`reply-container-${commentId}`);
 
-          // Đóng form ở nơi khác
-          document.querySelectorAll('.reply-form-container').forEach(el => {
-             if (el !== container && !el.classList.contains('editing')) { // Tránh đóng nhầm form edit
-                 el.innerHTML = '';
-                 el.classList.add('hidden');
-             }
-          });
+          // Đóng các form reply khác
+          document.querySelectorAll('.reply-form-container').forEach(el => el.innerHTML = '');
 
           const template = document.getElementById('reply-form-template').innerHTML;
-          container.innerHTML = template;
-          container.classList.remove('hidden');
+          container.innerHTML = `<div class="reply-form-container">${template}</div>`;
 
           const form = container.querySelector('form');
           form.querySelector('input[name="parent_id"]').value = commentId;
           form.querySelector('textarea').focus();
       }
 
-      // Hủy Reply
-      const cancelReplyBtn = e.target.closest('.js-cancel-reply');
-      if (cancelReplyBtn) {
-          const container = cancelReplyBtn.closest('.reply-form-container');
-          container.innerHTML = '';
-          container.classList.add('hidden');
+      if (e.target.closest('.js-cancel-reply')) {
+          e.target.closest('.reply-form-container').remove();
       }
     });
 
-    // Report Submits (Giữ nguyên logic cũ)
+    // Xử lý submit form Report
     document.addEventListener('submit', async e => {
-      const form = e.target.closest('.js-report-form[data-comment]');
+      const form = e.target.closest('.js-report-form');
       if (!form) return;
       e.preventDefault();
-      const commentId = form.dataset.comment;
-      const formData = new FormData(form);
-      const res = await fetch(`/forum/comment/${commentId}/report/`, {
-        method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }, body: formData
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.status === 'ok') { alert('✅ Gửi báo cáo thành công!'); form.closest('.modal').style.display='none'; form.reset(); }
-      }
-    });
-    document.addEventListener('submit', async e => {
-      const form = e.target.closest('.js-report-form[data-post]');
-      if (!form || form.dataset.handled) return;
-      form.dataset.handled = "true";
-      e.preventDefault();
-      const postId = form.dataset.post;
-      const formData = new FormData(form);
-      const res = await fetch(`/forum/${postId}/report/`, {
-        method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }, body: formData
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.status === 'ok') { alert('✅ Gửi báo cáo thành công!'); form.closest('.modal').style.display='none'; form.reset(); }
-      }
-      delete form.dataset.handled;
+
+      const isPost = form.hasAttribute('data-post');
+      const id = isPost ? form.dataset.post : form.dataset.comment;
+      const url = isPost ? `/forum/${id}/report/` : `/forum/comment/${id}/report/`;
+
+      const btn = form.querySelector('button[type="submit"]');
+      const oldText = btn.innerText;
+      btn.innerText = 'Đang gửi...'; btn.disabled = true;
+
+      try {
+          const formData = new FormData(form);
+          const res = await fetch(url, {
+            method: 'POST', headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' }, body: formData
+          });
+          const data = await res.json();
+          if (data.status === 'ok') {
+            alert('Đã gửi báo cáo thành công!');
+            form.closest('.modal').style.display = 'none';
+            form.reset();
+          } else {
+            alert('Có lỗi xảy ra.');
+          }
+      } catch (err) { console.error(err); }
+      finally { btn.innerText = oldText; btn.disabled = false; }
     });
   }
 });

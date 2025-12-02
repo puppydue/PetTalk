@@ -1,21 +1,61 @@
 {# Modal dùng chung, id theo post để không đụng nhau #}
 {% load static %}
 <div id="report-{{ post.post_id }}" class="modal" style="display:none">
-  <div class="modal__panel">
+  <div class="modal__panel" style="max-width: 500px;">
     <div class="modal__head">
-      <h3 style="margin:0;color:#003459">Báo cáo bài viết</h3>
+      <div>
+        <h3 style="margin:0;color:#003459; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#eab308"></i> Báo cáo bài viết
+        </h3>
+        <p style="margin:4px 0 0; color:#64748b; font-size:13px; font-weight:normal;">
+          Hãy cho chúng tôi biết điều gì đang xảy ra.
+        </p>
+      </div>
       <button class="close-x" data-close>&times;</button>
     </div>
 
     <form class="js-report-form" data-post="{{ post.post_id }}">
       {% csrf_token %}
-      <div style="display:grid;gap:10px">
-        <input class="form-control" name="reason" placeholder="Lý do (bắt buộc)" required>
-        <textarea class="form-control" rows="4" name="details" placeholder="Chi tiết (tuỳ chọn)…"></textarea>
+
+      <div class="form-group" style="margin-bottom:15px;">
+        <label class="form-label">Vấn đề gặp phải</label>
+        <div class="report-group">
+          <label class="report-radio-label">
+            <input type="radio" name="reason" value="Spam / Quảng cáo rác" required>
+            <span>Spam / Quảng cáo rác</span>
+          </label>
+          <label class="report-radio-label">
+            <input type="radio" name="reason" value="Ngôn từ gây thù ghét / Xúc phạm">
+            <span>Ngôn từ gây thù ghét / Xúc phạm</span>
+          </label>
+          <label class="report-radio-label">
+            <input type="radio" name="reason" value="Thông tin sai lệch">
+            <span>Thông tin sai lệch</span>
+          </label>
+          <label class="report-radio-label">
+            <input type="radio" name="reason" value="Lừa đảo / Gian lận">
+            <span>Lừa đảo / Gian lận</span>
+          </label>
+          <label class="report-radio-label">
+            <input type="radio" name="reason" value="Vi phạm quy tắc cộng đồng">
+            <span>Vi phạm quy tắc cộng đồng</span>
+          </label>
+          <label class="report-radio-label">
+            <input type="radio" name="reason" value="Khác">
+            <span>Khác</span>
+          </label>
+        </div>
       </div>
-      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px">
+
+      <div class="form-group">
+        <label class="form-label">Chi tiết thêm (Tuỳ chọn)</label>
+        <textarea class="form-control" name="details" rows="3"
+                  placeholder="Mô tả cụ thể hơn để chúng tôi dễ dàng xử lý..."></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; padding-top:15px; border-top:1px solid #f1f5f9;">
         <button type="button" class="btn-ghost" data-close>Hủy</button>
-        <button type="submit" class="btn-primary">Gửi báo cáo</button>
+        <button type="submit" class="btn-primary" style="background:#dc2626;">Gửi báo cáo</button>
       </div>
     </form>
   </div>

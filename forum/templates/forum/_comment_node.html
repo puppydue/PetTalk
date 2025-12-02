@@ -1,73 +1,118 @@
 {% load forum_extras %}
 
-<div class="comment-node {% if c.parent %}is-child{% endif %}" id="comment-{{ c.id }}" style="margin-top: 12px;">
-
-    <div class="comment-box" style="background:{% if c.parent %}#f8fafc{% else %}#f9fafb{% endif %}; padding:12px 14px; border-radius:16px; position:relative; border: 1px solid #f1f5f9;">
-
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div class="avatar">
-            {% if c.username.userprofile.avatar_image %}
-              <img src="{{ c.username.userprofile.avatar_image.url }}" alt="avatar">
-            {% else %}
-              {{ c.username.username|slice:":1"|upper }}
-            {% endif %}
-          </div>
-          <div>
-            <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#003459; font-size:15px;">
-                {{ c.username.username }}
-                {% if c.username.userprofile.display_badge %}
-                    {% with badge=c.username.userprofile.display_badge %}
-                    <span class="badge-chip badge-color-{{ badge.color }}" style="transform:scale(0.9);">
-                        {{ badge.icon }} {{ badge.name }}
-                    </span>
-                    {% endwith %}
-                {% endif %}
-            </div>
-            <small style="color:#94a3b8; font-size:13px"> • {{ c.created_at|date:"d/m/Y H:i" }}</small>
-          </div>
-        </div>
-
-        <div class="comment-menu-wrapper" style="position:relative;">
-          <button class="comment-menu-btn" aria-label="Menu">
-            <i class="fa-solid fa-ellipsis"></i>
-          </button>
-          <div class="comment-menu">
-            {% if c.username == request.user %}
-              <button type="button" class="menu-item js-edit-comment" data-id="{{ c.id }}">
-                <i class="fa-solid fa-pen"></i> Chỉnh sửa
-              </button>
-              <button type="button" class="menu-item danger js-delete-comment" data-id="{{ c.id }}">
-                <i class="fa-solid fa-trash"></i> Xóa
-              </button>
-            {% else %}
-              <button type="button" class="menu-item js-open-report-comment" data-target="report-comment-{{ c.id }}">
-                <i class="fa-solid fa-flag"></i> Báo cáo
-              </button>
-            {% endif %}
-          </div>
-        </div>
+<div class="comment-node" id="comment-{{ c.id }}">
+  <div class="comment-main">
+    <!-- 1. AVATAR BÊN TRÁI -->
+    <div class="comment-left">
+      <div class="avatar">
+        {% if c.username.userprofile.avatar_image %}
+          <a href="{% url 'profiles:view_user_profile' c.username.username %}">
+            <img src="{{ c.username.userprofile.avatar_image.url }}">
+          </a>
+        {% else %}
+          {{ c.username.username|slice:":1"|upper }}
+        {% endif %}
       </div>
-
-      <div class="comment-content">{{ c.content|linebreaksbr }}</div>
-
-      <div style="margin-top: 8px; display:flex; gap:10px;">
-          <button class="js-reply-trigger" data-id="{{ c.id }}" style="background:none; border:none; color:#64748b; font-weight:600; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:4px;">
-              <i class="fa-solid fa-reply"></i> Trả lời
-          </button>
-      </div>
-
-      {% include "forum/_report_comment_modal.html" with comment=c %}
     </div>
-    <div class="reply-form-container hidden" id="reply-form-{{ c.id }}" style="margin-top:10px; margin-left:20px;"></div>
 
-    {% if c.replies.all %}
-        <div class="replies-list" style="margin-left: 24px; padding-left: 10px; border-left: 2px solid #e2e8f0; display: flex; flex-direction: column;">
-            {% for reply in c.replies.all %}
-                {% with c=reply %}
-                    {% include "forum/_comment_node.html" %}
-                {% endwith %}
-            {% endfor %}
+    <!-- 2. NỘI DUNG BÊN PHẢI (BUBBLE) -->
+    <div class="comment-right">
+      <div class="comment-bubble">
+        <!-- Header: Tên + Badge + Time + Menu -->
+        <div class="comment-header">
+          <div style="display:flex; align-items:center; flex-wrap:wrap;">
+            <a href="{% url 'profiles:view_user_profile' c.username.username %}" class="comment-author-name">
+              {{ c.username.username }}
+            </a>
+            {% if c.username.userprofile.display_badge %}
+              {% with badge=c.username.userprofile.display_badge %}
+              <span class="badge-chip badge-color-{{ badge.color }}">
+                {{ badge.icon }} {{ badge.name }}
+              </span>
+              {% endwith %}
+            {% endif %}
+            <span class="comment-time">• {{ c.created_at|date:"d/m/Y H:i" }}</span>
+          </div>
+
+          <!-- Menu 3 chấm -->
+          <div style="position:relative;">
+            <button class="comment-menu-btn"><i class="fa-solid fa-ellipsis"></i></button>
+            <div class="comment-menu">
+              {% if c.username == request.user %}
+                <button class="menu-item js-edit-comment" data-id="{{ c.id }}">
+                  <i class="fa-solid fa-pen"></i> Chỉnh sửa
+                </button>
+                <button class="menu-item danger js-delete-comment" data-id="{{ c.id }}">
+                  <i class="fa-solid fa-trash"></i> Xóa
+                </button>
+              {% else %}
+                <button class="menu-item js-open-report" data-target="report-comment-{{ c.id }}">
+                  <i class="fa-solid fa-flag"></i> Báo cáo
+                </button>
+              {% endif %}
+            </div>
+          </div>
         </div>
-    {% endif %}
+
+        <!-- Nội dung comment -->
+        <div class="comment-content">{{ c.content|linebreaksbr }}</div>
+      </div>
+
+      <!-- Actions Bar (Reply / Like) -->
+      <div class="comment-actions-bar">
+        <button class="action-link js-reply-trigger" data-id="{{ c.id }}">
+          <i class="fa-solid fa-reply"></i> Trả lời
+        </button>
+        <!-- Có thể thêm nút Like comment ở đây nếu cần -->
+      </div>
+
+      <!-- Container để chèn Form Reply vào đây khi bấm nút -->
+      <div id="reply-container-{{ c.id }}"></div>
+    </div>
+  </div>
+
+  <!-- 3. DANH SÁCH CON (REPLIES) - CÓ ĐƯỜNG KẺ -->
+  {% if c.replies.all %}
+    <div class="replies-container">
+      {% for reply in c.replies.all %}
+        {% with c=reply template_name="forum/_comment_node.html" %}
+           {% include template_name %}
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Modal báo cáo cho comment này (nếu không phải của mình) -->
+  {% if c.username != request.user %}
+    <div id="report-comment-{{ c.id }}" class="modal" style="display:none">
+      <div class="modal__panel" style="max-width:450px;">
+        <div class="modal__head">
+          <h3 style="margin:0;color:#003459">Báo cáo bình luận</h3>
+          <button class="close-x" data-close>&times;</button>
+        </div>
+        <form class="js-report-form" data-comment="{{ c.id }}">
+          {% csrf_token %}
+           <div class="form-group">
+            <label class="form-label" style="font-size:14px;">Lý do báo cáo</label>
+            <div class="report-group">
+              <label class="report-radio-label">
+                <input type="radio" name="reason" value="Spam / Rác" required> <span>Spam / Rác</span>
+              </label>
+              <label class="report-radio-label">
+                <input type="radio" name="reason" value="Ngôn từ đả kích"> <span>Ngôn từ đả kích</span>
+              </label>
+              <label class="report-radio-label">
+                <input type="radio" name="reason" value="Khác"> <span>Khác</span>
+              </label>
+            </div>
+          </div>
+          <textarea class="form-control" name="details" rows="3" placeholder="Chi tiết thêm..."></textarea>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px">
+            <button type="button" class="btn-ghost" data-close>Hủy</button>
+            <button type="submit" class="btn-primary">Gửi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endif %}
 </div>
